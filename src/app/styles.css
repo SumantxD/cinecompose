@@ -1,0 +1,85 @@
+:root {
+  --ink: #e9e4d8;
+  --ink-dim: rgba(233, 228, 216, 0.55);
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --deva: 'Tiro Devanagari Hindi', serif;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body, #root { height: 100%; background: #000; overflow: hidden; overscroll-behavior: none; }
+body { color: var(--ink); font-family: var(--serif); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+.app { position: fixed; inset: 0; height: 100dvh; }
+.app canvas { display: block; touch-action: none; }
+.overlay { position: absolute; inset: 0; pointer-events: none; }
+.overlay button { pointer-events: auto; }
+.blackout { position: absolute; inset: 0; background: #000; }
+
+.gate { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6rem; background: #000; }
+.gate-hint { font-size: clamp(1rem, 4vw, 1.2rem); color: var(--ink-dim); font-style: italic; letter-spacing: 0.04em; }
+.gate-hint.hi { font-family: var(--deva); font-style: normal; font-size: clamp(0.95rem, 3.8vw, 1.1rem); }
+.gate-cta { margin-top: 2.4rem; font-size: clamp(1.1rem, 4.6vw, 1.35rem); letter-spacing: 0.32em; text-transform: uppercase; padding: 1rem 2rem; animation: breathe 3.2s ease-in-out infinite; }
+@keyframes breathe { 50% { opacity: 0.35; } }
+
+.title { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 3.5s ease; }
+.title.on { opacity: 1; }
+.title h1 { font-weight: 400; font-size: clamp(1.9rem, 8vw, 3.6rem); letter-spacing: min(0.42em, 2.4vw); margin-right: calc(-1 * min(0.42em, 2.4vw)); white-space: nowrap; }
+.title p { margin-top: 0.6rem; font-style: italic; color: var(--ink-dim); font-size: clamp(1rem, 4vw, 1.3rem); letter-spacing: 0.08em; }
+
+.caption {
+  position: absolute; left: 50%; bottom: calc(14vh + var(--safe-b)); transform: translateX(-50%);
+  width: min(88vw, 40rem); text-align: center; font-size: clamp(1.15rem, 4.8vw, 1.6rem); line-height: 1.35;
+  text-shadow: 0 0 12px #000, 0 0 3px #000; animation: rise 0.9s ease both; z-index: 2;
+}
+.caption .speaker { display: block; font-size: 0.62em; letter-spacing: 0.28em; color: var(--ink-dim); margin-bottom: 0.25rem; }
+.sp-narrator { font-style: italic; }
+.sp-diary { font-style: italic; color: #d8cdb4; }
+.sp-woman, .sp-meera, .sp-child { letter-spacing: 0.015em; }
+@keyframes rise { from { opacity: 0; transform: translate(-50%, 6px); } }
+
+.choices, .ended {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 0 1rem calc(3vh + var(--safe-b));
+  display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.75) 45%);
+}
+.choices { padding-top: 22vh; }
+.choices ~ .caption, .overlay:has(.choices) .caption { bottom: calc(30vh + var(--safe-b)); }
+.ended { padding-top: 12vh; }
+.choice {
+  min-height: 56px; width: min(92vw, 30rem); padding: 0.7rem 1rem;
+  font-size: clamp(1.15rem, 4.8vw, 1.45rem); letter-spacing: 0.06em;
+  border-bottom: 1px solid rgba(233, 228, 216, 0.14); opacity: 0; animation: appear 1.2s ease forwards;
+}
+.choice:last-child { border-bottom: 0; }
+.choice:hover, .choice:focus-visible { color: #fff; text-shadow: 0 0 14px rgba(255, 230, 190, 0.5); outline: none; }
+.choice.dim { color: var(--ink-dim); font-size: 1rem; }
+@keyframes appear { to { opacity: 1; } }
+
+.mute { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; width: 44px; height: 44px; display: grid; place-items: center; opacity: 0.35; }
+.mute:hover, .mute:focus-visible { opacity: 0.8; }
+.dev-scene { position: absolute; top: 8px; left: 10px; font: 11px/1 ui-monospace, monospace; color: rgba(255, 255, 255, 0.3); }
+
+/* Spatial choices: placed as directions in the world, still big, real buttons. */
+.choices.spatial { inset: 0; padding: 0; background: radial-gradient(ellipse at 50% 55%, transparent 30%, rgba(0, 0, 0, 0.55)); display: block; }
+.choices.spatial .choice { position: absolute; left: 50%; transform: translateX(-50%); width: min(80vw, 24rem); border: 0; text-shadow: 0 0 14px #000, 0 0 4px #000; }
+.choice .glyph { display: block; font-size: 0.8em; color: var(--ink-dim); line-height: 1; margin-bottom: 0.3rem; }
+.choice.dir-ahead { top: calc(18vh + env(safe-area-inset-top, 0px)); }
+.choice.dir-behind { bottom: calc(5vh + var(--safe-b)); }
+.choice.dir-left { top: 52%; left: 4vw !important; transform: none !important; width: min(42vw, 16rem); text-align: left; }
+.choice.dir-right { top: 52%; left: auto !important; right: 4vw; transform: none !important; width: min(42vw, 16rem); text-align: right; }
+.overlay:has(.choices.spatial) .caption { bottom: calc(22vh + var(--safe-b)); }
+
+/* YOU DIED */
+.dead { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, #0b0a0c, #000 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 1rem; animation: appear 2.5s ease both; opacity: 0; }
+.died { font-weight: 400; font-size: clamp(2.2rem, 11vw, 4.4rem); letter-spacing: 0.32em; margin-right: -0.32em; color: #cfc6b4; white-space: nowrap; }
+.died span { display: inline-block; opacity: 0; filter: blur(14px); animation: surface 2.8s cubic-bezier(.2,.6,.2,1) forwards; }
+@keyframes surface { 0% { opacity: 0; filter: blur(14px); transform: translateY(6px) scaleY(1.15); } 60% { opacity: 0.85; filter: blur(1.5px); } 100% { opacity: 1; filter: blur(0.4px); transform: none; } }
+.died-hi { font-family: var(--deva); color: rgba(207, 198, 180, 0.4); font-size: clamp(0.95rem, 4vw, 1.15rem); opacity: 0; animation: appear 2s ease 3.2s forwards; }
+.epitaph { font-style: italic; color: var(--ink-dim); font-size: clamp(1.1rem, 4.6vw, 1.4rem); text-align: center; max-width: 30rem; opacity: 0; animation: appear 2.4s ease 4.4s forwards; }
+.dead-options { margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; }
+.dead-options .choice { animation-delay: 6.2s; }
+.dead-options .choice + .choice { animation-delay: 6.8s; }
+
+@media (prefers-reduced-motion: reduce) { .caption, .choice, .gate-cta, .died span, .dead, .epitaph, .died-hi { animation-duration: 0.01s; animation-delay: 0s; } }

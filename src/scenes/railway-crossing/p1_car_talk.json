@@ -1,0 +1,120 @@
+{
+  "sceneId": "p1_car_talk",
+  "environment": "railway-crossing",
+  "duration": 14,
+  "shots": [
+    {
+      "id": "behind_taxi",
+      "type": "slow_push",
+      "duration": 14,
+      "from": [
+        -0.4,
+        1.7,
+        31.5
+      ],
+      "lookAt": [
+        -0.9,
+        1.1,
+        12
+      ],
+      "fov": 30,
+      "fovPortrait": 46,
+      "to": [
+        -0.7,
+        1.62,
+        28.6
+      ],
+      "exposure": 1.3
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.028,
+    "exposure": 1.0,
+    "moon": 0.6,
+    "gi": 1.0
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.55
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.25
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_far",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_near",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "dying"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "position": [
+        0.7,
+        0,
+        -9.5
+      ]
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": true,
+      "position": [
+        -1.0,
+        0,
+        24
+      ],
+      "rotationY": 3.14159
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -1.4,
+        0.05,
+        23.85
+      ],
+      "rotationY": 3.14159,
+      "anim": "sit"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": true,
+      "position": [
+        -0.6,
+        0.05,
+        23.85
+      ],
+      "rotationY": 3.14159,
+      "anim": "sit",
+      "headYaw": -0.25
+    }
+  ]
+}

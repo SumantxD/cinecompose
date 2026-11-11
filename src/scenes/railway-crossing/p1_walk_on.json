@@ -1,0 +1,186 @@
+{
+  "sceneId": "p1_walk_on",
+  "environment": "railway-crossing",
+  "duration": 20,
+  "shots": [
+    {
+      "id": "keep_walking",
+      "type": "track_lateral",
+      "duration": 13,
+      "from": [
+        -0.3,
+        0.6,
+        25.6
+      ],
+      "lookAt": [
+        -0.6,
+        0.8,
+        21
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "to": [
+        -0.3,
+        0.6,
+        33.5
+      ],
+      "lookAtTo": [
+        -0.6,
+        0.8,
+        29
+      ]
+    },
+    {
+      "id": "alone",
+      "type": "slow_push",
+      "duration": 7,
+      "from": [
+        2.8,
+        4.5,
+        40
+      ],
+      "lookAt": [
+        -0.5,
+        0.6,
+        28
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "exposure": 1.3,
+      "to": [
+        2.87,
+        4.35,
+        39.01
+      ]
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.028,
+    "exposure": 1.0,
+    "moon": 0.6,
+    "gi": 1.0
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.55
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.25
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_far",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_near",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "dying"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.6,
+        0,
+        29.5
+      ],
+      "from": [
+        -0.6,
+        0,
+        21
+      ],
+      "speed": 0.66
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "shadowOnly": true,
+      "position": [
+        -1.75,
+        0,
+        20.9
+      ]
+    },
+    {
+      "at": 3.5,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "shadowOnly": true,
+      "position": [
+        -1.5,
+        0,
+        46
+      ],
+      "from": [
+        -1.75,
+        0,
+        20.9
+      ],
+      "speed": 1.5
+    },
+    {
+      "at": 19,
+      "action": "entity",
+      "target": "chudail",
+      "visible": false
+    }
+  ],
+  "techniques": [
+    {
+      "use": "SND-03",
+      "at": 0.4,
+      "count": 16,
+      "hz": 1.0,
+      "other": "anklets",
+      "lag": 0.08,
+      "otherVolume": 0.35,
+      "otherFrom": [
+        -1.6,
+        0.1,
+        28
+      ],
+      "selfSilent": true,
+      "volume": 0
+    }
+  ]
+}

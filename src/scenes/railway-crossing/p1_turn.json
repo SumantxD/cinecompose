@@ -1,0 +1,231 @@
+{
+  "sceneId": "p1_turn",
+  "environment": "railway-crossing",
+  "duration": 32,
+  "shots": [
+    {
+      "id": "he_turns",
+      "type": "static",
+      "duration": 3,
+      "from": [
+        -0.2,
+        1.55,
+        19.2
+      ],
+      "lookAt": [
+        -0.6,
+        1.35,
+        14.5
+      ],
+      "fov": 30,
+      "fovPortrait": 44
+    },
+    {
+      "id": "walk_to_us",
+      "type": "track_lateral",
+      "duration": 12,
+      "from": [
+        -0.3,
+        0.6,
+        19.6
+      ],
+      "lookAt": [
+        -0.6,
+        0.75,
+        14.5
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "to": [
+        -0.3,
+        0.6,
+        25.6
+      ],
+      "lookAtTo": [
+        -0.6,
+        0.75,
+        21
+      ]
+    },
+    {
+      "id": "two_shadows",
+      "type": "slow_push",
+      "duration": 17,
+      "from": [
+        -0.3,
+        0.6,
+        25.6
+      ],
+      "lookAt": [
+        -0.6,
+        0.8,
+        21
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "to": [
+        -0.35,
+        0.62,
+        24.9
+      ]
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.028,
+    "exposure": 1.0,
+    "moon": 0.6,
+    "gi": 1.0
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.55
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.25
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_far",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_near",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "dying"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "position": [
+        0.4,
+        0,
+        -4.6
+      ]
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.6,
+        0,
+        14.5
+      ],
+      "rotationY": 3.14159
+    },
+    {
+      "at": 0.6,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.6,
+        0,
+        14.5
+      ],
+      "rotationY": 0
+    },
+    {
+      "at": 3.4,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "off"
+    },
+    {
+      "at": 3.4,
+      "action": "sfx",
+      "sound": "tube_tick",
+      "volume": 0.5,
+      "position": [
+        -5.8,
+        2.36,
+        5.7
+      ]
+    },
+    {
+      "at": 4.5,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.6,
+        0,
+        21
+      ],
+      "from": [
+        -0.6,
+        0,
+        14.5
+      ],
+      "speed": 0.62
+    },
+    {
+      "at": 9.5,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "shadowOnly": true,
+      "position": [
+        -1.75,
+        0,
+        20.9
+      ],
+      "from": [
+        -1.75,
+        0,
+        17.2
+      ],
+      "speed": 0.6
+    }
+  ],
+  "techniques": [
+    {
+      "use": "SND-03",
+      "at": 9.6,
+      "count": 13,
+      "hz": 1.0,
+      "other": "anklets",
+      "lag": 0.08,
+      "extra": 1,
+      "otherVolume": 0.45,
+      "otherFrom": [
+        -1.75,
+        0.1,
+        19
+      ],
+      "selfSilent": true,
+      "volume": 0
+    }
+  ]
+}

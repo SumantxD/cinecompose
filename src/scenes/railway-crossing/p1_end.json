@@ -1,0 +1,121 @@
+{
+  "sceneId": "p1_end",
+  "environment": "railway-crossing",
+  "duration": 12,
+  "shots": [
+    {
+      "id": "crane_up",
+      "type": "slow_push",
+      "duration": 12,
+      "from": [
+        0.3,
+        1.6,
+        22
+      ],
+      "lookAt": [
+        0,
+        0.8,
+        0
+      ],
+      "fov": 36,
+      "fovPortrait": 54,
+      "to": [
+        1.5,
+        8.5,
+        30
+      ],
+      "lookAtTo": [
+        0,
+        0.5,
+        -4
+      ],
+      "exposure": 1.3
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.028,
+    "exposure": 1.0,
+    "moon": 0.6,
+    "gi": 1.0
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.55
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.25
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_far",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_near",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "dying"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "position": [
+        0.7,
+        0,
+        -9.5
+      ]
+    },
+    {
+      "at": 5.5,
+      "action": "title",
+      "visible": true
+    },
+    {
+      "at": 8,
+      "action": "fade",
+      "to": 0.55,
+      "duration": 4
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "sceneId": "crossing_prototype",
+  "environment": "railway-crossing",
+  "duration": 27,
+  "shots": [
+    {
+      "id": "road_low",
+      "type": "low_angle",
+      "duration": 9,
+      "from": [
+        -0.9,
+        0.22,
+        30
+      ],
+      "to": [
+        -0.7,
+        0.3,
+        24
+      ],
+      "lookAt": [
+        0.2,
+        1.1,
+        -8
+      ],
+      "fov": 34,
+      "fovPortrait": 52
+    },
+    {
+      "id": "push_to_barrier",
+      "type": "slow_push",
+      "duration": 15,
+      "from": [
+        -0.5,
+        1.15,
+        16
+      ],
+      "to": [
+        -0.2,
+        1.35,
+        6.5
+      ],
+      "lookAt": [
+        0.4,
+        1.1,
+        -8
+      ],
+      "lookAtTo": [
+        0.6,
+        1.2,
+        -9
+      ],
+      "fov": 30,
+      "fovPortrait": 44
+    },
+    {
+      "id": "hold_on_crossing",
+      "type": "static",
+      "duration": 3,
+      "from": [
+        -0.2,
+        1.35,
+        6.5
+      ],
+      "lookAt": [
+        0.6,
+        1.2,
+        -9
+      ],
+      "fov": 30,
+      "fovPortrait": 44
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.03,
+    "exposure": 1.0
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.55
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.25
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "fade",
+      "to": 1,
+      "duration": 0.01
+    },
+    {
+      "at": 2.2,
+      "action": "fade",
+      "to": 0,
+      "duration": 4
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_far",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "chudail",
+      "visible": false
+    },
+    {
+      "at": 3.0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "dying"
+    },
+    {
+      "at": 3.0,
+      "action": "sfx",
+      "sound": "tube_tick",
+      "volume": 0.5,
+      "position": [
+        -5.8,
+        2.36,
+        5.7
+      ]
+    },
+    {
+      "at": 17.5,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "position": [
+        0.7,
+        0,
+        -9.5
+      ],
+      "tilt": 0.12
+    },
+    {
+      "at": 22.0,
+      "action": "title",
+      "visible": true
+    },
+    {
+      "at": 23.5,
+      "action": "fade",
+      "to": 0.6,
+      "duration": 3.5
+    }
+  ],
+  "techniques": [
+    {
+      "use": "ENT-04",
+      "at": 9.0,
+      "entity": "chudail",
+      "position": [
+        0.7,
+        0,
+        -9.5
+      ],
+      "motifDelay": 3.5
+    },
+    {
+      "use": "LGT-03",
+      "at": 20.5,
+      "light": "sodium_far",
+      "entity": "chudail"
+    }
+  ]
+}

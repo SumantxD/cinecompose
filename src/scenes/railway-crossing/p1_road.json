@@ -1,0 +1,305 @@
+{
+  "sceneId": "p1_road",
+  "environment": "railway-crossing",
+  "duration": 37,
+  "shots": [
+    {
+      "id": "taxi_leaves",
+      "type": "slow_push",
+      "duration": 6.5,
+      "from": [
+        0.7,
+        0.5,
+        15
+      ],
+      "lookAt": [
+        -1.3,
+        1.0,
+        24
+      ],
+      "fov": 34,
+      "fovPortrait": 52,
+      "to": [
+        0.19,
+        0.52,
+        15.82
+      ]
+    },
+    {
+      "id": "follow",
+      "type": "track_lateral",
+      "duration": 6.5,
+      "from": [
+        -0.9,
+        1.85,
+        25.4
+      ],
+      "lookAt": [
+        0.3,
+        1.3,
+        -6
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "to": [
+        -0.6,
+        1.85,
+        18.9
+      ]
+    },
+    {
+      "id": "head_turns",
+      "type": "slow_push",
+      "duration": 3.5,
+      "from": [
+        2.9,
+        1.35,
+        16.4
+      ],
+      "lookAt": [
+        -0.8,
+        1.3,
+        14.8
+      ],
+      "fov": 30,
+      "fovPortrait": 44,
+      "exposure": 1.15,
+      "to": [
+        2.52,
+        1.35,
+        16.04
+      ]
+    },
+    {
+      "id": "the_door",
+      "type": "static",
+      "duration": 2.5,
+      "from": [
+        -0.9,
+        1.62,
+        14.6
+      ],
+      "lookAt": [
+        -5.9,
+        1.15,
+        5.7
+      ],
+      "fov": 30,
+      "fovPortrait": 44,
+      "exposure": 1.25
+    },
+    {
+      "id": "over_shoulder",
+      "type": "slow_push",
+      "duration": 2.5,
+      "from": [
+        -0.25,
+        1.95,
+        16.3
+      ],
+      "lookAt": [
+        0.35,
+        1.25,
+        -4.6
+      ],
+      "fov": 34,
+      "fovPortrait": 56,
+      "exposure": 1.35,
+      "eyeLight": 0.5,
+      "to": [
+        -0.12,
+        1.94,
+        15.95
+      ]
+    },
+    {
+      "id": "push",
+      "type": "slow_push",
+      "duration": 15.5,
+      "from": [
+        -0.25,
+        1.95,
+        16.3
+      ],
+      "lookAt": [
+        0.35,
+        1.25,
+        -4.6
+      ],
+      "fov": 32,
+      "fovPortrait": 52,
+      "to": [
+        -0.4,
+        1.92,
+        15.6
+      ],
+      "exposure": 1.35,
+      "eyeLight": 0.5
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.028,
+    "exposure": 1.0,
+    "moon": 0.6,
+    "gi": 1.0
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.55
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.25
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_far",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_near",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "dying"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "position": [
+        0.7,
+        0,
+        -9.5
+      ]
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": true,
+      "position": [
+        -1.0,
+        0,
+        62
+      ],
+      "from": [
+        -1.0,
+        0,
+        24
+      ],
+      "speed": 3.2,
+      "rotationY": 3.14159
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -1.7,
+        0,
+        23.4
+      ],
+      "rotationY": 3.14159
+    },
+    {
+      "at": 5.5,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.6,
+        0,
+        14.5
+      ],
+      "from": [
+        -1.7,
+        0,
+        23.4
+      ],
+      "speed": 1.0
+    },
+    {
+      "at": 11,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 13.0,
+      "action": "sfx",
+      "sound": "tube_tick",
+      "volume": 0.6,
+      "position": [
+        -5.8,
+        2.36,
+        5.7
+      ]
+    },
+    {
+      "at": 13.0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "dying"
+    },
+    {
+      "at": 13.3,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "keep": true,
+      "headYaw": 1.0
+    },
+    {
+      "at": 17.5,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "position": [
+        0.4,
+        0,
+        -4.6
+      ]
+    },
+    {
+      "at": 19.0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "keep": true,
+      "headYaw": 0
+    },
+    {
+      "at": 21.8,
+      "action": "sfx",
+      "sound": "signal",
+      "volume": 0.28,
+      "position": [
+        30,
+        3,
+        -20
+      ]
+    }
+  ]
+}

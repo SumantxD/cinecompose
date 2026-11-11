@@ -1,0 +1,144 @@
+{
+  "sceneId": "p1_look",
+  "environment": "railway-crossing",
+  "duration": 2.0,
+  "shots": [
+    {
+      "id": "he_turns",
+      "type": "static",
+      "duration": 0.8,
+      "from": [
+        -0.45,
+        1.55,
+        23.4
+      ],
+      "lookAt": [
+        -0.6,
+        1.4,
+        21
+      ],
+      "fov": 32,
+      "fovPortrait": 46
+    },
+    {
+      "id": "her",
+      "type": "static",
+      "duration": 1.2,
+      "from": [
+        -0.18,
+        1.72,
+        21.55
+      ],
+      "lookAt": [
+        -0.62,
+        1.6,
+        20.35
+      ],
+      "fov": 40,
+      "fovPortrait": 58,
+      "exposure": 1.6,
+      "eyeLight": 0.9
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.028,
+    "exposure": 1.0,
+    "moon": 0.6,
+    "gi": 1.0
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.55
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.25
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_far",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_near",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "dying"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.6,
+        0,
+        21
+      ],
+      "rotationY": 3.14159
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "shadowOnly": false,
+      "position": [
+        -0.62,
+        0,
+        20.35
+      ],
+      "rotationY": 0
+    },
+    {
+      "at": 0.8,
+      "action": "sfx",
+      "sound": "capture_hit",
+      "volume": 1
+    },
+    {
+      "at": 0.9,
+      "action": "light",
+      "target": "sodium_near",
+      "mode": "flicker"
+    }
+  ],
+  "techniques": [
+    {
+      "use": "EDT-01",
+      "at": 1.7
+    }
+  ]
+}

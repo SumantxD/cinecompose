@@ -1,0 +1,39 @@
+# Decision Log
+
+Newest at the bottom. One line per decision: **date · area · decision · why**. Never delete entries. Supersede them instead ("supersedes 2026-11-08 #3").
+
+| # | Date | Area | Decision | Why |
+|---|---|---|---|---|
+| 1 | 2026-11-08 | stack | React 19 + TS + Vite 8, R3F 9 + drei, GSAP, inkjs, Howler, zustand, @react-three/postprocessing | As specified in the master brief. All free and static-hostable. |
+| 2 | 2026-11-08 | story | Ink is compiled at build time by a Vite plugin (`vite.config.ts`), not at runtime | Keeps the ~200 KB compiler out of the bundle. Script errors fail the build. |
+| 3 | 2026-11-08 | story | Ink owns *what* is said and *when* (`# at`). Scene JSON owns camera, light and sfx on the same clock | Writers and directors edit separate files but share one timeline. |
+| 4 | 2026-11-08 | engine | One scene clock (`clock.t`) drives everything. The GSAP timeline is paused and scrubbed, never played | Deterministic playback, so Reels can be exported frame by frame and look identical to live. |
+| 5 | 2026-11-08 | engine | Unbuilt scenes play as black animatics (rain + captions) | The full 27-path episode is playable and testable from day one, and sets fill in later. |
+| 6 | 2026-11-08 | audio | Every sound has a procedural synth fallback. Recorded files override it through `manifest.ts` | Never silent. No paid assets. The team can swap in CC0 recordings one sound at a time. |
+| 7 | 2026-11-08 | world | The village is "Sonpahari" (सोनपहाड़ी), Jharkhand. The crossing is "LC Gate 47" | Fictional, so we owe nothing to a real place. Plausible regional name. |
+| 8 | 2026-11-08 | world | Sal forest as the tree type | Jharkhand's signature forest. Tall straight trunks read well as silhouettes. |
+| 9 | 2026-11-08 | look | The near crossing boom is jammed half-open and the far boom is down | Clears the composition. Leaves a single line she stands beneath (FRM-02). Signals neglect. |
+| 10 | 2026-11-08 | look | Warm sodium means her, cool tube light means the living world | Gives the series a colour grammar viewers learn without being told. |
+| 11 | 2026-11-08 | audio | The motif is E5–C5–B♭4 with the last note sagging flat, distant, ≤0.3 | It reads as a railway signal before it reads as her. |
+| 12 | 2026-11-08 | dev | Default entry is `?start=prototype` until Scene 1 is built. `?start=arrival` plays the full episode | The first thing anyone sees is the best-looking thing we have. |
+| 13 | 2026-11-08 | perf | Quality is "low" on coarse-pointer or ≤4-core devices (and PerformanceMonitor can downgrade at runtime): no bloom, fewer trees, less rain, 512 shadow maps | A mid-range Android phone is the target. The story never gets cut for performance. |
+| 14 | 2026-11-08 | world | Forest = seeded sal archetypes (trunk + branches + alpha-cut leaf cards), instanced per archetype, wind shader | The audit found icosahedron crowns were ~90% of triangles and the most "procedural" thing on screen. |
+| 15 | 2026-11-08 | look | The sky horizon always equals the fog colour; the fog sits lighter than near silhouettes | Atmospheric perspective: depth reads as layers of haze instead of uniform black. |
+| 16 | 2026-11-08 | engine | Techniques are **macros** in scene JSON (`techniques: [{use, at, …}]`) that expand to cues | Composable techniques that can't desync camera, audio or story, because everything stays on one clock. Validated by `npm run check`. |
+| 17 | 2026-11-08 | deps | No Rapier, no Leva (for now) | No physical interaction exists. Tuning lives in versioned JSON plus the `kr` console. See `docs/world/architecture.md`. |
+| 18 | 2026-11-08 | assets | AI-generated 3D allowed only per-asset, with the tool's free-tier output license recorded | The brief forbids paid generation, and free-tier terms vary. See `docs/world/asset-pipeline.md`. |
+| 19 | 2026-11-08 | docs | Docs restructured: `docs/bible` (canon), `docs/cinematics` (techniques, visual language), `docs/world` (engine, library, assets, perf, QC) | Requested team structure. Canon stays separate from craft and engineering. |
+| 20 | 2026-11-08 | product | Hybrid: chapters are narrator-led cinematic POV with choices; gameplay (free look, flashlight, chase) comes later as *bounded* segments, never an open world | Reconciles the master brief ("no walking or fighting") with Phase 12. Keeps scope buildable. See `docs/direction/`. |
+| 21 | 2026-11-08 | canon | The player IS Aarav. Second-person narrator. Aarav's lines are shown as "You" | Phase 11: the player is the protagonist. Supersedes the earlier third-person framing. |
+| 22 | 2026-11-08 | canon | The woman's capture is proximity, never a lunge. Chases and grabs need a *different* entity (to be designed with the team) | Keeps her rules (`entity.md`) while allowing Phase 12 gameplay. |
+| 23 | 2026-11-08 | engine | Outcomes in Ink: `# captured` (continue), `# dead` (epitaph → YOU DIED). Automatic checkpoints before every choice beat; "Return to the last decision" replays that beat | Ink owns consequences; the player owns presentation. Caught ≠ dead ≠ wrong decision. |
+| 24 | 2026-11-08 | look | Asphalt and ground albedo raised to plausible values (the road was effectively black) | Found while staging the second-shadow scene: the road was invisible outside one lamp pool. |
+| 25 | 2026-11-08 | world | Second sodium lamp by the gatekeeper's cabin, aimed at the village; lights that are off skip their shadow pass; budget ≤2 shadow lights | Needed for the shadow reveal (Reels moment D). Stays within the desktop budget. |
+| 26 | 2026-11-08 | product | **Cinematic, not FPS.** Part 1 re-shot as film coverage with Aarav visible (wides, over-the-shoulder, tracking, inserts). First-person is only a rare motivated insert; no player camera, no HUD. Decisions are the only interaction | User: "it should be cinematic… like a real horror movie… you made it like an FPS game." **Supersedes the camera parts of #20/#21.** The narrator still speaks in second person. |
+| 27 | 2026-11-08 | look | Brightness targets: story frames average luma **40–57** (0–255) with spread ≥ 60, measured with ffmpeg. Image-based night fill (`NightSky`, code-built environment map), series exposure 1.35, per-shot `exposure` and camera `eyeLight` | Recorded playthrough analysis: 60% of the runtime was black (unbuilt animatics) and the rest averaged 10–15 luma. |
+| 28 | 2026-11-08 | tools | Built-in **Studio** (`?studio`) edits the real scene JSON (camera from view, timing, look) with save and undo; not ThreeSpace/Theatre.js | One source of truth. Theatre.js studio is AGPL (commercial risk). Other editors use their own scene formats. |
+| 29 | 2026-11-08 | audio | Rain = two beds with coprime loop lengths + slow gusts + a live random drop scheduler (asphalt, leaf, puddle, tin) | User: "rain has no variation, sounds very fake". |
+| 30 | 2026-11-08 | story | No black animatic in a shipped path: Part 1 ends on its own scene (`p1_end`) instead of falling into the unbuilt Part 2 | Black screens are the worst possible Reel. |
+| 31 | 2026-11-08 | engine | Never pass `uniforms` as a JSX prop on `<shaderMaterial>`: build the material in `useMemo` and mutate `material.uniforms` | R3F copied the object, so the rain's time stayed at 0: **the rain never fell** (and lamp beams never flickered). Found by diffing two frames. |
+| 32 | 2026-11-08 | look | Monsoon rain: 9k (5k on mobile) longer, motion-blurred streaks lit by up to 4 lamps, plus ground splashes that follow the road's height | User: "the rain is not raining". |
+| 33 | 2026-11-08 | camera | **No dead-still shots.** Shots without a move get a slow creep plus a slight arc (`give_life` in `scripts/_scenes.py`); the `static` preset breathes slightly. Only deliberate holds stay still (inserts, the split-second capture) | User: "the camera is static most of the time". Now 19 of 23 shots move, and motion is present in 100% of playthrough samples. |
