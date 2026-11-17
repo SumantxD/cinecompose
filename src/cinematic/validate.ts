@@ -59,6 +59,8 @@ export function validateScene(value: unknown): string[] {
   if (value.props !== undefined && !record(value.props)) err('props must be an object.')
   const burn = record(value.props) ? value.props.paperBurn : undefined
   if (burn !== undefined && (!record(burn) || !finite(burn.at) || burn.at < 0 || !finite(burn.duration) || burn.duration <= 0 || (finite(value.duration) && finite(burn.at) && burn.at > value.duration))) err('paperBurn needs a non-negative at within the scene and a positive duration.')
+  const rain = record(value.props) ? value.props.rain : undefined
+  if (rain !== undefined && (!record(rain) || (rain.enabled !== undefined && typeof rain.enabled !== 'boolean') || (rain.count !== undefined && (!finite(rain.count) || rain.count < 0 || rain.count > 20000)) || (rain.wind !== undefined && (!Array.isArray(rain.wind) || rain.wind.length !== 2 || rain.wind.some((v: unknown) => !finite(v) || Math.abs(v as number) > 6))))) err('rain needs enabled?: boolean, count 0–20000 and wind [x, z] within ±6.')
   const mist = record(value.props) ? value.props.groundMist : undefined
   if (mist !== undefined && (!record(mist) || !vector(mist.center) || !finite(mist.width) || mist.width <= 0 || mist.width > 24 || !finite(mist.length) || mist.length <= 0 || mist.length > 48 || (mist.height !== undefined && (!finite(mist.height) || mist.height < 0.1 || mist.height > 0.4)) || (mist.opacity !== undefined && (!finite(mist.opacity) || mist.opacity < 0 || mist.opacity > 0.12)))) err('groundMist needs a center, bounded positive width/length, a low height and restrained opacity.')
 

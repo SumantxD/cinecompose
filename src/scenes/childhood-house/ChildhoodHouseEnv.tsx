@@ -48,8 +48,9 @@ function DiaryOnTable({ paperBurn }: { paperBurn?: { at: number; duration: numbe
   return <group position={[0.85, 0, -8.7]} visible={visible}><Grounded name='diary' position={[0, 0, 0]} floor={TABLE_TOP}><Diary position={[0, 0, 0]} paperBurn={paperBurn} /></Grounded></group>
 }
 
-function IndoorRain({ low }: { low: boolean }) {
-  return <RainSystem count={low ? 2600 : 4800} splashes={low ? 220 : 430} box={[22, 10, 24]} shelter={{ center: [0, -2], size: [7.4, 21.2], height: CEILING_BOTTOM - 0.03 }} />
+function IndoorRain({ low, scene }: { low: boolean; scene: EnvironmentProps['scene'] }) {
+  if (scene.props?.rain?.enabled === false) return null
+  return <RainSystem count={scene.props?.rain?.count || (low ? 2600 : 4800)} splashes={low ? 220 : 430} box={[22, 10, 24]} shelter={{ center: [0, -2], size: [7.4, 21.2], height: CEILING_BOTTOM - 0.03 }} wind={scene.props?.rain?.wind} />
 }
 
 function Fan() {
@@ -104,7 +105,7 @@ export function ChildhoodHouseEnv({ lighting, scene }: EnvironmentProps) {
     <directionalLight position={[-6, 9, 9]} color='#8ba5b7' intensity={lighting.moon ?? 0.24} />
     <mesh rotation-x={-Math.PI / 2} receiveShadow><planeGeometry args={[65, 65]} /><meshStandardMaterial map={ground(18)} roughness={0.8} /></mesh>
     <ForestEnvironment clear={clear} trees={low ? 24 : 38} bushes={low ? 30 : 60} grass={low ? 100 : 240} />
-    <IndoorRain low={low} />
+    <IndoorRain low={low} scene={scene} />
     <WoodBox position={[0, 0.08, -1.5]} size={[6.8, 0.16, 18]} material={dado} />
     {[0, 1, 2].map(step => <WoodBox key={step} position={[0, 0.027 + step * 0.053, 8.1 - step * 0.36]} size={[2.4, 0.052, 0.48]} material={dado} />)}
     {[-3.34, 3.34].map(x => <group key={x}>

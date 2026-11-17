@@ -81,6 +81,16 @@ export type Cue =
   | { at: number; action: 'title'; visible: boolean }
   | { at: number; action: 'fade'; to: number; duration: number }
 
+/** Authorable outdoor rain. Everything falls back to the environment's own setup when omitted. */
+export interface RainConfig {
+  /** false hides the outdoor rain emitters (shelter logic and audio are separate). */
+  enabled?: boolean
+  /** GPU rain streaks. 0 / omitted = the environment's own density. */
+  count?: number
+  /** Horizontal wind drift [x, z]. */
+  wind?: [number, number]
+}
+
 export interface GroundMistConfig {
   center: Vec3
   width: number
@@ -99,7 +109,7 @@ export interface SceneConfig {
   audio: { ambience: { sound: string; volume: number }[]; music: string | null }
   cues: Cue[]
   /** Set dressing selected by the story branch. */
-  props?: { horse?: 'room' | 'carried' | 'meera' | 'absent' | 'inventory'; footprints?: boolean; cassette?: boolean; paperBurn?: { at: number; duration: number }; groundMist?: GroundMistConfig }
+  props?: { horse?: 'room' | 'carried' | 'meera' | 'absent' | 'inventory'; footprints?: boolean; cassette?: boolean; paperBurn?: { at: number; duration: number }; groundMist?: GroundMistConfig; rain?: RainConfig }
   /** Technique macros (cinematic/techniques.ts) — expanded into cues at build time. */
   techniques?: import('./techniques').TechniqueUse[]
 }

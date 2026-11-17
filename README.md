@@ -116,6 +116,17 @@ In an ortho view, **dragging drops you back into FREE orbit** at that exact spot
 ![Drag to insert a point](docs/screenshots/studio-drag-insert.png)
 ![Segment plus handles](docs/screenshots/studio-segment-plus.png)
 
+### Weather & look
+
+The right-hand panel edits the scene's environment directly — changes write into the scene JSON and preview live.
+
+![Weather controls](docs/screenshots/studio-weather.png)
+
+- **Look:** scene brightness (exposure), night glow, moonlight, ambient fill, fog density and fog colour. Per-shot exposure is set on the selected shot.
+- **Weather:** toggle outdoor **rain** on/off, set **rain density** (GPU streaks; `0` keeps the environment's own default), and drift direction with **Wind X / Wind Z**. Rain is shelter-aware — it won't fall through roofs. Ambience audio is authored separately as audio cues.
+
+These are authored per scene and saved like any other edit (`⌘S`). Everything still reads the shared `clock.t`, so the preview and the final render stay in sync.
+
 ### Effects at the playhead
 
 Click **✦ Effect** then pick one: **light**, **entity**, **sound**, **ambience**, **title**, **fade**. Each lands as a cue on the timeline at the current playhead. Entity and sound cues get a draggable position handle in the director view; **📍 Put where the camera looks** snaps it to your orbit target.

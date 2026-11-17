@@ -74,7 +74,7 @@ const MEERA_LOOK = { jacket: '#496165', trousers: '#463b33', skin: '#765948', ha
 export function ReturnRoadEnv({ lighting, scene }: EnvironmentProps) {
   const train = scene.cues.find((cue): cue is TrainCue => cue.action === 'train')
   const remembering = scene.props?.horse === 'meera' || scene.props?.horse === 'absent'
-  return <RailwayCrossingEnv lighting={lighting} groundedActors softFill nearIntensity={300}>
+  return <RailwayCrossingEnv lighting={lighting} scene={scene} groundedActors softFill nearIntensity={300}>
     <FreightTrain cue={train} />
     <Artefacts cassette={!!scene.props?.cassette} horse={scene.props?.horse === 'carried'} />
     {remembering && <>

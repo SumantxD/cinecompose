@@ -84,7 +84,7 @@ export function RailwayCrossingEnv({ lighting, scene, children, groundedActors =
       <Actor id="driver" groundAt={groundedActors ? railwaySurfaceHeight : undefined} look={DRIVER_LOOK} height={1.7} />
       <Taxi id="taxi" lowShadows={low} />
       {/* splash height follows the road's ramp up to the rails (same formula as roadRamp) */}
-      <RainSystem count={low ? 5000 : 9000} splashes={low ? 400 : 700} ground="0.665 * (1.0 - smoothstep(2.0, 10.0, abs(p.z)))" />
+      {scene?.props?.rain?.enabled !== false && <RainSystem count={scene?.props?.rain?.count || (low ? 5000 : 9000)} wind={scene?.props?.rain?.wind} splashes={low ? 400 : 700} ground="0.665 * (1.0 - smoothstep(2.0, 10.0, abs(p.z)))" />}
       {children}
     </group>
   )

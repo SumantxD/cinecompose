@@ -16,8 +16,9 @@ import { practicalIntensity } from '../../cinematic/lighting'
 // Light ids: stall_tube, mirror_sodium, dawn. Entities: aarav, her_reflection.
 const clear = (x: number, z: number) => Math.abs(z) > 7 && !(x > -4 && x < 4 && z > -4 && z < 7)
 
-function ShelterRain({ low }: { low: boolean }) {
-  return <RainSystem count={low ? 2200 : 4200} splashes={low ? 250 : 450} box={[16, 9, 18]} shelter={{ center: [0, 0], size: [4.8, 4.7], height: 2.55 }} />
+function ShelterRain({ low, scene }: { low: boolean; scene: SceneConfig }) {
+  if (scene.props?.rain?.enabled === false) return null
+  return <RainSystem count={scene.props?.rain?.count || (low ? 2200 : 4200)} splashes={low ? 250 : 450} box={[16, 9, 18]} shelter={{ center: [0, 0], size: [4.8, 4.7], height: 2.55 }} wind={scene.props?.rain?.wind} />
 }
 
 function Chair({ position, rotationY = 0 }: { position: Vec3; rotationY?: number }) {
@@ -29,7 +30,7 @@ function Chair({ position, rotationY = 0 }: { position: Vec3; rotationY?: number
   </group>
 }
 
-export function TeaStallEnv({ lighting }: { lighting: SceneConfig['lighting']; scene: SceneConfig }) {
+export function TeaStallEnv({ lighting, scene }: { lighting: SceneConfig['lighting']; scene: SceneConfig }) {
   useEffect(() => { void loadSurfacePack(['wood', 'plaster']) }, [])
   const low = useStore(s => s.quality === 'low')
   const wood = periodMaterial('wood', '#66523d'), plaster = periodMaterial('plaster', '#849187'), tin = periodMaterial('metal', '#5b6561')
@@ -44,7 +45,7 @@ export function TeaStallEnv({ lighting }: { lighting: SceneConfig['lighting']; s
       <planeGeometry args={[70, 70]} /><meshStandardMaterial map={ground(11)} roughness={0.76} />
     </mesh>
     <ForestEnvironment clear={clear} trees={28} bushes={45} grass={180} />
-    <ShelterRain low={low} />
+    <ShelterRain low={low} scene={scene} />
     <WoodBox position={[0, 2.55, 0]} size={[4.8, 0.08, 4.7]} material={tin} />
     <Slats transforms={roof} material={tin} />
     <WoodBox position={[0, 1.26, -2.0]} size={[4.7, 2.5, 0.15]} material={plaster} />

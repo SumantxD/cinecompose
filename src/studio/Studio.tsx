@@ -326,6 +326,15 @@ export function Studio() {
             <label className="st-slider"><span>Fog colour</span><input type="color" value={cfg.lighting.fogColor ?? '#232d39'} onChange={(e) => st.edit((c) => void (c.lighting.fogColor = e.target.value))} /></label>
           </section>
 
+          <section>
+            <h3>Weather</h3>
+            <label className="st-slider" title="Outdoor rain emitters (shelter-aware). Ambience audio is separate."><span>Rain</span><input type="checkbox" checked={cfg.props?.rain?.enabled !== false} onChange={(e) => st.edit((c) => { const p = (c.props ??= {}); p.rain = { ...p.rain, enabled: e.target.checked } })} /></label>
+            <Slider label="Rain density" hint="GPU rain streaks. 0 keeps the environment's own default." value={cfg.props?.rain?.count ?? 0} min={0} max={14000} step={100} onChange={(v) => st.edit((c) => { const p = (c.props ??= {}); p.rain = { ...p.rain, count: v } })} />
+            <Slider label="Wind X" hint="Sideways drift of the rain streaks" value={cfg.props?.rain?.wind?.[0] ?? 0.6} min={-4} max={4} step={0.1} onChange={(v) => st.edit((c) => { const p = (c.props ??= {}); const wind: [number, number] = [...(p.rain?.wind ?? [0.6, 0.2])]; wind[0] = v; p.rain = { ...p.rain, wind } })} />
+            <Slider label="Wind Z" hint="Forward/back drift of the rain streaks" value={cfg.props?.rain?.wind?.[1] ?? 0.2} min={-4} max={4} step={0.1} onChange={(v) => st.edit((c) => { const p = (c.props ??= {}); const wind: [number, number] = [...(p.rain?.wind ?? [0.6, 0.2])]; wind[1] = v; p.rain = { ...p.rain, wind } })} />
+            <span className="st-hint">Saved to the scene JSON. Ambience audio stays in the scene's audio cues.</span>
+          </section>
+
           {shot && (
             <section>
               <h3>Shot {sel!.index + 1}: <input className="st-name" value={shot.id} onChange={(e) => editShot((s) => void (s.id = e.target.value))} /></h3>
