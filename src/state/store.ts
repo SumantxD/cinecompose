@@ -25,6 +25,12 @@ interface EntityState {
   rotationY?: number
   /** Actors: 'walk' | 'idle' | 'sit' (default: walk while moving, else idle). */
   anim?: string
+  /** Her face is only revealed in the ending that remembers. */
+  face?: boolean
+  /** A restrained mouth shape can show through her concealing hair. */
+  smile?: boolean
+  /** Ending C: forward feet are more unsettling than reversed ones. */
+  feetForward?: boolean
   /** Actors: head turn in radians (+ = his left). */
   headYaw?: number
   /** clock.t when this state was set (deterministic movement). */
@@ -59,7 +65,7 @@ interface State {
 export const useStore = create<State>((set) => ({
   phase: 'gate',
   quality: 'high',
-  muted: false,
+  muted: true,
   sceneId: null,
   caption: null,
   choices: [],

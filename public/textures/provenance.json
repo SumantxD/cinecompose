@@ -1,0 +1,122 @@
+{
+  "sourceLicenceVerifiedAt": "2026-11-12",
+  "policyUrl": "https://polyhaven.com/license",
+  "sourceImages": "original 1K JPEG",
+  "convertedImages": "1K WebP; normal maps remain linear",
+  "assets": [
+    {
+      "id": "damaged_plaster",
+      "source": "Poly Haven",
+      "url": "https://polyhaven.com/a/damaged_plaster",
+      "licence": "CC0 1.0 Universal",
+      "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceFiles": {
+        "color": {
+          "md5": "a8df39b93ebece3c1c84290e3e916ec1"
+        },
+        "normal": {
+          "md5": "f51f2fb57309e9d1974b9841f9b605ea"
+        },
+        "roughness": {
+          "md5": "bbdad97a6d7c74e24b58b6e398e8eb19"
+        }
+      },
+      "maps": [
+        {
+          "channel": "color",
+          "path": "textures/damaged_plaster/color.webp",
+          "bytes": 301334,
+          "sha256": "c94d6c6922f50b3ba36c4be3d77cf9a5ec01e2cdba96c8181ad2359eed78a5a7"
+        },
+        {
+          "channel": "normal",
+          "path": "textures/damaged_plaster/normal.webp",
+          "bytes": 461362,
+          "sha256": "646bde76f44a87969d049834431f68032da23a0c66627696ec6eb5a76a215ab4"
+        },
+        {
+          "channel": "roughness",
+          "path": "textures/damaged_plaster/roughness.webp",
+          "bytes": 74632,
+          "sha256": "b5ef1798ca6ff047569efc231a6be09e683b102cb3f5042bf9517b8497f7a3dc"
+        }
+      ]
+    },
+    {
+      "id": "old_wood_floor",
+      "source": "Poly Haven",
+      "url": "https://polyhaven.com/a/old_wood_floor",
+      "licence": "CC0 1.0 Universal",
+      "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceFiles": {
+        "color": {
+          "md5": "ffaa68add0544811b30459e58cc9b4fd"
+        },
+        "normal": {
+          "md5": "2ec0f5e82232d1e9348fc48923f427a4"
+        },
+        "roughness": {
+          "md5": "e52625ea19fa46a31747abbef00d1627"
+        }
+      },
+      "maps": [
+        {
+          "channel": "color",
+          "path": "textures/old_wood_floor/color.webp",
+          "bytes": 249960,
+          "sha256": "8d5ed9209feb08a0839adad51649b3a7940f14b150b9a27d03b84d94944d8587"
+        },
+        {
+          "channel": "normal",
+          "path": "textures/old_wood_floor/normal.webp",
+          "bytes": 274168,
+          "sha256": "6a0043fa7bd85440f73f4e18c195b43126689dbacf2444f73eafa68c57d3acf8"
+        },
+        {
+          "channel": "roughness",
+          "path": "textures/old_wood_floor/roughness.webp",
+          "bytes": 141730,
+          "sha256": "a73ccf7817554b1e5e3fb053c468f91ed3c9e895afbc48bd125670dee89b65a5"
+        }
+      ]
+    },
+    {
+      "id": "denim_fabric",
+      "source": "Poly Haven",
+      "url": "https://polyhaven.com/a/denim_fabric",
+      "licence": "CC0 1.0 Universal",
+      "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourceFiles": {
+        "color": {
+          "md5": "3835b5e277dd99784bfe68d985da14ae"
+        },
+        "normal": {
+          "md5": "9008fe723671f9cb3e6d0889eab9adb0"
+        },
+        "roughness": {
+          "md5": "7eebb4a6185f2e6805976bc356dd1b41"
+        }
+      },
+      "maps": [
+        {
+          "channel": "color",
+          "path": "textures/denim_fabric/color.webp",
+          "bytes": 556722,
+          "sha256": "0c37b69ee094c049c4d4afc9736a235592e9d866028b0b22053dae484fead7aa"
+        },
+        {
+          "channel": "normal",
+          "path": "textures/denim_fabric/normal.webp",
+          "bytes": 281430,
+          "sha256": "9fe9c96600aa865932ae911200d0c9e219c851a7f707ca8276d9e40f6029654a"
+        },
+        {
+          "channel": "roughness",
+          "path": "textures/denim_fabric/roughness.webp",
+          "bytes": 337760,
+          "sha256": "8562d765412ceea406bec0810a62e2bcc7075ee702cb48ca9c9e4df3dcb1d7a1"
+        }
+      ]
+    }
+  ]
+}

@@ -7,6 +7,10 @@ import { useStore } from '../state/store'
 import { AudioManager } from '../audio/AudioManager'
 import type { SceneConfig } from '../cinematic/types'
 import type { Line } from '../story/StoryEngine'
+export { inspectFrame } from '../cinematic/quality'
+export { getSurfaceStatus } from '../components/SurfaceTextures'
+export const getRainState = () => AudioManager.getRainState()
+export const getVoiceState = () => AudioManager.getVoiceState()
 import { Howler } from 'howler'
 
 export const studio = new URLSearchParams(location.search).has('studio')
@@ -16,10 +20,11 @@ export const studio = new URLSearchParams(location.search).has('studio')
 let engine: StoryEngine
 /** Story snapshots taken before each beat that ends in a choice — "return to the last decision". */
 let checkpoints: ReturnType<StoryEngine['save']>[] = []
-let current: { tl: ReturnType<typeof buildTimeline>["tl"]; duration: number; beat: Beat; done: boolean } | null = null
+let current: { tl: ReturnType<typeof buildTimeline>["tl"]; duration: number; voices: ReturnType<typeof buildTimeline>["voices"]; beat: Beat; done: boolean } | null = null
 let ambience = new Set<string>()
 export let environment = 'void'
 export let lighting: SceneConfig['lighting'] = animatic('').lighting
+export let scene: SceneConfig = animatic('')
 
 export function start(knot?: string) {
   AudioManager.stopAll()
@@ -56,11 +61,12 @@ function playNext() {
 
   environment = cfg.environment
   lighting = cfg.lighting
+  scene = cfg
   // Built scenes open visible unless they author their own fade-in at 0.
   const fadesIn = cfg.cues.some((c) => c.action === 'fade' && c.at === 0)
-  useStore.getState().set({ sceneId: cfg.sceneId, lights: {}, entities: {}, caption: null, ...(cfg.environment !== 'void' && !fadesIn && { blackout: 0 }) })
-  const { tl, duration } = buildTimeline(cfg, beat.lines)
-  current = { tl, duration, beat, done: false }
+  useStore.getState().set({ sceneId: cfg.sceneId, lights: {}, entities: {}, flags: { ...engine.flags }, caption: null, ...(cfg.environment !== 'void' && !fadesIn && { blackout: 0 }) })
+  const { tl, duration, voices } = buildTimeline(cfg, beat.lines)
+  current = { tl, duration, voices, beat, done: false }
   clock.t = 0
 }
 
@@ -68,25 +74,33 @@ function playNext() {
 export let paused = false
 export function setPaused(p: boolean) {
   paused = p
+  // Studio is silent while paused/scrubbing; the user's mute preference applies only during playback.
+  if (studio) Howler.mute(p || useStore.getState().muted)
+  AudioManager.setVoicePaused(p)
 }
 
 /** Loads a scene config (possibly unsaved edits) and jumps to time t. Lines = its Ink captions. */
-export function previewScene(cfg: SceneConfig, t = 0, lines: Line[] = []) {
+export function previewScene(cfg: SceneConfig, t = 0, lines: Line[] = [], flags?: Record<string, unknown>) {
+  AudioManager.stopAll()
+  Howler.mute(true)
+  AudioManager.setScrubbing(true)
   environment = cfg.environment
   lighting = cfg.lighting
+  scene = cfg
   const s = useStore.getState()
-  s.set({ phase: 'playing', sceneId: `${cfg.sceneId}@${Date.now()}`, lights: {}, entities: {}, caption: null, choices: [], blackout: 0, showTitle: false })
-  const { tl, duration } = buildTimeline(cfg, lines)
-  current = { tl, duration, beat: { sceneId: cfg.sceneId, lines, choices: [], ended: false }, done: false }
+  s.set({ phase: 'playing', sceneId: `${cfg.sceneId}@${Date.now()}`, lights: {}, entities: {}, caption: null, choices: [], blackout: 0, showTitle: false, ...(flags ? { flags } : {}) })
+  cfg.audio.ambience.forEach((a) => AudioManager.ambience(a.sound, a.volume, 0))
+  const { tl, duration, voices } = buildTimeline(cfg, lines)
+  current = { tl, duration, voices, beat: { sceneId: cfg.sceneId, lines, choices: [], ended: false }, done: false }
   clock.t = 0
-  // Step (not jump) so every cue fires in order with the right clock time — same as live playback.
-  Howler.mute(true)
+  // Step through state, but never emit one-shot sounds while seeking.
   for (let k = 0; clock.t < t - 1e-6 && k < 10000; k++) {
     clock.t = Math.min(t, clock.t + 0.05)
     tl.time(Math.min(clock.t, duration), false)
   }
   tl.time(Math.min(Math.max(clock.t, 0.001), duration), false) // t = 0 still applies the first shot
-  Howler.mute(useStore.getState().muted)
+  AudioManager.setScrubbing(false)
+  Howler.mute(paused || useStore.getState().muted)
   return duration
 }
 
@@ -109,10 +123,13 @@ export function tick(dt: number) {
   clock.t += Math.min(dt, 0.1)
   if (!current || current.done) return
   current.tl.time(Math.min(clock.t, current.duration), false)
+  const voice = current.voices.find((v) => clock.t >= v.at && clock.t < v.at + v.duration)
+  AudioManager.voiceAt(voice, voice ? clock.t - voice.at : 0)
   if (clock.t < current.duration) return
   current.done = true
   const { beat } = current
   const s = useStore.getState()
+  AudioManager.stopVoice()
   if (beat.choices.length) {
     const last = beat.lines.at(-1)
     s.set({ phase: 'choice', choices: beat.choices, caption: last ? { speaker: last.speaker, text: last.text } : null })

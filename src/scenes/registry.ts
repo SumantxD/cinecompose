@@ -1,10 +1,18 @@
 import type { ComponentType } from 'react'
 import type { SceneConfig } from '../cinematic/types'
 import { RailwayCrossingEnv } from './railway-crossing/RailwayCrossingEnv'
+import { TeaStallEnv } from './tea-stall/TeaStallEnv'
+import { ChildhoodHouseEnv } from './childhood-house/ChildhoodHouseEnv'
+import { ReturnRoadEnv } from './return-road/ReturnRoadEnv'
+
+export interface EnvironmentProps { lighting: SceneConfig['lighting']; scene: SceneConfig }
 
 /** Environment key (scene.json `environment`) → 3D set. `void` = black stage for animatic scenes. */
-export const ENVIRONMENTS: Record<string, ComponentType<{ lighting: SceneConfig['lighting'] }>> = {
+export const ENVIRONMENTS: Record<string, ComponentType<EnvironmentProps>> = {
   'railway-crossing': RailwayCrossingEnv,
+  'tea-stall': TeaStallEnv,
+  'childhood-house': ChildhoodHouseEnv,
+  'return-road': ReturnRoadEnv,
   void: () => null,
 }
 

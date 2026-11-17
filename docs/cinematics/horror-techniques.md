@@ -67,6 +67,7 @@ Each macro (`src/cinematic/techniques.ts`) expands into ordinary cues on the sce
 | LGT-06 | The Candle Foreground | 🔧 | low | — | CAM-08 |
 | LGT-07 | Light Avoids Her | 📋 | low | — | LGT-08, SND-04 |
 | LGT-08 | Delayed Environmental Reaction | 🔧 | free | — | ENT-04, LGT-07 |
+| ATM-01 | Ground-Attached Drift | ✅ | low–med (2–3 planes) | — | LGT-01, ENT-04 |
 | EDT-01 | Cut to Silence | ✅ (macro) | free | ✅ `EDT-01` | SND-05 |
 | EDT-02 | Delayed Reveal Cut | 🔧 | free | — | CAM-08 |
 | EDT-03 | Continuity Error on Purpose | 🔧 | free | — | LGT-03, FRM-06 |
@@ -314,6 +315,15 @@ Each macro (`src/cinematic/techniques.ts`) expands into ordinary cues on the sce
 **Build:** 📋 a `knock` synth/recording played non-spatial, after the visuals have gone fully black.
 
 ---
+
+### ATM-01 · Ground-Attached Drift ✅
+**Effect:** a low, slowly moving veil makes the wet road feel inhabited without concealing the figure or the evidence.
+**Use when:** a shadow or apparition needs the environment to react quietly. Useful in film coverage where the actor's waist and face stay well above the effect.
+**Avoid:** screen-wide haze, indoor rain, bright smoke bursts, or hiding the subject. This is not a substitute for a finished environment or character.
+**Build:** `props.groundMist` in scene JSON, with a sampled analytic surface. `GroundMist` supplies two mobile / three desktop transparent, procedurally advected planes over a bounded road area. The field's height is capped at 0.4 m and each layer's opacity at 0.12. Lighting remains the shot's existing exposure and local lamps. Motion reads `clock.t`; materials are built once in `useMemo`. No extra render pass, fluid simulation or ray-marched volume is claimed. Scene props provide the persistent field, so no macro is needed.
+**Used in:** `p1_turn`, alongside the second shadow.
+**Cost:** low–med (2–3 transparent planes, no extra post-processing pass).
+**Combines with:** LGT-01, ENT-04.
 
 ## ENT — Entity behaviour
 

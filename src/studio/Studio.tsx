@@ -6,11 +6,14 @@ import { clock } from '../cinematic/clock'
 import { useStore } from '../state/store'
 import { SCENES, SCENE_FILES } from '../scenes/registry'
 import { paceLines } from '../cinematic/timeline'
+import { moveCameraAim, moveCameraPoint, movePathHandle, pathFromShot, setNodeMode, setShotDuration, shotPointCount } from '../cinematic/curve.ts'
 import { expandTechniques } from '../cinematic/techniques'
 import { audioReady } from '../app/Overlay'
 import { useStudio } from './studioStore'
+import { EffectCreator, JsonEditor, NudgeCamera } from './AuthoringTools'
+import { validateScene } from '../cinematic/validate.ts'
 import { linesForScene } from './lines'
-import type { Cue, Shot, ShotType, Vec3 } from '../cinematic/types'
+import type { Cue, SceneConfig, Shot, ShotType, Vec3 } from '../cinematic/types'
 import './studio.css'
 
 // KAALI RAAT Studio — nudge shots, timing and the look by hand, then Save back to the scene JSON.
@@ -65,6 +68,8 @@ export function Studio() {
   const [, setTick] = useState(0)
   const [recording, setRecording] = useState(false)
   const [status, setStatus] = useState('')
+  const [adding, setAdding] = useState(false)
+  const [jsonOpen, setJsonOpen] = useState(false)
   const dirty = JSON.stringify(cfg) !== st.saved
   const cues = useMemo(() => [...cfg.cues.map((c, i) => ({ c, i, own: true })), ...expandTechniques(cfg.techniques).map((c) => ({ c, i: -1, own: false }))], [cfg])
   const paced = useMemo(() => paceLines(lines).timed, [lines])
@@ -73,14 +78,17 @@ export function Studio() {
   useEffect(() => {
     audioReady.then(() => player.previewScene(cfg, useStudio.getState().t, lines))
     player.setPaused(!useStudio.getState().playing)
-  }, [cfg, lines])
+  }, [cfg, lines, st.sel])
 
   // Playhead follows the clock while playing.
   useEffect(() => {
     let raf = 0
     const loop = () => {
       if (useStudio.getState().playing) {
-        if (clock.t >= cfg.duration) useStudio.getState().set({ playing: false, t: cfg.duration })
+        if (clock.t >= cfg.duration) {
+          useStudio.getState().set({ playing: false, t: cfg.duration })
+          player.setPaused(true)
+        }
         setTick((n) => n + 1)
       }
       raf = requestAnimationFrame(loop)
@@ -101,15 +109,53 @@ export function Studio() {
     player.setPaused(!on)
   }
   const save = async () => {
+    const errors = validateScene(cfg)
+    if (errors.length) return setStatus(errors.join(' · '))
     const file = SCENE_FILES.get(st.sceneId)!
     const json = JSON.stringify(cfg, null, 2) + '\n'
-    const r = await fetch(`/__scene?file=${file}`, { method: 'POST', body: json })
-    setStatus(r.ok ? `Saved ${file}` : 'Save failed — is the dev server running?')
-    if (r.ok) st.set({ saved: JSON.stringify(cfg) })
+    try {
+      const r = await fetch(`/__scene?file=${file}`, { method: 'POST', body: json })
+      setStatus(r.ok ? `Saved ${file}` : `Save failed · ${await r.text()}`)
+      if (r.ok) {
+        SCENES.set(st.sceneId, cfg)
+        st.set({ saved: JSON.stringify(cfg) })
+      }
+    } catch {
+      setStatus('Save failed — is the dev server running?')
+    }
+  }
+  const createScene = async (duplicate: boolean) => {
+    const sceneId = window.prompt(duplicate ? 'Name for the duplicated scene:' : 'New scene id (lowercase, numbers, _ or -):', `${st.sceneId}${duplicate ? '_copy' : '_new'}`)?.trim()
+    if (!sceneId) return
+    if (!/^[a-z][\w-]*$/.test(sceneId)) return setStatus('Scene id must start with a lowercase letter; use letters, numbers, _ or -.')
+    if (SCENES.has(sceneId)) return setStatus(`Scene "${sceneId}" already exists.`)
+    const folder = SCENE_FILES.get(st.sceneId)!.split('/')[0]
+    const file = `${folder}/${sceneId}.json`
+    const next: SceneConfig = duplicate ? JSON.parse(JSON.stringify(cfg)) as SceneConfig : {
+      ...JSON.parse(JSON.stringify(cfg)) as typeof cfg,
+      sceneId,
+      shots: [{ ...JSON.parse(JSON.stringify(cfg.shots[0])) as Shot, id: 'opening', type: 'static' as const, duration: 6, to: undefined, lookAtTo: undefined }],
+      cues: cfg.cues.filter((c) => c.at === 0 && c.action === 'light').map((c) => ({ ...c })),
+      techniques: [],
+    }
+    next.sceneId = sceneId
+    next.duration = next.shots.reduce((sum, s) => sum + s.duration, 0)
+    const errors = validateScene(next)
+    if (errors.length) return setStatus(errors.join(' · '))
+    try {
+      const r = await fetch(`/__scene?file=${file}`, { method: 'POST', body: JSON.stringify(next, null, 2) + '\n' })
+      if (!r.ok) return setStatus(`Create failed · ${await r.text()}`)
+      SCENES.set(sceneId, next)
+      SCENE_FILES.set(sceneId, file)
+      st.load(sceneId)
+      setStatus(`Created ${file}`)
+    } catch {
+      setStatus('Create failed — is the dev server running?')
+    }
   }
   const record = async () => {
     // Plays the scene from the top and records the canvas (+ sound) to a downloadable clip.
-    const canvas = document.querySelector('.st-viewport canvas') as HTMLCanvasElement
+    const canvas = document.querySelector('.st-preview canvas') as HTMLCanvasElement
     const stream = canvas.captureStream(30)
     const dest = Howler.ctx.createMediaStreamDestination()
     Howler.masterGain.connect(dest)
@@ -126,7 +172,6 @@ export function Studio() {
       setRecording(false)
     }
     setRecording(true)
-    st.set({ free: false })
     seek(0)
     rec.start()
     play(true)
@@ -136,7 +181,7 @@ export function Studio() {
   // Keyboard: Space play/pause, ←/→ nudge playhead, ⌘Z / ⇧⌘Z undo/redo, ⌘S save.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'SELECT') return
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
       const meta = e.metaKey || e.ctrlKey
       if (e.code === 'Space') { e.preventDefault(); play(!useStudio.getState().playing) }
       else if (e.key === 'ArrowLeft') seek(useStudio.getState().t - (e.shiftKey ? 1 : 0.1))
@@ -157,10 +202,11 @@ export function Studio() {
   const editCue = (fn: (c: Cue) => void) => st.edit((c) => fn(c.cues[sel!.index]))
   const fromView = (end: boolean) => {
     const { camera, target } = useStudio.getState()
-    if (!camera || !target) return setStatus('Turn on Free camera first, frame the shot, then click this.')
+    if (!camera || !target) return setStatus('The director view is still loading.')
     editShot((s) => {
-      if (end) { s.to = vec(camera.position); s.lookAtTo = vec(target) }
-      else { s.from = vec(camera.position); s.lookAt = vec(target) }
+      const count = shotPointCount(s), node = end ? count - 1 : 0
+      moveCameraPoint(s, node, vec(camera.position))
+      moveCameraAim(s, node, vec(target))
     })
     setStatus(`Shot ${end ? 'END' : 'START'} set from your view.`)
   }
@@ -179,15 +225,21 @@ export function Studio() {
         <select value={st.sceneId} onChange={(e) => st.load(e.target.value)} title="Which scene to edit">
           {[...SCENES.keys()].map((id) => <option key={id}>{id}</option>)}
         </select>
+        <button onClick={() => createScene(false)} title="Create a blank scene in this environment">＋</button>
+        <button onClick={() => createScene(true)} title="Duplicate this scene, including unsaved edits">⧉</button>
+        <button onClick={() => setJsonOpen(true)} title="Edit full scene JSON, including technique macros">{ }</button>
         <button onClick={() => play(!st.playing)} className="st-primary">{st.playing ? '❚❚ Pause' : '▶ Play'}</button>
         <button onClick={() => seek(0)} title="Back to the start">⏮</button>
-        <button onClick={st.undo} disabled={!st.past.length} title="Undo (⌘Z)">↶ Undo</button>
-        <button onClick={st.redo} disabled={!st.future.length} title="Redo (⇧⌘Z)">↷ Redo</button>
+        <button onClick={st.undo} disabled={!st.past.length} title="Undo (⌘Z)">↶</button>
+        <button onClick={st.redo} disabled={!st.future.length} title="Redo (⇧⌘Z)">↷</button>
         <span className="st-seg">
           {(['9:16', '16:9'] as const).map((a) => <button key={a} className={st.aspect === a ? 'on' : ''} onClick={() => st.set({ aspect: a })}>{a === '9:16' ? '📱 9:16' : '🖥 16:9'}</button>)}
         </span>
-        <button onClick={() => st.set({ free: !st.free })} className={st.free ? 'on' : ''} title="Drag to orbit, scroll to zoom, right-drag to slide. Then use 'Use my view' on a shot.">🎥 Free camera {st.free ? 'ON' : 'off'}</button>
-        <button onClick={() => { const m = !useStore.getState().muted; Howler.mute(m); useStore.getState().set({ muted: m }) }}>{useStore.getState().muted ? '🔇' : '🔊'}</button>
+        <button onClick={() => { play(false); setAdding(true) }} className={adding ? 'on' : ''} title="Add a light, entity, sound, title or fade at the playhead">✦ Effect</button>
+        <select className="st-nav-speed" value={st.navSpeed} onChange={(e) => st.set({ navSpeed: +e.target.value })} title="Director navigation and pan speed">{[0.5, 1, 2, 4].map((n) => <option key={n} value={n}>Nav {n}×</option>)}</select>
+        <button onClick={() => st.set({ guides: !st.guides })} className={st.guides ? 'on' : ''} title="Numbered camera points, clickable pipes, effect handles and live camera">◈</button>
+        <button onClick={() => { const m = !useStore.getState().muted; useStore.getState().set({ muted: m }); Howler.mute(!st.playing || m) }} title="Audio follows this setting during Play. Pause and scrubbing are always silent.">{useStore.getState().muted ? '🔇' : '🔊'}</button>
+        <a className="st-character-link" href="/?characters" title="Rig, procedural character motion, IK and keyframes">Character</a>
         <span className="st-grow" />
         <button onClick={record} disabled={recording} title="Plays this scene from the start and downloads it as a video">{recording ? '● Recording…' : '⏺ Record clip'}</button>
         <button onClick={save} className={dirty ? 'st-save dirty' : 'st-save'} title="Write to the scene file (⌘S)">{dirty ? '💾 Save changes' : '✓ Saved'}</button>
@@ -195,15 +247,27 @@ export function Studio() {
 
       <div className="st-main">
         <div className="st-stagewrap">
-          <div className={`st-viewport ${st.aspect === '9:16' ? 'portrait' : 'landscape'}`}>
-            <Stage />
-            <Captions />
-            {st.free && <div className="st-freehint">Free camera — drag to orbit · scroll to zoom · right-drag to slide</div>}
+          <div className="st-viewport">
+            <Stage mode="director" />
+            <div className="st-director-label">DIRECTOR · {st.view === 'orbit' ? 'FREE' : `${st.view.toUpperCase()} ORTHO`}</div>
+            <div className="st-view-switch" aria-label="Director view">
+              <button className={st.view === 'orbit' ? 'on' : ''} title="Free perspective" onClick={() => st.set({ view: 'orbit' })}>FREE</button>
+              {(['top', 'bottom', 'left', 'right'] as const).map((v) => <button key={v} className={st.view === v ? 'on' : ''} title={`${v} view (${v[0].toUpperCase()})`} onClick={() => st.set({ view: v })}>{v[0].toUpperCase()}</button>)}
+            </div>
+            <div className="st-freehint">{st.view === 'orbit' ? 'LMB orbit · RMB/MMB pan · scroll fly-through · WASD/QE fly · Shift fast · F focus · Home overview · T/B/L/R ortho' : `${st.view.toUpperCase()} ORTHO · ${st.view === 'top' || st.view === 'bottom' ? 'X ↔ / Z ↕' : 'Z ↔ / Y ↕'} · RMB/MMB pan · scroll zoom · F focus · Home free`}</div>
+            <div className={`st-preview ${st.aspect === '9:16' ? 'portrait' : 'landscape'}`}>
+              <div className="st-preview-label">● FILM CAMERA · LIVE</div>
+              <div className="st-preview-frame">
+                <Stage mode="preview" />
+                <PreviewOverlay />
+              </div>
+            </div>
           </div>
           <p className="st-status">{status || `${st.sceneId} · shot ${curShot + 1}/${cfg.shots.length} “${cfg.shots[curShot]?.id}” · ${t.toFixed(1)}s / ${cfg.duration.toFixed(1)}s`}</p>
         </div>
 
         <aside className="st-panel">
+          {adding && <EffectCreator onClose={() => setAdding(false)} />}
           <section>
             <h3>Look of this scene</h3>
             <Slider label="Brightness" hint="Exposure for the whole scene" value={cfg.lighting.exposure ?? 1} min={0.3} max={3} onChange={(v) => st.edit((c) => void (c.lighting.exposure = v))} />
@@ -222,28 +286,30 @@ export function Studio() {
                   {SHOT_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
               </label>
-              <Slider label="Length (s)" value={shot.duration} min={0.3} max={30} step={0.1} onChange={(v) => editShot((s) => void (s.duration = v))} />
+              <Slider label="Length (s)" value={shot.duration} min={0.3} max={30} step={0.1} onChange={(v) => st.edit((c) => { setShotDuration(c.shots[sel!.index], v); c.duration = c.shots.reduce((sum, s) => sum + s.duration, 0) })} />
               <Slider label="Lens (16:9)" hint="Vertical field of view in degrees: small = telephoto, big = wide" value={shot.fov} min={8} max={90} step={1} onChange={(v) => editShot((s) => void (s.fov = v))} />
               <Slider label="Lens (9:16)" hint="Same, for phones" value={shot.fovPortrait ?? shot.fov * 1.45} min={8} max={100} step={1} onChange={(v) => editShot((s) => void (s.fovPortrait = v))} />
               <Slider label="Brightness" hint="This shot only (×scene)" value={shot.exposure ?? 1} min={0.3} max={3} onChange={(v) => editShot((s) => void (s.exposure = v))} />
-              <Slider label="Face light" hint="Soft light from the camera so close subjects read" value={shot.eyeLight ?? 0} min={0} max={5} onChange={(v) => editShot((s) => void (s.eyeLight = v))} />
+              <Slider label="Face light" hint="Soft light from the camera so close subjects read" value={shot.eyeLight ?? 0} min={0} max={160} onChange={(v) => editShot((s) => void (s.eyeLight = v))} />
               <Slider label="Tilt (Dutch)" value={shot.roll ?? 0} min={-0.2} max={0.2} onChange={(v) => editShot((s) => void (s.roll = v))} />
               <div className="st-row">
                 <button onClick={() => fromView(false)} title="Free camera on → frame it → click">📷 Use my view as START</button>
                 <button onClick={() => fromView(true)} title="Where the camera ends up (moving shots)">📷 … as END</button>
               </div>
+              <NudgeCamera index={sel!.index} />
+              <CameraPathEditor shotIndex={sel!.index} />
               <div className="st-row">
                 <button onClick={() => seek(shotStarts[sel!.index] + 0.01)}>⏵ Go to shot</button>
-                <button onClick={() => editShot((s) => { delete s.to; delete s.lookAtTo })}>Make it still</button>
+                <button onClick={() => editShot((s) => { s.type = 'static'; delete s.to; delete s.lookAtTo })}>Make it still</button>
                 <button onClick={() => st.edit((c) => void c.shots.splice(sel!.index + 1, 0, { ...JSON.parse(JSON.stringify(shot)), id: shot.id + '_b', duration: 3 }))}>＋ Duplicate</button>
                 <button className="st-danger" disabled={cfg.shots.length < 2} onClick={() => { st.edit((c) => void c.shots.splice(sel!.index, 1)); st.set({ sel: null }) }}>Delete</button>
               </div>
-              <details><summary>Exact numbers</summary>
+              {!shot.path && <details><summary>Exact numbers</summary>
                 <VecField label="Start pos" value={shot.from} onChange={(v) => editShot((s) => void (s.from = v))} />
                 <VecField label="Start looks at" value={shot.lookAt} onChange={(v) => editShot((s) => void (s.lookAt = v))} />
                 <VecField label="End pos" value={shot.to} onChange={(v) => editShot((s) => void (s.to = v))} />
                 <VecField label="End looks at" value={shot.lookAtTo} onChange={(v) => editShot((s) => void (s.lookAtTo = v))} />
-              </details>
+              </details>}
             </section>
           )}
 
@@ -278,12 +344,12 @@ export function Studio() {
               <h3>How to nudge a shot</h3>
               <ol>
                 <li>Click a shot (top row of the timeline).</li>
-                <li>Pause, then turn on <b>🎥 Free camera</b>.</li>
-                <li>Drag in the picture to frame it the way you want.</li>
+                <li>Navigate freely in the large director view. Play never takes over that camera.</li>
+                <li>Frame a new shot there; the film render stays visible in the small preview.</li>
                 <li>Click <b>📷 Use my view as START</b> (and END if it moves).</li>
                 <li><b>💾 Save</b> — the game uses it immediately.</li>
               </ol>
-              <p>Drag shot edges to change length. Drag the ◆ cues to retime lights, sounds and movement. Space = play, ←/→ = step, ⌘Z = undo.</p>
+              <p>LMB orbit · RMB pan · scroll fly-through · WASD/QE fly · Shift fast · F focus · Home overview. Space = play, ←/→ = step, ⌘Z = undo. Audio plays only during Play.</p>
             </section>
           )}
         </aside>
@@ -312,12 +378,60 @@ export function Studio() {
           <div className="st-playhead" style={{ left: t * PX }} />
         </div>
       </footer>
+      {jsonOpen && <JsonEditor onClose={() => setJsonOpen(false)} />}
     </div>
   )
 
   function editShotDuration(i: number, d: number) {
-    st.edit((c) => void (c.shots[i].duration = d))
+    st.edit((c) => { setShotDuration(c.shots[i], d); c.duration = c.shots.reduce((sum, s) => sum + s.duration, 0) })
   }
+}
+
+function CameraPathEditor({ shotIndex }: { shotIndex: number }) {
+  const st = useStudio(), shot = st.cfg.shots[shotIndex]
+  const nodeCount = shotPointCount(shot)
+  const nodeIndex = Math.min(st.sel?.node ?? (st.cameraEnd ? nodeCount - 1 : 0), nodeCount - 1)
+  if (!shot.path) return <button onClick={() => st.edit((c) => { c.shots[shotIndex].path = pathFromShot(c.shots[shotIndex]) })}>Enable Bézier handles</button>
+  const path = shot.path, node = path.nodes[nodeIndex]
+  const selectNode = (value: number) => st.set({ sel: { kind: 'shot', index: shotIndex, node: value }, cameraEnd: value === nodeCount - 1 })
+  const handle = (field: 'in' | 'out' | 'aimIn' | 'aimOut', value: Vec3) => st.edit((c) => movePathHandle(c.shots[shotIndex].path!, nodeIndex, field, value))
+  return <div className="st-path-editor">
+    <div className="st-row"><button className={st.editAim ? 'on' : ''} onClick={() => st.set({ editAim: !st.editAim })}>{st.editAim ? 'Editing AIM · switch to position' : 'Editing position · switch to AIM'}</button></div>
+    <div className="st-row">
+      <select value={nodeIndex} onChange={(e) => selectNode(+e.target.value)}>
+        {path.nodes.map((p, i) => <option key={p.id} value={i}>Point {p.id}{i === 0 || i === nodeCount - 1 ? ' · endpoint' : ''}</option>)}
+      </select>
+      <select value={node.mode} title="Linked handle behaviour" onChange={(e) => st.edit((c) => setNodeMode(c.shots[shotIndex].path!, nodeIndex, e.target.value as typeof node.mode))}>
+        <option value="locked">Locked handles</option><option value="direction">Direction locked</option><option value="free">Free handles</option>
+      </select>
+    </div>
+    <span className="st-hint">Blue on a pipe = slower · orange = faster. Points change speed, not cuts.</span>
+    <div className="st-path-segments">{path.segments.map((s, i) => <div className="st-row" key={s.id}>
+      <span>{s.id}</span><input type="number" min={0.05} max={30} step={0.05} value={r2(s.duration)} onChange={(e) => st.edit((c) => {
+        const shot = c.shots[shotIndex], segment = shot.path!.segments[i]
+        segment.duration = Math.max(0.05, Number(e.target.value) || 0.05)
+        shot.duration = shot.path!.segments.reduce((sum, s) => sum + s.duration, 0)
+        c.duration = c.shots.reduce((sum, s) => sum + s.duration, 0)
+      })} /><span>s</span>
+      <select value={s.easing} onChange={(e) => st.edit((c) => { c.shots[shotIndex].path!.segments[i].easing = e.target.value })}>
+        {['none', 'sine.out', 'sine.inOut', 'power1.in', 'power1.out', 'power1.inOut', 'power2.inOut'].map((ease) => <option key={ease}>{ease}</option>)}
+      </select>
+    </div>)}</div>
+    <details open={nodeIndex > 0 && nodeIndex < nodeCount - 1}><summary>Point position, aim and curve handles</summary>
+      <VecField label="Position" value={node.position} onChange={(v) => st.edit((c) => moveCameraPoint(c.shots[shotIndex], nodeIndex, v))} />
+      <VecField label="Incoming handle" value={node.in} onChange={(v) => handle('in', v)} />
+      <VecField label="Outgoing handle" value={node.out} onChange={(v) => handle('out', v)} />
+      <VecField label="Aim target" value={node.aim} onChange={(v) => st.edit((c) => moveCameraAim(c.shots[shotIndex], nodeIndex, v))} />
+      <VecField label="Aim incoming" value={node.aimIn} onChange={(v) => handle('aimIn', v)} />
+      <VecField label="Aim outgoing" value={node.aimOut} onChange={(v) => handle('aimOut', v)} />
+    </details>
+  </div>
+}
+
+function PreviewOverlay() {
+  const blackout = useStore((s) => s.blackout)
+  const showTitle = useStore((s) => s.showTitle)
+  return <><div className="st-preview-blackout" style={{ opacity: blackout }} />{showTitle && <div className="st-preview-title">KAALI RAAT</div>}<Captions /></>
 }
 
 /** Captions over the preview (same text the player sees). */

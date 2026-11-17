@@ -20,11 +20,12 @@ Speakers allowed: `NARRATOR AARAV DRIVER MEERA WOMAN CHILD DIARY`. To add one, a
 | `# at: 4.5` | Show the line 4.5 s after the scene starts. This syncs with camera cues on the same clock. |
 | `# hold: 3` | How long it stays on screen. Defaults to reading speed. |
 | `_` (a line that is just an underscore) | A **silent beat**: gives a purely visual shot its own scene, no caption. `_ # scene: p1_look` |
+| `# vo: clip_id` | Use a local, provenance-recorded performance: a human or an explicitly approved voice-model generation. Never a runtime speech service. |
 | `# captured` | An entity has the player. The story continues (Ink decides where). |
 | `# dead` | This line is the **epitaph**: it isn't shown as a caption, but on the YOU DIED screen. Follow it with `-> END`. The player offers "Return to the last decision" (automatic checkpoint) and "Start again". |
 | choice `# dir: ahead/behind/left/right` | `* [Cross the tracks # dir: ahead]` places the option where it points in the world. |
 
-Lines without `at` are paced automatically, one after another.
+Lines without `at` are paced automatically, one after another. Unspecified `# hold` includes the baked clip's duration plus a short breath. Explicit holds must contain the clip. Voice playback follows scene time and respects pause, seek and cuts. Captions remain whole-line; no word-level lip-sync is implied.
 
 ## Choices
 

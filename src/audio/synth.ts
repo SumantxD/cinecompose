@@ -107,6 +107,15 @@ const synths: Record<string, () => Promise<AudioBuffer>> = {
     hiss.start(); wash.start()
   }), 1.5),
 
+  rain_indoor: async () => {
+    const raw = await synths.rain()
+    const ctx = new OfflineAudioContext(raw.numberOfChannels, raw.length, raw.sampleRate)
+    const source = ctx.createBufferSource()
+    source.buffer = raw
+    chain(ctx, source, filter(ctx, 'lowpass', 1200), gain(ctx, 0.85))
+    return ctx.startRendering()
+  },
+
   // Layer B: rain on leaves and earth — dense small impacts, band-limited, its own gust pattern. 13.7 s loop.
   rain_body: async () => loopify(await render(15.2, (ctx) => {
     const buf = ctx.createBuffer(2, 15.2 * SR, SR)
@@ -289,6 +298,64 @@ const synths: Record<string, () => Promise<AudioBuffer>> = {
         o.stop(3.2)
       })
     }),
+
+  cassette_click: () => render(0.24, (ctx) => {
+    const s = ctx.createBufferSource()
+    s.buffer = shaped(ctx, 0.24, t => (Math.sin(2 * Math.PI * 110 * t) * 0.7 + Math.sin(2 * Math.PI * 1800 * t) * 0.18) * Math.exp(-t * 62))
+    chain(ctx, s, filter(ctx, 'lowpass', 3200), gain(ctx, 0.65)); s.start()
+  }, 1),
+
+  cassette_hiss: async () => loopify(await render(5, (ctx) => {
+    const s = ctx.createBufferSource(); s.buffer = noise(ctx, 5)
+    chain(ctx, s, filter(ctx, 'bandpass', 2200, 0.45), gain(ctx, 0.14)); s.start()
+  }), 0.8),
+
+  radio_static: async () => loopify(await render(7, (ctx) => {
+    const s = ctx.createBufferSource(); s.buffer = noise(ctx, 7, 'brown')
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.18
+    lfo.connect(gain(ctx, 0.45)).connect(filter(ctx, 'bandpass', 1000, 0.4).frequency)
+    chain(ctx, s, filter(ctx, 'lowpass', 4000), gain(ctx, 0.35)); s.start();
+  }), 1.0),
+
+  fan_ceiling: async () => loopify(await render(4, (ctx) => {
+    const air = ctx.createBufferSource(); air.buffer = noise(ctx, 4, 'brown')
+    chain(ctx, air, filter(ctx, 'lowpass', 350), gain(ctx, 0.2)); air.start()
+    const motor = ctx.createOscillator(); motor.frequency.value = 97
+    chain(ctx, motor, filter(ctx, 'lowpass', 600), gain(ctx, 0.025)); motor.start()
+  }), 0.7),
+
+  footstep_wood: () => render(0.38, (ctx) => {
+    const s = ctx.createBufferSource()
+    s.buffer = shaped(ctx, 0.38, t => (Math.sin(2 * Math.PI * 165 * t) * 0.6 + Math.sin(2 * Math.PI * 620 * t) * 0.32) * Math.exp(-t * 32))
+    chain(ctx, s, filter(ctx, 'lowpass', 1800), gain(ctx, 0.6)); s.start()
+  }, 1),
+
+  knock_three: () => render(1.9, (ctx) => {
+    [0.06, 0.59, 1.15].forEach(at => {
+      const o = ctx.createOscillator(), g = gain(ctx, 0)
+      o.type = 'triangle'; o.frequency.value = 114
+      g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(0.6, at + 0.004)
+      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.21)
+      o.connect(g).connect(ctx.destination); o.start(at); o.stop(at + 0.24)
+    })
+  }, 1),
+
+  train_pass: () => render(6.4, (ctx) => {
+    const s = ctx.createBufferSource()
+    s.buffer = shaped(ctx, 6.4, t => {
+      const phase = (t * 8.8) % 1, fade = Math.min(1, t, 6.4 - t)
+      const clack = Math.sin(2 * Math.PI * 110 * t) * Math.exp(-phase * 43)
+      return (clack * 0.5 + Math.sin(2 * Math.PI * 57 * t) * 0.22 + Math.sin(2 * Math.PI * 181 * t) * 0.08) * fade
+    })
+    chain(ctx, s, filter(ctx, 'lowpass', 1300), gain(ctx, 0.65)); s.start()
+  }, 1),
+
+  paper_burn: () => render(5.5, (ctx) => {
+    const s = ctx.createBufferSource(); s.buffer = noise(ctx, 5.5)
+    const g = gain(ctx, 0)
+    g.gain.linearRampToValueAtTime(0.22, 0.6); g.gain.setTargetAtTime(0.0001, 4.0, 0.9)
+    chain(ctx, s, filter(ctx, 'highpass', 900), g); s.start()
+  }, 1),
 
   // The one loud moment: sub drop, a choked burst, a dissonant cluster that hangs.
   capture_hit: () =>

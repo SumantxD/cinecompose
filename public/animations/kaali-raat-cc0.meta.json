@@ -1,0 +1,259 @@
+{
+  "source": "https://github.com/Kinemiq/free-game-animations/releases/tag/v1.0",
+  "version": "1.0",
+  "authors": [
+    "Quaternius",
+    "KinemIQ"
+  ],
+  "license": "CC0-1.0",
+  "licenseUrl": "https://raw.githubusercontent.com/Kinemiq/free-game-animations/main/LICENSE",
+  "omitted": "Mannequin mesh; only the shared transform hierarchy and animation tracks are bundled.",
+  "fps": 30,
+  "clips": [
+    {
+      "id": "action-dance",
+      "name": "Action dance",
+      "sourceFile": "GLB/Action_dance.glb",
+      "clip": "Action_dance",
+      "duration": 1
+    },
+    {
+      "id": "action-interact",
+      "name": "Action interact",
+      "sourceFile": "GLB/Action_interact.glb",
+      "clip": "Action_interact",
+      "duration": 2
+    },
+    {
+      "id": "action-pick-up-from-a-table",
+      "name": "Action pick up from a table",
+      "sourceFile": "GLB/Action_pick_up_from_a_table.glb",
+      "clip": "Action_pick_up_from_a_table",
+      "duration": 0.800000011920929
+    },
+    {
+      "id": "action-sit-down",
+      "name": "Action sit down",
+      "sourceFile": "GLB/Action_sit_down.glb",
+      "clip": "Action_sit_down",
+      "duration": 1.2999999523162842
+    },
+    {
+      "id": "action-stand-up-from-sitting",
+      "name": "Action stand up from sitting",
+      "sourceFile": "GLB/Action_stand_up_from_sitting.glb",
+      "clip": "Action_stand_up_from_sitting",
+      "duration": 1.0333333015441895
+    },
+    {
+      "id": "block-with-the-sword",
+      "name": "Block with the sword",
+      "sourceFile": "GLB/Block_with_the_sword.glb",
+      "clip": "Block_with_the_sword",
+      "duration": 1.2000000476837158
+    },
+    {
+      "id": "death-fall-backwards",
+      "name": "Death fall backwards",
+      "sourceFile": "GLB/Death_fall_backwards.glb",
+      "clip": "Death_fall_backwards",
+      "duration": 2.366666555404663
+    },
+    {
+      "id": "dodge-roll",
+      "name": "Dodge roll",
+      "sourceFile": "GLB/Dodge_roll.glb",
+      "clip": "Dodge_roll",
+      "duration": 1.4333332777023315
+    },
+    {
+      "id": "hit-knockback",
+      "name": "Hit knockback",
+      "sourceFile": "GLB/Hit_knockback.glb",
+      "clip": "Hit_knockback",
+      "duration": 0.8333333134651184
+    },
+    {
+      "id": "hit-to-the-chest",
+      "name": "Hit to the chest",
+      "sourceFile": "GLB/Hit_to_the_chest.glb",
+      "clip": "Hit_to_the_chest",
+      "duration": 0.3333333432674408
+    },
+    {
+      "id": "hit-to-the-head",
+      "name": "Hit to the head",
+      "sourceFile": "GLB/Hit_to_the_head.glb",
+      "clip": "Hit_to_the_head",
+      "duration": 0.4333333373069763
+    },
+    {
+      "id": "idle-arms-folded-waiting",
+      "name": "Idle arms folded waiting",
+      "sourceFile": "GLB/Idle_arms_folded_waiting.glb",
+      "clip": "Idle_arms_folded_waiting",
+      "duration": 2.5
+    },
+    {
+      "id": "idle-crouching",
+      "name": "Idle crouching",
+      "sourceFile": "GLB/Idle_crouching.glb",
+      "clip": "Idle_crouching",
+      "duration": 2.933333396911621
+    },
+    {
+      "id": "idle-relaxed",
+      "name": "Idle relaxed",
+      "sourceFile": "GLB/Idle_relaxed.glb",
+      "clip": "Idle_relaxed",
+      "duration": 2.5
+    },
+    {
+      "id": "idle-sitting",
+      "name": "Idle sitting",
+      "sourceFile": "GLB/Idle_sitting.glb",
+      "clip": "Idle_sitting",
+      "duration": 1.6666666269302368
+    },
+    {
+      "id": "idle-talking",
+      "name": "Idle talking",
+      "sourceFile": "GLB/Idle_talking.glb",
+      "clip": "Idle_talking",
+      "duration": 2.933333396911621
+    },
+    {
+      "id": "idle-with-a-sword",
+      "name": "Idle with a sword",
+      "sourceFile": "GLB/Idle_with_a_sword.glb",
+      "clip": "Idle_with_a_sword",
+      "duration": 1.6666666269302368
+    },
+    {
+      "id": "idle-zombie",
+      "name": "Idle zombie",
+      "sourceFile": "GLB/Idle_zombie.glb",
+      "clip": "Idle_zombie",
+      "duration": 1.3333333730697632
+    },
+    {
+      "id": "jump-in-the-air",
+      "name": "Jump in the air",
+      "sourceFile": "GLB/Jump_in_the_air.glb",
+      "clip": "Jump_in_the_air",
+      "duration": 2.5
+    },
+    {
+      "id": "jump-landing",
+      "name": "Jump landing",
+      "sourceFile": "GLB/Jump_landing.glb",
+      "clip": "Jump_landing",
+      "duration": 1.2333333492279053
+    },
+    {
+      "id": "jump-take-off",
+      "name": "Jump take off",
+      "sourceFile": "GLB/Jump_take_off.glb",
+      "clip": "Jump_take_off",
+      "duration": 1.2333333492279053
+    },
+    {
+      "id": "move-climb-up-1-m",
+      "name": "Move climb up 1 m",
+      "sourceFile": "GLB/Move_climb_up_1_m.glb",
+      "clip": "Move_climb_up_1_m",
+      "duration": 0.6333333253860474
+    },
+    {
+      "id": "move-get-up-from-the-ground",
+      "name": "Move get up from the ground",
+      "sourceFile": "GLB/Move_get_up_from_the_ground.glb",
+      "clip": "Move_get_up_from_the_ground",
+      "duration": 1.5
+    },
+    {
+      "id": "punch-cross-right-2",
+      "name": "Punch cross right 2",
+      "sourceFile": "GLB/Punch_cross_right_2.glb",
+      "clip": "Punch_cross_right_2",
+      "duration": 0.9333333373069763
+    },
+    {
+      "id": "punch-hook-right-2",
+      "name": "Punch hook right 2",
+      "sourceFile": "GLB/Punch_hook_right_2.glb",
+      "clip": "Punch_hook_right_2",
+      "duration": 0.4333333373069763
+    },
+    {
+      "id": "punch-jab-left-2",
+      "name": "Punch jab left 2",
+      "sourceFile": "GLB/Punch_jab_left_2.glb",
+      "clip": "Punch_jab_left_2",
+      "duration": 0.800000011920929
+    },
+    {
+      "id": "run-jog-forwards",
+      "name": "Run jog forwards",
+      "sourceFile": "GLB/Run_jog_forwards.glb",
+      "clip": "Run_jog_forwards",
+      "duration": 0.8666666746139526
+    },
+    {
+      "id": "run-sprint",
+      "name": "Run sprint",
+      "sourceFile": "GLB/Run_sprint.glb",
+      "clip": "Run_sprint",
+      "duration": 0.6333333253860474
+    },
+    {
+      "id": "strike-zombie-scratch",
+      "name": "Strike zombie scratch",
+      "sourceFile": "GLB/Strike_zombie_scratch.glb",
+      "clip": "Strike_zombie_scratch",
+      "duration": 1.7999999523162842
+    },
+    {
+      "id": "sword-slash",
+      "name": "Sword slash",
+      "sourceFile": "GLB/Sword_slash.glb",
+      "clip": "Sword_slash",
+      "duration": 1.5333333015441895
+    },
+    {
+      "id": "walk-carrying",
+      "name": "Walk carrying",
+      "sourceFile": "GLB/Walk_carrying.glb",
+      "clip": "Walk_carrying",
+      "duration": 2
+    },
+    {
+      "id": "walk-crouched-forwards",
+      "name": "Walk crouched forwards",
+      "sourceFile": "GLB/Walk_crouched_forwards.glb",
+      "clip": "Walk_crouched_forwards",
+      "duration": 2
+    },
+    {
+      "id": "walk-formal",
+      "name": "Walk formal",
+      "sourceFile": "GLB/Walk_formal.glb",
+      "clip": "Walk_formal",
+      "duration": 1.2999999523162842
+    },
+    {
+      "id": "walk-forwards",
+      "name": "Walk forwards",
+      "sourceFile": "GLB/Walk_forwards.glb",
+      "clip": "Walk_forwards",
+      "duration": 1.2999999523162842
+    },
+    {
+      "id": "walk-zombie-forwards",
+      "name": "Walk zombie forwards",
+      "sourceFile": "GLB/Walk_zombie_forwards.glb",
+      "clip": "Walk_zombie_forwards",
+      "duration": 1.2666666507720947
+    }
+  ]
+}

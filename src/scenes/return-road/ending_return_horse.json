@@ -1,0 +1,368 @@
+{
+  "sceneId": "ending_return_horse",
+  "environment": "return-road",
+  "duration": 61.92,
+  "shots": [
+    {
+      "id": "take_it_to_the_rails",
+      "type": "slow_push",
+      "duration": 11.18,
+      "from": [
+        -1.5,
+        1.73,
+        20
+      ],
+      "lookAt": [
+        0,
+        1.25,
+        -4.5
+      ],
+      "fov": 40,
+      "fovPortrait": 59,
+      "to": [
+        -1.27,
+        1.67,
+        18.8
+      ],
+      "eyeLight": 10.4
+    },
+    {
+      "id": "the_offering",
+      "type": "slow_push",
+      "duration": 12.9,
+      "from": [
+        0.4,
+        1.58,
+        0.78
+      ],
+      "lookAt": [
+        0.4,
+        0.775,
+        0
+      ],
+      "fov": 32,
+      "fovPortrait": 57,
+      "to": [
+        0.4,
+        1.5,
+        0.7
+      ],
+      "eyeLight": 0.817,
+      "focus": {
+        "object": "cassette",
+        "local": [
+          0,
+          0.03,
+          0
+        ],
+        "radius": 0.11
+      }
+    },
+    {
+      "id": "you_came_back",
+      "type": "slow_push",
+      "duration": 11.18,
+      "from": [
+        1.35,
+        1.7,
+        7.15
+      ],
+      "lookAt": [
+        0.4,
+        1.35,
+        -6.5
+      ],
+      "fov": 39,
+      "fovPortrait": 58,
+      "to": [
+        1.29,
+        1.66,
+        6.57
+      ],
+      "eyeLight": 10.4
+    },
+    {
+      "id": "the_train_passes",
+      "type": "low_angle",
+      "duration": 14.62,
+      "from": [
+        0.85,
+        0.48,
+        10
+      ],
+      "lookAt": [
+        0,
+        1,
+        -3
+      ],
+      "fov": 42,
+      "fovPortrait": 62,
+      "to": [
+        0.6,
+        0.47,
+        9.4
+      ],
+      "eyeLight": 10.4
+    },
+    {
+      "id": "feet_facing_forward",
+      "type": "focus",
+      "duration": 12.04,
+      "from": [
+        0.34,
+        0.29,
+        16.75
+      ],
+      "lookAt": [
+        0.07,
+        0.05,
+        15.31
+      ],
+      "fov": 26,
+      "fovPortrait": 38,
+      "to": [
+        0.31,
+        0.27,
+        16.53
+      ],
+      "lookAtTo": [
+        0.065,
+        0.04,
+        15.31
+      ],
+      "eyeLight": 1.322,
+      "focus": {
+        "object": "chudail",
+        "local": [
+          0.075,
+          0.035,
+          0.145
+        ],
+        "radius": 0.085
+      }
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.95,
+    "fogDensity": 0.028,
+    "exposure": 1.1,
+    "moon": 0.72,
+    "gi": 1
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.52
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.22
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "dawn",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "mirror_sodium",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "meera",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_far",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "sodium_near",
+      "mode": "on"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "gate_tube",
+      "mode": "dying"
+    },
+    {
+      "at": 34.4,
+      "action": "entity",
+      "target": "taxi",
+      "visible": true,
+      "position": [
+        -31,
+        0,
+        -1.6
+      ],
+      "from": [
+        -45,
+        0,
+        -1.6
+      ],
+      "speed": 16
+    },
+    {
+      "at": 42.14,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        0.4,
+        0.665,
+        0.25
+      ],
+      "from": [
+        0.05,
+        0,
+        14.5
+      ],
+      "speed": 1.3,
+      "rotationY": 3.141592653589793,
+      "anim": "walk"
+    },
+    {
+      "at": 8.6,
+      "action": "entity",
+      "target": "cassette",
+      "visible": true
+    },
+    {
+      "at": 12.9,
+      "action": "entity",
+      "target": "horse",
+      "visible": true
+    },
+    {
+      "at": 12.9,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        0,
+        0.665,
+        0.25
+      ],
+      "rotationY": 3.141592653589793,
+      "anim": "idle"
+    },
+    {
+      "at": 15.48,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "position": [
+        0.55,
+        0,
+        -7.2
+      ],
+      "rotationY": 0
+    },
+    {
+      "at": 17.2,
+      "action": "sfx",
+      "sound": "signal",
+      "volume": 0.2,
+      "position": [
+        0.55,
+        1,
+        -7.2
+      ]
+    },
+    {
+      "at": 30.96,
+      "action": "sfx",
+      "sound": "train_horn",
+      "volume": 0.65,
+      "position": [
+        -20,
+        1.6,
+        0
+      ]
+    },
+    {
+      "at": 36.12,
+      "action": "train",
+      "target": "freight",
+      "from": [
+        -33,
+        0,
+        0
+      ],
+      "to": [
+        63,
+        0,
+        0
+      ],
+      "duration": 6.02
+    },
+    {
+      "at": 36.12,
+      "action": "sfx",
+      "sound": "train_pass",
+      "volume": 0.65
+    },
+    {
+      "at": 39.56,
+      "action": "entity",
+      "target": "aarav",
+      "visible": false
+    },
+    {
+      "at": 43,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "position": [
+        0.05,
+        0,
+        15.2
+      ],
+      "rotationY": 0,
+      "feetForward": true,
+      "smile": true
+    }
+  ],
+  "props": {
+    "cassette": true,
+    "horse": "carried"
+  }
+}

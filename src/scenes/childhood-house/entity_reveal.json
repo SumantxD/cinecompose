@@ -1,0 +1,253 @@
+{
+  "sceneId": "entity_reveal",
+  "environment": "childhood-house",
+  "duration": 59.34,
+  "shots": [
+    {
+      "id": "beyond_the_doorway",
+      "type": "slow_push",
+      "duration": 11.18,
+      "from": [
+        0.7,
+        1.64,
+        2.75
+      ],
+      "lookAt": [
+        0,
+        1.35,
+        -6.8
+      ],
+      "fov": 33,
+      "fovPortrait": 49,
+      "to": [
+        0.62,
+        1.61,
+        2.18
+      ],
+      "eyeLight": 10.4,
+      "focus": {
+        "object": "chudail",
+        "local": [
+          0,
+          1,
+          0
+        ],
+        "radius": 0.72
+      }
+    },
+    {
+      "id": "you_left_her",
+      "type": "slow_push",
+      "duration": 20.64,
+      "from": [
+        -0.35,
+        1.65,
+        2.3
+      ],
+      "lookAt": [
+        0,
+        1.43,
+        -6.8
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "to": [
+        -0.28,
+        1.63,
+        1.95
+      ],
+      "eyeLight": 10.4
+    },
+    {
+      "id": "wrong_feet",
+      "type": "focus",
+      "duration": 12.04,
+      "from": [
+        0.52,
+        0.63,
+        -4.9
+      ],
+      "lookAt": [
+        0,
+        0.21,
+        -6.8
+      ],
+      "fov": 38,
+      "fovPortrait": 56,
+      "to": [
+        0.45,
+        0.42,
+        -5.2
+      ],
+      "lookAtTo": [
+        0,
+        0.12,
+        -6.8
+      ],
+      "eyeLight": 2.637,
+      "focus": {
+        "object": "chudail",
+        "local": [
+          0.075,
+          0.035,
+          -0.05
+        ],
+        "radius": 0.12
+      }
+    },
+    {
+      "id": "her_name_is_forgotten",
+      "type": "slow_push",
+      "duration": 15.48,
+      "from": [
+        0.6,
+        1.67,
+        -4
+      ],
+      "lookAt": [
+        0,
+        1.61,
+        -6.8
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "to": [
+        0.53,
+        1.65,
+        -4.35
+      ],
+      "eyeLight": 5.332
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.006,
+    "exposure": 1.65,
+    "moon": 0.36,
+    "gi": 0.7
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain_indoor",
+        "volume": 0.24
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.14
+      },
+      {
+        "sound": "fan_ceiling",
+        "volume": 0.2
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "dawn",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "mirror_sodium",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "meera",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "position": [
+        0,
+        0.176,
+        -6.8
+      ],
+      "rotationY": 3.141592653589793
+    },
+    {
+      "at": 2.408,
+      "action": "sfx",
+      "sound": "signal",
+      "volume": 0.2,
+      "position": [
+        0,
+        1.2,
+        -5.7
+      ]
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.56,
+        0.176,
+        0.35
+      ],
+      "rotationY": 3.141592653589793,
+      "anim": "hold"
+    },
+    {
+      "at": 42.14,
+      "action": "sfx",
+      "sound": "signal",
+      "volume": 0.2,
+      "position": [
+        0,
+        1.1,
+        -6.8
+      ]
+    },
+    {
+      "at": 42.312,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "keep": true,
+      "position": [
+        0,
+        0.176,
+        -6.35
+      ],
+      "tilt": 0.08
+    },
+    {
+      "at": 42.14,
+      "action": "light",
+      "target": "corridor_tube",
+      "mode": "flicker"
+    },
+    {
+      "at": 43,
+      "action": "light",
+      "target": "corridor_tube",
+      "mode": "on"
+    }
+  ],
+  "props": {
+    "horse": "inventory"
+  }
+}

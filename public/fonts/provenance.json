@@ -1,0 +1,57 @@
+{
+  "api": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Tiro+Devanagari+Hindi&display=swap",
+  "fonts": [
+    {
+      "file": "cormorant_garamond_italic_400.ttf",
+      "family": "Cormorant Garamond",
+      "style": "italic",
+      "weight": 400,
+      "format": "truetype",
+      "license": "OFL-1.1",
+      "licenseFile": "CORMORANT-OFL.txt",
+      "source": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3smX5slCNuHLi8bLeY9MK7whWMhyjYrGFEsdtdc62E6zd58jDOjw.ttf",
+      "sha256": "0b9a8a33cfaa624d30f70f9b6686da769b319b8c37a55af16e29fef690108bbf",
+      "bytes": 293036,
+      "added": "2026-11-13"
+    },
+    {
+      "file": "cormorant_garamond_normal_400.ttf",
+      "family": "Cormorant Garamond",
+      "style": "normal",
+      "weight": 400,
+      "format": "truetype",
+      "license": "OFL-1.1",
+      "licenseFile": "CORMORANT-OFL.txt",
+      "source": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_v86GnM.ttf",
+      "sha256": "6d37a86241a25d63f8fe6018b4c083449886b7165c1acb15edd0f574f690ecf7",
+      "bytes": 290236,
+      "added": "2026-11-13"
+    },
+    {
+      "file": "cormorant_garamond_normal_500.ttf",
+      "family": "Cormorant Garamond",
+      "style": "normal",
+      "weight": 500,
+      "format": "truetype",
+      "license": "OFL-1.1",
+      "licenseFile": "CORMORANT-OFL.txt",
+      "source": "https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_s06GnM.ttf",
+      "sha256": "1724047c8988ca5155bff667bc48fa52e97d57aabc6b42eebbf986f21a4be20b",
+      "bytes": 290496,
+      "added": "2026-11-13"
+    },
+    {
+      "file": "tiro_devanagari_hindi_normal_400.ttf",
+      "family": "Tiro Devanagari Hindi",
+      "style": "normal",
+      "weight": 400,
+      "format": "truetype",
+      "license": "OFL-1.1",
+      "licenseFile": "Tiro-OFL.txt",
+      "source": "https://fonts.gstatic.com/s/tirodevanagarihindi/v7/55xyezN7P8T4e0_CfIJrwdodg9HoYw0i-M9fSA.ttf",
+      "sha256": "611617bab084f061e4789b91b6f0b5aab776c557cdf0b49f72393f58ef716724",
+      "bytes": 376908,
+      "added": "2026-11-13"
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "sceneId": "house_exterior_captured",
+  "environment": "childhood-house",
+  "duration": 17.2,
+  "shots": [
+    {
+      "id": "small_house",
+      "type": "low_angle",
+      "duration": 9.46,
+      "from": [
+        -1.2,
+        1.65,
+        12.8
+      ],
+      "lookAt": [
+        0,
+        1.42,
+        5.1
+      ],
+      "fov": 43,
+      "fovPortrait": 64,
+      "to": [
+        -1.02,
+        1.61,
+        11.9
+      ],
+      "eyeLight": 10.4
+    },
+    {
+      "id": "the_open_door",
+      "type": "slow_push",
+      "duration": 7.74,
+      "from": [
+        0.35,
+        1.56,
+        8.9
+      ],
+      "lookAt": [
+        0,
+        1.36,
+        4.9
+      ],
+      "fov": 38,
+      "fovPortrait": 56,
+      "to": [
+        0.35,
+        1.57,
+        8.1
+      ],
+      "eyeLight": 10.4
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.006,
+    "exposure": 1.65,
+    "moon": 0.36,
+    "gi": 0.7
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.26
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.14
+      },
+      {
+        "sound": "fan_ceiling",
+        "volume": 0.2
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "dawn",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "mirror_sodium",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "meera",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.55,
+        0.176,
+        8.3
+      ],
+      "rotationY": 3.141592653589793,
+      "anim": "idle"
+    },
+    {
+      "at": 3.44,
+      "action": "sfx",
+      "sound": "tube_tick",
+      "volume": 0.3,
+      "position": [
+        -1.7,
+        2.65,
+        6.5
+      ]
+    }
+  ],
+  "props": {
+    "footprints": true
+  }
+}

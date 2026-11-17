@@ -1,0 +1,186 @@
+{
+  "sceneId": "tea_stall_mirror",
+  "environment": "tea-stall",
+  "duration": 38.7,
+  "shots": [
+    {
+      "id": "rewind",
+      "type": "slow_push",
+      "duration": 10.32,
+      "from": [
+        -0.7,
+        1.38,
+        0.25
+      ],
+      "lookAt": [
+        -0.53,
+        1.16,
+        -0.59
+      ],
+      "fov": 34,
+      "fovPortrait": 55,
+      "to": [
+        -0.61,
+        1.28,
+        -0.02
+      ],
+      "eyeLight": 0.509,
+      "focus": {
+        "object": "cassette",
+        "local": [
+          0,
+          0.11,
+          -0.02
+        ],
+        "radius": 0.145
+      }
+    },
+    {
+      "id": "the_other_recording",
+      "type": "pan",
+      "duration": 12.9,
+      "from": [
+        -0.25,
+        1.45,
+        1.4
+      ],
+      "lookAt": [
+        -0.5,
+        1.24,
+        -0.59
+      ],
+      "fov": 36,
+      "fovPortrait": 53,
+      "lookAtTo": [
+        0.9,
+        1.45,
+        -1.86
+      ],
+      "eyeLight": 2.643
+    },
+    {
+      "id": "the_way_home",
+      "type": "pan",
+      "duration": 15.48,
+      "from": [
+        0.1,
+        1.45,
+        1.75
+      ],
+      "lookAt": [
+        0.9,
+        1.43,
+        -1.9
+      ],
+      "fov": 36,
+      "fovPortrait": 53,
+      "lookAtTo": [
+        0.05,
+        1.38,
+        4.8
+      ],
+      "eyeLight": 9.076
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.42,
+    "fogDensity": 0.009,
+    "exposure": 1.35,
+    "moon": 0.26,
+    "gi": 0.75
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain_indoor",
+        "volume": 0.26
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.18
+      },
+      {
+        "sound": "radio_static",
+        "volume": 0.12
+      },
+      {
+        "sound": "cassette_hiss",
+        "volume": 0.14
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "dawn",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "mirror_sodium",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "meera",
+      "visible": false
+    },
+    {
+      "at": 0.344,
+      "action": "sfx",
+      "sound": "cassette_click",
+      "volume": 0.48,
+      "position": [
+        -0.53,
+        1.1,
+        -0.59
+      ]
+    },
+    {
+      "at": 25.8,
+      "action": "sfx",
+      "sound": "cassette_click",
+      "volume": 0.3,
+      "position": [
+        -0.53,
+        1.1,
+        -0.59
+      ]
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "her_reflection",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -1.17,
+        0,
+        1.05
+      ],
+      "rotationY": 3.141592653589793,
+      "anim": "idle"
+    }
+  ]
+}

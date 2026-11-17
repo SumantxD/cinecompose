@@ -1,0 +1,170 @@
+{
+  "sceneId": "ending_waiting",
+  "environment": "tea-stall",
+  "duration": 40.42,
+  "shots": [
+    {
+      "id": "stay",
+      "type": "slow_push",
+      "duration": 15.48,
+      "from": [
+        -0.7,
+        1.28,
+        2.5
+      ],
+      "lookAt": [
+        -0.8,
+        1.2,
+        0.8
+      ],
+      "fov": 37,
+      "fovPortrait": 55,
+      "to": [
+        -0.66,
+        1.23,
+        1.75
+      ],
+      "eyeLight": 1.889
+    },
+    {
+      "id": "leave_the_house",
+      "type": "pan",
+      "duration": 15.48,
+      "from": [
+        -0.7,
+        1.38,
+        1.8
+      ],
+      "lookAt": [
+        -0.5,
+        1.3,
+        -1.8
+      ],
+      "fov": 35,
+      "fovPortrait": 52,
+      "lookAtTo": [
+        0,
+        1.33,
+        5.5
+      ],
+      "eyeLight": 8.454
+    },
+    {
+      "id": "morning",
+      "type": "focus",
+      "duration": 9.46,
+      "from": [
+        0.1,
+        1.25,
+        2.8
+      ],
+      "lookAt": [
+        0,
+        1.1,
+        -0.5
+      ],
+      "fov": 39,
+      "fovPortrait": 58,
+      "to": [
+        0.1,
+        1.25,
+        2.55
+      ],
+      "lookAtTo": [
+        -0.4,
+        1.12,
+        -0.59
+      ],
+      "eyeLight": 7.1
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.42,
+    "fogDensity": 0.009,
+    "exposure": 1.35,
+    "moon": 0.26,
+    "gi": 0.75
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain_indoor",
+        "volume": 0.26
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.18
+      },
+      {
+        "sound": "radio_static",
+        "volume": 0.12
+      },
+      {
+        "sound": "cassette_hiss",
+        "volume": 0.14
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "dawn",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "mirror_sodium",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "meera",
+      "visible": false
+    },
+    {
+      "at": 23.22,
+      "action": "light",
+      "target": "stall_tube",
+      "mode": "flicker"
+    },
+    {
+      "at": 26.66,
+      "action": "light",
+      "target": "stall_tube",
+      "mode": "on"
+    },
+    {
+      "at": 20.64,
+      "action": "light",
+      "target": "dawn",
+      "mode": "on"
+    },
+    {
+      "at": 26.488,
+      "action": "sfx",
+      "sound": "cassette_click",
+      "volume": 0.24,
+      "position": [
+        -0.53,
+        1.1,
+        -0.59
+      ]
+    }
+  ]
+}

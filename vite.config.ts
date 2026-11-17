@@ -2,6 +2,7 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { Compiler } from 'inkjs/full'
 import { mkdirSync, writeFileSync } from 'node:fs'
+import { validateScene } from './src/cinematic/validate.ts'
 
 // Compiles .ink scripts to Ink JSON at build time; script errors fail the build / show in the dev overlay.
 function ink(): Plugin {
@@ -46,14 +47,24 @@ function sceneSave(): Plugin {
     apply: 'serve',
     configureServer(server) {
       server.middlewares.use('/__scene', (req, res) => {
-        const file = new URL(req.url!, 'http://x').searchParams.get('file')!
+        if (req.method !== 'POST') return void (res.statusCode = 405, res.end('POST only'))
+        const file = new URL(req.url!, 'http://x').searchParams.get('file') ?? ''
         if (!/^[\w-]+\/[\w-]+\.json$/.test(file)) return void (res.statusCode = 400, res.end('bad file'))
         let body = ''
         req.on('data', (c) => (body += c))
         req.on('end', () => {
-          JSON.parse(body) // refuse to write broken JSON
-          writeFileSync(`src/scenes/${file}`, body)
-          res.end('ok')
+          try {
+            const cfg: unknown = JSON.parse(body)
+            const errors = validateScene(cfg)
+            const id = (cfg as { sceneId?: string })?.sceneId
+            if (id !== file.split('/')[1].replace('.json', '')) errors.unshift('sceneId must match the filename.')
+            if (errors.length) return void (res.statusCode = 422, res.end(errors.join('\n')))
+            writeFileSync(`src/scenes/${file}`, body)
+            res.end('ok')
+          } catch (e) {
+            res.statusCode = 400
+            res.end(e instanceof Error ? e.message : String(e))
+          }
         })
       })
     },

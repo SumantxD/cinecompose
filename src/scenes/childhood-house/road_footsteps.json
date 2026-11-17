@@ -1,0 +1,165 @@
+{
+  "sceneId": "road_footsteps",
+  "environment": "childhood-house",
+  "duration": 17.2,
+  "shots": [
+    {
+      "id": "feet_in_the_mud",
+      "type": "low_angle",
+      "duration": 9.46,
+      "from": [
+        1.9,
+        0.44,
+        11.4
+      ],
+      "lookAt": [
+        0,
+        0.72,
+        9.4
+      ],
+      "fov": 38,
+      "fovPortrait": 56,
+      "to": [
+        1.7,
+        0.42,
+        10.6
+      ],
+      "eyeLight": 4.997
+    },
+    {
+      "id": "a_light_left_on",
+      "type": "slow_push",
+      "duration": 7.74,
+      "from": [
+        1.7,
+        1.7,
+        12.1
+      ],
+      "lookAt": [
+        0,
+        1.3,
+        5.1
+      ],
+      "fov": 40,
+      "fovPortrait": 59,
+      "to": [
+        1.4,
+        1.65,
+        10.8
+      ],
+      "eyeLight": 10.4
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.006,
+    "exposure": 1.65,
+    "moon": 0.36,
+    "gi": 0.7
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain",
+        "volume": 0.26
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.14
+      },
+      {
+        "sound": "fan_ceiling",
+        "volume": 0.2
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "dawn",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "mirror_sodium",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "meera",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.2,
+        0,
+        10.2
+      ],
+      "from": [
+        -0.2,
+        0,
+        13.3
+      ],
+      "speed": 0.62,
+      "rotationY": 3.141592653589793,
+      "anim": "walk"
+    },
+    {
+      "at": 9.46,
+      "action": "entity",
+      "target": "chudail",
+      "visible": true,
+      "shadowOnly": true,
+      "position": [
+        -0.65,
+        0.05,
+        9.8
+      ],
+      "from": [
+        -0.65,
+        0,
+        13.7
+      ],
+      "speed": 0.6
+    },
+    {
+      "at": 8.6,
+      "action": "sfx",
+      "sound": "anklets",
+      "volume": 0.22,
+      "position": [
+        -0.65,
+        0.05,
+        10.4
+      ]
+    },
+    {
+      "at": 11.868,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "keep": true,
+      "headYaw": 0.25
+    }
+  ]
+}

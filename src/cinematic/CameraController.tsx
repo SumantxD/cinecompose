@@ -44,7 +44,8 @@ export function CameraController() {
       camera.updateProjectionMatrix()
     }
 
-    eye.current.position.copy(camera.position)
+    eye.current.position.set(-0.35, 0.55, 0.1)
+    camera.localToWorld(eye.current.position)
 
     camera.getWorldDirection(fwd)
     AudioManager.listener([camera.position.x, camera.position.y, camera.position.z], [fwd.x, fwd.y, fwd.z])

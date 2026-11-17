@@ -1,4 +1,4 @@
-import type { ShotType } from './types'
+import type { ShotType } from './types.ts'
 
 /**
  * How each shot type feels. Scenes only choose a type; tune the feel here once for the whole series.

@@ -1,0 +1,159 @@
+{
+  "sceneId": "tea_stall_tape",
+  "environment": "tea-stall",
+  "duration": 24.94,
+  "shots": [
+    {
+      "id": "listen_again",
+      "type": "slow_push",
+      "duration": 8.6,
+      "from": [
+        -0.53,
+        1.37,
+        0.27
+      ],
+      "lookAt": [
+        -0.53,
+        1.16,
+        -0.59
+      ],
+      "fov": 35,
+      "fovPortrait": 55,
+      "to": [
+        -0.51,
+        1.31,
+        0.05
+      ],
+      "eyeLight": 0.509,
+      "focus": {
+        "object": "cassette",
+        "local": [
+          0,
+          0.11,
+          -0.02
+        ],
+        "radius": 0.145
+      }
+    },
+    {
+      "id": "the_house_is_listening",
+      "type": "pan",
+      "duration": 8.6,
+      "from": [
+        -0.5,
+        1.42,
+        1.6
+      ],
+      "lookAt": [
+        0.15,
+        1.4,
+        -1.91
+      ],
+      "fov": 35,
+      "fovPortrait": 52,
+      "lookAtTo": [
+        -0.8,
+        1.25,
+        -1.4
+      ],
+      "eyeLight": 8.283
+    },
+    {
+      "id": "three_knocks",
+      "type": "static",
+      "duration": 7.74,
+      "from": [
+        -0.5,
+        1.12,
+        1.4
+      ],
+      "lookAt": [
+        0,
+        1.1,
+        -0.59
+      ],
+      "fov": 36,
+      "fovPortrait": 53,
+      "eyeLight": 2.737
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.42,
+    "fogDensity": 0.009,
+    "exposure": 1.35,
+    "moon": 0.26,
+    "gi": 0.75
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain_indoor",
+        "volume": 0.26
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.18
+      },
+      {
+        "sound": "radio_static",
+        "volume": 0.12
+      },
+      {
+        "sound": "cassette_hiss",
+        "volume": 0.14
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "dawn",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "mirror_sodium",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "meera",
+      "visible": false
+    },
+    {
+      "at": 15.48,
+      "action": "sfx",
+      "sound": "knock_three",
+      "volume": 0.65
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        0.8,
+        0,
+        1.7
+      ],
+      "rotationY": 3.141592653589793,
+      "anim": "idle"
+    }
+  ]
+}

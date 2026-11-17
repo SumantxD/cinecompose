@@ -1,30 +1,38 @@
 import { create } from 'zustand'
 import type * as THREE from 'three'
 import type { SceneConfig } from '../cinematic/types'
+import { validateScene } from '../cinematic/validate.ts'
 import { SCENES } from '../scenes/registry'
+import type { ViewMode } from './viewpoints.ts'
 
-// Studio state: the scene being edited (a working copy), undo/redo, playhead, selection, view options.
-// Edits never touch the live SCENES map until Save writes the JSON file.
+// Studio state: one recoverable working copy, undo/redo, selection and 3D authoring guides.
 
-export type Selection = { kind: 'shot' | 'cue'; index: number } | null
+export type Selection = { kind: 'shot' | 'cue'; index: number; node?: number } | null
 
 interface StudioState {
   sceneId: string
   cfg: SceneConfig
-  saved: string // JSON of the last saved/loaded version, to show "unsaved changes"
+  saved: string
   past: string[]
   future: string[]
   t: number
   playing: boolean
-  free: boolean
+  guides: boolean
+  navSpeed: number
+  cameraEnd: boolean
+  editAim: boolean
+  gizmoDragging: boolean
+  view: ViewMode
   aspect: '9:16' | '16:9'
   sel: Selection
-  /** Live handles set from inside the Canvas (StudioRig). */
-  camera: THREE.PerspectiveCamera | null
+  camera: THREE.Camera | null
   target: THREE.Vector3 | null
   load: (sceneId: string) => void
-  /** Apply an edit (pushes undo history). */
+  /** One editing transaction. Use begin/change for continuous 3D drags. */
   edit: (fn: (c: SceneConfig) => void) => void
+  begin: () => void
+  change: (fn: (c: SceneConfig) => void) => void
+  replace: (cfg: SceneConfig) => void
   undo: () => void
   redo: () => void
   set: (p: Partial<StudioState>) => void
@@ -40,31 +48,59 @@ const remembered = (() => {
 })()
 
 const clone = (c: SceneConfig) => JSON.parse(JSON.stringify(c)) as SceneConfig
+const updateDuration = (c: SceneConfig) => { c.duration = +c.shots.reduce((a, s) => a + s.duration, 0).toFixed(3) }
+
+function restored(sceneId: string) {
+  const original = SCENES.get(sceneId)!
+  const saved = JSON.stringify(original)
+  try {
+    const draft = JSON.parse(localStorage.getItem(`${KEY}-draft:${sceneId}`) ?? 'null') as { base?: string; cfg?: SceneConfig } | null
+    if (draft?.base === saved && draft.cfg?.sceneId === sceneId && !validateScene(draft.cfg).length)
+      return { cfg: clone(draft.cfg), saved }
+  } catch { /* ignore damaged or unavailable local drafts */ }
+  return { cfg: clone(original), saved }
+}
+
 const first = remembered.sceneId && SCENES.has(remembered.sceneId) ? remembered.sceneId : [...SCENES.keys()][0]
+const initial = restored(first)
 
 export const useStudio = create<StudioState>((set, get) => ({
   sceneId: first,
-  cfg: clone(SCENES.get(first)!),
-  saved: JSON.stringify(SCENES.get(first)),
+  cfg: initial.cfg,
+  saved: initial.saved,
   past: [],
   future: [],
-  t: remembered.t ?? 0,
+  t: Math.min(remembered.t ?? 0, initial.cfg.duration),
   playing: false,
-  free: false,
+  guides: true,
+  navSpeed: 1,
+  cameraEnd: false,
+  editAim: false,
+  gizmoDragging: false,
+  view: 'orbit',
   aspect: remembered.aspect ?? '9:16',
   sel: null,
   camera: null,
   target: null,
   load: (sceneId) => {
-    const c = SCENES.get(sceneId)!
-    set({ sceneId, cfg: clone(c), saved: JSON.stringify(c), past: [], future: [], t: 0, sel: null, playing: false })
+    const r = restored(sceneId)
+    set({ sceneId, cfg: r.cfg, saved: r.saved, past: [], future: [], t: 0, sel: null, playing: false, cameraEnd: false, view: 'orbit' })
   },
-  edit: (fn) => {
-    const before = JSON.stringify(get().cfg)
+  edit: (fn) => { get().begin(); get().change(fn) },
+  begin: () => {
+    const { cfg, past } = get()
+    set({ past: [...past.slice(-99), JSON.stringify(cfg)], future: [] })
+  },
+  change: (fn) => {
     const next = clone(get().cfg)
     fn(next)
-    next.duration = +next.shots.reduce((a, s) => a + s.duration, 0).toFixed(3) // scene length = its shots
-    set({ cfg: next, past: [...get().past.slice(-99), before], future: [] })
+    updateDuration(next)
+    set({ cfg: next })
+  },
+  replace: (cfg) => {
+    const next = clone(cfg)
+    updateDuration(next)
+    set({ cfg: next, past: [...get().past.slice(-99), JSON.stringify(get().cfg)], future: [], sel: null })
   },
   undo: () => {
     const { past, cfg, future } = get()
@@ -82,7 +118,8 @@ export const useStudio = create<StudioState>((set, get) => ({
 useStudio.subscribe((s) => {
   try {
     sessionStorage.setItem(KEY, JSON.stringify({ sceneId: s.sceneId, t: s.t, aspect: s.aspect }))
-  } catch {
-    /* private mode: no memory, still works */
-  }
+    const key = `${KEY}-draft:${s.sceneId}`
+    if (JSON.stringify(s.cfg) !== s.saved) localStorage.setItem(key, JSON.stringify({ base: s.saved, cfg: s.cfg }))
+    else localStorage.removeItem(key)
+  } catch { /* private mode: editing still works, recovery is unavailable */ }
 })

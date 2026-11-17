@@ -8,7 +8,7 @@ if (matchMedia('(pointer: coarse)').matches || navigator.hardwareConcurrency <= 
 createRoot(document.getElementById('root')!).render(<App />)
 
 if (import.meta.env.DEV) {
-  // Dev console helpers: kr.start('arrival'), kr.skip(12), kr.choose(0)
+  // Dev console helpers: kr.start('part1'), kr.skip(12), kr.choose(0)
   import('./app/player').then((p) => {
     const skip = (s: number) => { for (let i = 0; i < s * 10; i++) p.tick(0.1) }
     // Proxy keeps the module's live bindings (kr.lighting is always the current scene's).

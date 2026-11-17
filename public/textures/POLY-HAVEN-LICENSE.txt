@@ -1,0 +1,4 @@
+Poly Haven assets: CC0 1.0 Universal.
+License: https://polyhaven.com/license
+CC0: https://creativecommons.org/publicdomain/zero/1.0/
+Individual asset URLs and source hashes are recorded in provenance.json. Source images are 1K JPEG supplied by Poly Haven. WebP conversion is local; no runtime hotlinks.

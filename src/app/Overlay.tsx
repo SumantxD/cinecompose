@@ -7,20 +7,30 @@ const params = new URLSearchParams(location.search)
 /** Optional knot to start from (?start=prototype). Default: the top of the story. */
 const START = params.get('start') ?? undefined
 
-export const audioReady = AudioManager.init()
+AudioManager.mute(true) // Sound is opt-in; also silence a live page when this module reloads.
+export const audioReady = params.has('characters') ? Promise.resolve() : AudioManager.init()
 
 function Gate() {
   const [loading, setLoading] = useState(false)
-  const begin = async () => {
+  const [error, setError] = useState(false)
+  const begin = async (fromBeginning: boolean) => {
     setLoading(true)
-    await audioReady
-    player.start(START)
+    setError(false)
+    try {
+      await audioReady
+      player.start(fromBeginning ? undefined : START)
+    } catch (error) {
+      console.error('Chapter could not start', error)
+      setLoading(false)
+      setError(true)
+    }
   }
   return (
-    <button className="gate" onClick={begin} disabled={loading}>
+    <button className="gate" onClick={() => begin(error)} disabled={loading}>
       <span className="gate-hint">Headphones. Lights off.</span>
       <span className="gate-hint hi">हेडफ़ोन लगाइए। बत्ती बुझाइए।</span>
-      <span className="gate-cta">{loading ? '…' : 'Tap to begin'}</span>
+      <span className="gate-cta">{loading ? '…' : error ? 'Start over' : 'Tap to begin'}</span>
+      {error && <span className="gate-hint" role="alert">This chapter could not start.</span>}
     </button>
   )
 }

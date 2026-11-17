@@ -9,6 +9,8 @@ export interface Line {
   /** Seconds after scene start. */
   at?: number
   hold?: number
+  /** Local, provenance-recorded voice id from `# vo:`; speaker/text remain authoritative. */
+  vo?: string
   /** `# captured` — an entity has the player; the story continues on Ink's branch. */
   captured?: boolean
   /** A `_` line: a beat with no caption (a purely visual shot). */
@@ -55,6 +57,7 @@ function parse(raw: string, tags: string[]) {
     text: (m ? m[2] : raw).trim(),
     at: tag.at !== undefined ? Number(tag.at) : undefined,
     hold: tag.hold !== undefined ? Number(tag.hold) : undefined,
+    vo: tag.vo || undefined,
     captured: 'captured' in tag || undefined,
   }
   return { line, scene: tag.scene as string | undefined, dead: 'dead' in tag }
@@ -83,8 +86,10 @@ export class StoryEngine {
     let epitaph: string | undefined
     if (this.pending) {
       this.scene = this.pending.scene ?? this.scene
-      if (this.pending.dead) epitaph = this.pending.line.text
-      else if (this.pending.line.text || this.pending.line.silent) lines.push(this.pending.line)
+      if (this.pending.dead) {
+        epitaph = this.pending.line.text
+        if (this.pending.line.text) lines.push(this.pending.line)
+      } else if (this.pending.line.text || this.pending.line.silent) lines.push(this.pending.line)
       this.pending = null
     }
     while (this.story.canContinue) {
@@ -96,8 +101,10 @@ export class StoryEngine {
         }
         this.scene = p.scene
       }
-      if (p.dead) epitaph = p.line.text
-      else if (p.line.text || p.line.silent) lines.push(p.line)
+      if (p.dead) {
+        epitaph = p.line.text
+        if (p.line.text) lines.push(p.line)
+      } else if (p.line.text || p.line.silent) lines.push(p.line)
     }
     const choices = this.story.currentChoices.map((c) => ({ index: c.index, text: c.text, dir: tagMap(c.tags ?? []).dir }))
     return { sceneId: this.scene, lines, choices, ended: choices.length === 0, epitaph }

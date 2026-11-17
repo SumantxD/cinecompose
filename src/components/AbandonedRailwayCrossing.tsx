@@ -23,6 +23,12 @@ export const roadRamp = (_x: number, z: number) => (RAIL_TOP - 0.035) * (1 - ss(
 export const groundLevel = (x: number, z: number) =>
   Math.max(FORMATION * (1 - ss(Math.abs(z), 2.6, 8)), roadRamp(x, z) * (1 - ss(Math.abs(x), 3, 7)))
 
+/** Match the actual crowned road mesh / raised crossing panel for new grounded placements. */
+export const railwaySurfaceHeight = (x: number, z: number) => {
+  if (Math.abs(x) < ROAD_GAP && Math.abs(z) < 1.8) return RAIL_TOP
+  return groundLevel(x, z) + 0.035 - 0.004 * x * x + (fbm(x * 0.8, z * 0.8) - 0.5) * 0.015
+}
+
 function useSign(lines: Parameters<typeof signboard>[0], bg: string, fg: string, w?: number, h?: number) {
   const [t, setT] = useState<THREE.Texture | null>(null)
   useEffect(() => {

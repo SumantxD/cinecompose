@@ -38,3 +38,19 @@ The original brief forbids *paid* AI generation. If the team decides to use a fr
 ```
 
 The check script should verify that every manifest path exists on disk and every file in `public/` is in the manifest. Add that when the manifest is created.
+
+## Episode surfaces and head attachments
+
+The episode locally vendors **Poly Haven `old_wood_floor`, `damaged_plaster`, and `denim_fabric` (CC0)**. Each includes color, tangent normal, and roughness maps: PBR 1K, locally converted WebP, with original download URLs, JPEG hashes and converted-file sizes in `public/textures/provenance.json`. `SurfaceTextures` shares resources, loads a kind only when requested, and retains procedural materials if the download fails. Measured linear-RGB albedo means from the local maps normalize the old dark tints to the procedural reference reflectance (0.55); tint gains are applied once to preserved base colors, not repeatedly and not as a global exposure increase. Color maps are sRGB; normal/roughness maps stay linear. The independent Character Lab does not fetch these scene surfaces.
+
+`HeadDetails` supplies the canonical short-hair, braided-child, and driver cap/beard attachments in normalized head-local coordinates. Its extension slot is for a separately licensed, correctly scaled attachment—not arbitrary-body-GLB retargeting. No scanned hair/head model is currently vendored. A future model requires role-specific licensing, scale, style and close-up review; Meera is not a scaled adult asset. The existing scene characters stay procedural and are not claimed to be photorealistic or final close-up actors.
+
+`npm run check` now runs `scripts/check-assets.mjs` (local files and license/provenance), plus the library export and immutable rendered-frame guard. The browser scene audit is `node scripts/audit-scenes.mjs http://localhost:5173/ /tmp/kaali-audit-1` (optional final argument: comma-separated scene ids). It uses `agent-browser` to obtain Chrome's CDP endpoint and never overwrites a completed report. Review the resulting images as well as the structural report; clear sightlines do not prove good composition or natural-looking people.
+
+## Character motion pack
+
+`public/animations/kaali-raat-cc0.glb` bundles 35 motion clips from the KinemIQ **free-game-animations** v1.0 source (original motion: Quaternius), under **CC0 1.0**. Keep their transform hierarchy and clips; the source mannequin is not redistributed. The exact source/license and included license text live in `public/CREDITS.md` and `public/animations/`.
+
+The pack is a Character Lab authoring asset, not a character or episode-actor replacement. `AnimationLibrary` loads it on demand for licensed motion only, then retargets its verified hierarchy onto the shared 18-bone procedural rig and samples explicit clip time. It is not a generic user-GLB import system. Validate additions and inspect representative rendered motion, rather than accepting clip count or bone metadata alone.
+
+Rebuild from the verified source directory with `node scripts/prepare-animation-pack.mjs <source-directory>`. The script generates the pack, `public/animations/kaali-raat-cc0.meta.json`, and `src/characters/animation-source.ts` together. Each new source version needs its license recorded before commit, plus a re-import and rendered-motion check.

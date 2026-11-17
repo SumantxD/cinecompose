@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { clock, lightRegistry } from '../cinematic/clock'
@@ -20,6 +20,7 @@ const LIGHTS_GLSL = /* glsl */ `
 
 const streakVert = /* glsl */ `
   uniform float uTime; uniform vec3 uCam; uniform vec3 uBox; uniform float uLen; uniform vec2 uWind;
+  uniform vec4 uShelter; uniform float uShelterHeight;
   ${LIGHTS_GLSL}
   attribute vec3 aSeed; attribute float aEnd;
   varying vec3 vCol; varying float vA;
@@ -35,6 +36,8 @@ const streakVert = /* glsl */ `
     float dist = distance(p, uCam);
     vA = smoothstep(0.3, 1.2, dist) * exp(-dist * 0.05) * (0.35 + aEnd * 0.65);
     vCol = lampLight(p);
+    // Analytic roof exclusion, not particles raining through the room walls.
+    if (abs(p.x - uShelter.x) < uShelter.z && abs(p.z - uShelter.y) < uShelter.w && p.y < uShelterHeight) vA = 0.0;
     gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
   }`
 
@@ -44,6 +47,7 @@ const streakFrag = /* glsl */ `
 
 const splashVert = /* glsl */ `
   uniform float uTime; uniform vec3 uCam; uniform float uRadius; uniform float uPx;
+  uniform vec4 uShelter; uniform float uShelterHeight;
   ${LIGHTS_GLSL}
   attribute vec3 aSeed;
   varying float vPhase; varying vec3 vCol; varying float vFade;
@@ -60,6 +64,7 @@ const splashVert = /* glsl */ `
     vCol = lampLight(p);
     float dist = distance(p, uCam);
     vFade = exp(-dist * 0.12);
+    if (abs(p.x - uShelter.x) < uShelter.z && abs(p.z - uShelter.y) < uShelter.w && p.y < uShelterHeight) vFade = 0.0;
     vec4 mv = viewMatrix * vec4(p, 1.0);
     gl_PointSize = uPx * (0.4 + vPhase) / -mv.z;
     gl_Position = projectionMatrix * mv;
@@ -85,10 +90,15 @@ interface Props {
   wind?: [number, number]
   /** GLSL expression for ground height at vec3 p (e.g. a road ramp). */
   ground?: string
+  shelter?: { center: [number, number]; size: [number, number]; height: number }
 }
 
-export function RainSystem({ count = 9000, splashes = 700, box = [30, 14, 36], wind = [0.6, 0.2], ground = '0.0' }: Props) {
+export function RainSystem({ count = 9000, splashes = 700, box = [30, 14, 36], wind = [0.6, 0.2], ground = '0.0', shelter }: Props) {
+  const dimensions = useMemo(() => new THREE.Vector3(...box), [box[0], box[1], box[2]])
+  const direction = useMemo(() => new THREE.Vector2(...wind), [wind[0], wind[1]])
+  const exclusion = useMemo(() => new THREE.Vector4(shelter?.center[0] ?? 0, shelter?.center[1] ?? 0, (shelter?.size[0] ?? 0) / 2, (shelter?.size[1] ?? 0) / 2), [shelter?.center[0], shelter?.center[1], shelter?.size[0], shelter?.size[1]])
   const camera = useThree((s) => s.camera)
+  const zone = useRef<THREE.Group>(null!)
   const lights = useMemo(
     () => ({
       uLightPos: { value: Array.from({ length: MAX_LIGHTS }, () => new THREE.Vector3(0, -999, 0)) },
@@ -114,10 +124,10 @@ export function RainSystem({ count = 9000, splashes = 700, box = [30, 14, 36], w
     g.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1e6)
     const m = new THREE.ShaderMaterial({
       vertexShader: streakVert, fragmentShader: streakFrag, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-      uniforms: { uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uBox: { value: new THREE.Vector3(...box) }, uLen: { value: 0.7 }, uWind: { value: new THREE.Vector2(...wind) }, ...lights },
+      uniforms: { uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uBox: { value: dimensions }, uLen: { value: 0.7 }, uWind: { value: direction }, uShelter: { value: exclusion }, uShelterHeight: { value: shelter?.height ?? -1 }, ...lights },
     })
     return { g, m }
-  }, [count, box, wind, lights])
+  }, [count, dimensions, direction, lights, exclusion, shelter?.height])
 
   const splash = useMemo(() => {
     const rand = rng(77)
@@ -128,12 +138,13 @@ export function RainSystem({ count = 9000, splashes = 700, box = [30, 14, 36], w
     g.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1e6)
     const m = new THREE.ShaderMaterial({
       vertexShader: splashVert.replace('GROUND', `(${ground})`), fragmentShader: splashFrag, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-      uniforms: { uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uRadius: { value: 14 }, uPx: { value: 260 }, ...lights },
+      uniforms: { uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uRadius: { value: 14 }, uPx: { value: 260 }, uShelter: { value: exclusion }, uShelterHeight: { value: shelter?.height ?? -1 }, ...lights },
     })
     return { g, m }
-  }, [splashes, ground, lights])
+  }, [splashes, ground, lights, exclusion, shelter?.height])
 
   useFrame(({ size, viewport }) => {
+    if (shelter) zone.current.visible = !(Math.abs(camera.position.x - shelter.center[0]) < shelter.size[0] / 2 && Math.abs(camera.position.z - shelter.center[1]) < shelter.size[1] / 2 && camera.position.y < shelter.height)
     streaks.m.uniforms.uTime.value = splash.m.uniforms.uTime.value = clock.t
     streaks.m.uniforms.uCam.value.copy(camera.position)
     splash.m.uniforms.uCam.value.copy(camera.position)
@@ -148,9 +159,10 @@ export function RainSystem({ count = 9000, splashes = 700, box = [30, 14, 36], w
   })
 
   return (
-    <>
+    <group ref={zone}>
+      {/* ponytail: interior cameras hide outdoor emitters; separate exterior portal emitters can cover windows later. */}
       <lineSegments geometry={streaks.g} material={streaks.m} frustumCulled={false} renderOrder={3} />
       <points geometry={splash.g} material={splash.m} frustumCulled={false} renderOrder={3} />
-    </>
+    </group>
   )
 }

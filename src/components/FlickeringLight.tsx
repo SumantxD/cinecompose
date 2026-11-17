@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useContext, useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useStore } from '../state/store'
@@ -7,6 +7,7 @@ import { hash } from '../utils/random'
 import { radial } from '../utils/textures'
 import { AudioManager } from '../audio/AudioManager'
 import type { LightMode, Vec3 } from '../cinematic/types'
+import { StageModeContext } from '../app/StageContext'
 
 /** Brightness 0..1 for a mode at scene time t. Deterministic: same t, same flicker. */
 function level(mode: LightMode, t: number, since: number, seed: number) {
@@ -64,6 +65,7 @@ interface Props {
 }
 
 export function FlickeringLight({ id, kind, color, intensity, position, target, angle = 0.8, distance = 0, castShadow, shadowSize = 1024, bulb, glow = 1.2, beam, hum, seed = 1 }: Props) {
+  const { director } = useContext(StageModeContext)
   const mode = useStore((s) => s.lights[id] ?? 'on')
   const since = useRef(0)
   const humOn = useRef(false)
@@ -94,13 +96,13 @@ export function FlickeringLight({ id, kind, color, intensity, position, target, 
       light.current.target.position.set(...target)
       light.current.target.updateMatrixWorld()
     }
-    lightRegistry.set(id, { position: new THREE.Vector3(...position), color: col, level: 1, intensity })
+    if (!director) lightRegistry.set(id, { position: new THREE.Vector3(...position), color: col, level: 1, intensity })
     return () => {
-      lightRegistry.delete(id)
-      if (hum) AudioManager.ambience(hum, 0, 0.3)
+      if (!director) lightRegistry.delete(id)
+      if (hum && !director) AudioManager.ambience(hum, 0, 0.3)
       humOn.current = false
     }
-  }, [id, kind, target, position, col, intensity, hum])
+  }, [id, kind, target, position, col, intensity, hum, director])
 
   useFrame(() => {
     const l = level(mode, clock.t, since.current, seed)
@@ -110,9 +112,10 @@ export function FlickeringLight({ id, kind, color, intensity, position, target, 
     if (glowMat.current) glowMat.current.opacity = l * 0.3
     coneMat.uniforms.uLevel.value = l
     const r = lightRegistry.get(id)
-    if (r) r.level = l
-    if (hum) {
+    if (r && !director) r.level = l
+    if (hum && !director) {
       // ponytail: one loop per sound id, so two lights can't share a hum sound yet.
+      if (humOn.current && !AudioManager.hasLoop(hum)) humOn.current = false
       if (mode !== 'off' && !humOn.current) {
         AudioManager.ambience(hum, 0.0001, 0.01, position)
         humOn.current = true

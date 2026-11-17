@@ -1,4 +1,4 @@
-import type { Cue, Vec3 } from './types'
+import type { Cue, Vec3 } from './types.ts'
 import { STEP_HZ } from './presets.ts'
 
 // Technique macros: a scene lists `{ "use": "LGT-03", "at": 20.5, ...params }` and it expands into plain cues

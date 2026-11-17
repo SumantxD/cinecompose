@@ -41,11 +41,11 @@ Tonight, someone sent you a memory. # at: 14 # hold: 3.5
 === part1 ===
 // p1_car — FILM. Low on the wet road: one pair of headlights comes out of the rain and stops short of us.
 // Inside: Aarav in the passenger seat, dashboard glow, the crossing far ahead through the windscreen.
-It is 2:17 in the morning. # scene: p1_car # at: 3 # hold: 3
-You have not been back to Sonpahari in seventeen years. # at: 6.4 # hold: 3.6
-In your hand, a cassette nobody should have been able to send you. On the label: MEERA — 17/08/1992. # at: 10.4 # hold: 4.6
-Meera was eight when she disappeared. # at: 15.4 # hold: 3
-DRIVER: Yahin utarna hai? # at: 19.2 # hold: 2.6
+रात के ठीक दो बजकर सत्रह मिनट हो रहे हैं। # scene: p1_car # at: 3 # hold: 4.1 # vo: part1_opening_hi
+You have not been back to Sonpahari in seventeen years. # at: 7.5 # hold: 3.6
+In your hand, a cassette nobody should have been able to send you. On the label: MEERA — 17/08/1992. # at: 11.5 # hold: 4.6
+Meera was eight when she disappeared. # at: 16.5 # hold: 3
+DRIVER: Yahin utarna hai? # at: 20.3 # hold: 2.6
 * [Ask why he won't drive any further] -> ask_driver
 * [Get out without a word] -> get_out
 
@@ -133,162 +133,205 @@ Toward the only light still burning on this road: the old tea stall. # at: 14.4 
 === part1_end ===
 // p1_end — crane up off the empty road; the crossing small in the rain; title. Part 2 picks up at the tea stall.
 The road remembers you now. # scene: p1_end # at: 2 # hold: 4
--> END
+-> tea_stall
 
-// ═══════════════════════════════════════════════════════════ PART 2+ — DRAFT
-// Converted to second person; still needs a full pass for Part 1 continuity (docs/bible/story.md → "Part 2 rewrite").
+// ═══════════════════════════════════════════════════════════ PART 2 — THE HOUSE
+// Consequences and inventory come from Ink. Cameras, light changes and sound timing come from scene JSON.
 
-// ─────────────────────────────────────────────────────────── SCENE 2
 === tea_stall ===
-// One flickering tube light. A disconnected radio. A dusty mirror.
 {
-- captured_at_crossing: Your cassette is on the counter. You don't remember putting it there. # scene: tea_stall
-- else: You set the cassette down on the counter. # scene: tea_stall
+- captured_at_crossing:
+The bench is hard beneath your back. Your cassette is on the counter. You don't remember putting it there. # scene: tea_wake # at: 0.688 # hold: 4.042
+- else:
+The old tea stall still has a light on. A radio and a cassette player sit under it, side by side. # scene: tea_stall # at: 0.688 # hold: 3.87
 }
-// The disconnected radio wakes: static.
-MEERA: Bhaiya?
-AARAV: Meera?
-// Silence. Something falls behind the counter. We stay on your reaction.
-The same voice. Coming out of a radio that isn't plugged in.
-// Slow pan to the mirror: a woman stands behind you. Hold 2s — the viewer sees her first. Flicker. Gone.
+MEERA: Bhaiya? # at: 6.45 # hold: 2.15
+AARAV: Meera? # at: 9.46 # hold: 1.892
+The reply comes from the radio. Its power cord lies curled on the counter. # at: 12.04 # hold: 3.526
+For a moment, the mirror shows a woman behind you. You don't turn around. # at: 16.34 # hold: 3.87
+The room beyond the counter is empty. # at: 21.5 # hold: 3.096
+MEERA: Bhaiya… ghar mat aana. # at: 25.8 # hold: 3.01
 -> first_decision
 
-// ─────────────────────────────────────────────────────────── SCENE 3
 === first_decision ===
-// The cassette is playing now. Clearer.
-MEERA: Bhaiya… don't come home. # scene: tea_stall_tape
-AARAV: Where are you?
-MEERA: You're already here.
-// Three knocks. Not the door. Inside the wall. Static camera.
-Some memories are better left buried.
-But if you leave now, you will never know what happened to her.
-* [Go to the house # dir: ahead] -> go_home
-* [Play the cassette again # dir: left] -> replay_cassette
+She asked you not to go. For seventeen years, you have used that warning as an excuse. # scene: tea_stall_tape # at: 0.43 # hold: 3.87
+AARAV: Tujhe kya hua tha? # at: 6.88 # hold: 2.58
+MEERA: Aap phir se dekh lo. # at: 11.18 # hold: 2.752
+Three knocks come from inside the wall. # at: 15.48 # hold: 2.924
+The house is waiting. So is her voice. # at: 19.78 # hold: 3.01
+* [Take the cassette and go to the house # dir: ahead] -> go_home
+* [Play the last part again # dir: left] -> replay_cassette
+* [Stay with her voice until morning # dir: behind] -> ending_waiting
 
 = go_home
-// Camera behind... (POV): a second set of footsteps — if you saw the shadow, you know whose.
-Someone has left a light on for you. # scene: road_footsteps
+You pick up the cassette. It is lighter than you remember. # scene: road_footsteps # at: 0.602 # hold: 2.924
+Your footsteps follow you into the village. The other set stops when you do. # at: 4.73 # hold: 3.526
+Someone has left a light on in your mother's house. # at: 9.46 # hold: 3.01
 -> childhood_house
 
 = replay_cassette
 ~ replayed_cassette = true
-MEERA: Bhaiya… don't come home. # scene: tea_stall_mirror
-MEERA: She's standing behind you.
-// Slow move to the mirror. The mirror is empty.
-MEERA: Don't look at her.
-// Your reflection begins to smile. You do not.
+You press rewind. The reels turn without a motor. # scene: tea_stall_mirror # at: 0.43 # hold: 3.44
+MEERA: Bhaiya… ghar mat aana. # at: 6.02 # hold: 3.096
+Under her voice is an older recording. A woman trying not to wake the house. # at: 10.32 # hold: 3.698
+DIARY: Meera, darwaza band karo. # at: 15.48 # hold: 2.924
+CHILD: Bhaiya is awake. # at: 19.78 # hold: 2.494
+The words hiss into a different quiet. # at: 24.08 # hold: 2.752
+WOMAN: I only asked for shelter. # at: 28.38 # hold: 3.268
+The mirror no longer shows a woman. It shows the way to your house. # at: 33.54 # hold: 3.87
 -> childhood_house
 
-// ─────────────────────────────────────────────────────────── SCENE 4
 === childhood_house ===
 {
-- captured_at_crossing: The verandah steps are wet with small footprints. They go in ahead of you. # scene: house_exterior
-- returned_home: The door is open. A light is on inside. # scene: house_exterior
-- else: You don't look at the mirror in the hall. You don't want to know if it will smile again. # scene: house_exterior
+- captured_at_crossing:
+There are small footprints under the verandah roof. Dry, in all this rain. They go in ahead of you. # scene: house_exterior_captured # at: 0.516 # hold: 3.87
+- replayed_cassette:
+You know your mother's voice now. What you don't know is who recorded her that night. # scene: house_exterior # at: 0.516 # hold: 3.698
+- else:
+The verandah is exactly as you left it. The door is open. A light is on inside. # scene: house_exterior # at: 0.516 # hold: 3.698
 }
-// Corridor — longer than it should be. The family photograph: you (14), Meera (8), your mother. Meera's face is scratched out.
-CHILD: Bhaiya? # scene: corridor
-AARAV: Meera?
-// The door at the end opens by itself. Fully. A dark bedroom.
-You remember this room.
-You remember leaving her here.
-* [Enter the bedroom # dir: ahead] -> enter_bedroom
-* [Look closer at the photograph # dir: left] -> examine_photo
-* [Call out to Meera # dir: right] -> call_meera
+CHILD: Bhaiya? # scene: corridor # at: 0.86 # hold: 2.064
+The corridor is longer than you remember. The room at the end has not moved. # at: 4.3 # hold: 3.612
+CHILD: Bhaiya, darwaza kholo. # at: 9.46 # hold: 3.182
+You remember this room. You remember leaving her here. # at: 13.76 # hold: 3.612
+Her horse is inside the room. Her face has been scratched out of the family photograph. Her voice is behind the door. # at: 18.92 # hold: 4.73
+* [Take the horse to her # dir: ahead] -> enter_bedroom
+* [Look at the photograph # dir: left] -> examine_photo
+* [Call Meera to the door # dir: right] -> call_meera
 
 = enter_bedroom
 ~ entered_bedroom = true
-// A wooden horse on the floor rotates — slightly. You kneel.
-CHILD: You promised. # scene: bedroom_horse
+The wooden horse is beside the bed. Its rockers are worn. # scene: bedroom_horse # at: 0.516 # hold: 3.182
+CHILD: You promised you would come back. # at: 5.16 # hold: 3.612
+AARAV: I know. # at: 10.32 # hold: 2.236
+You pick it up. It is still small enough for her hands. # at: 13.76 # hold: 3.612
 -> entity_reveal
 
 = examine_photo
 ~ examined_photo = true
-// Three people. Four shadows. The fourth is a woman standing behind the family.
-AARAV: Who is that? # scene: photo_shadow
+Three people stand in the photograph. Four shadows fall across the wall behind them. # scene: photo_shadow # at: 0.43 # hold: 4.042
+The fourth shadow belongs to a woman. # at: 6.02 # hold: 2.924
+AARAV: You were there? # at: 10.32 # hold: 2.58
+There is no answer from the house. # at: 14.62 # hold: 3.182
 -> entity_reveal
 
 = call_meera
 ~ called_meera = true
-AARAV: Meera! # scene: corridor_call
-CHILD: Bhaiya?
-AARAV: I'm here.
-CHILD: No.
-CHILD: You're not.
-// The bedroom door closes. Behind you, an adult woman whispers:
-WOMAN: He's not your brother anymore.
+AARAV: Meera! Andar aa jao. # scene: corridor_call # at: 0.602 # hold: 2.924
+CHILD: Bhaiya? # at: 4.3 # hold: 2.064
+AARAV: I'm here. # at: 7.74 # hold: 2.064
+CHILD: No. # at: 11.18 # hold: 1.548
+CHILD: You're not. # at: 13.76 # hold: 2.322
+{
+- heard_rule:
+You told yourself the driver's rule belonged to the crossing. You lift your voice again anyway. # at: 18.06 # hold: 4.3
+WOMAN: He's not your brother anymore. # at: 23.22 # hold: 3.87
+- else:
+WOMAN: He's not your brother anymore. # at: 18.92 # hold: 3.87
+}
 -> entity_reveal
 
-// ─────────────────────────────────────────────────────────── SCENE 5
 === entity_reveal ===
-// End of the corridor. A woman by the far doorway. Faded sari, wet hair, face in darkness. Completely still.
-AARAV: Who are you? # scene: entity_reveal
-AARAV: Where is Meera?
-WOMAN: You remember the road.
-WOMAN: But you don't remember what you did.
-{entered_bedroom: WOMAN: You touched her horse. She has been holding it for seventeen years.}
-{examined_photo: WOMAN: You saw me in the photograph. I was always in it.}
-{called_meera: WOMAN: You called her. You should not call the ones you left.}
-{captured_at_crossing: WOMAN: You looked at me. Nobody looks at me twice.}
-AARAV: What did I do?
-WOMAN: You left her.
-AARAV: Who?
-WOMAN: Me.
-// Flicker — for one frame she is closer. Your eyes drop to her feet: bare, turned the wrong way. Hold 3s.
-AARAV: Chudail…
-WOMAN: That is what they called me.
-WOMAN: Before they forgot my name.
+She is at the far end of the corridor. Not standing in the doorway. Standing beyond it. # scene: entity_reveal # at: 0.43 # hold: 3.526
+AARAV: What did you do with Meera? # at: 5.16 # hold: 2.924
+WOMAN: You remember the road. You don't remember what you did. # at: 9.46 # hold: 4.042
+{
+- entered_bedroom: WOMAN: You picked up her horse. She has been holding it for seventeen years. # at: 14.62 # hold: 4.042
+}
+{
+- examined_photo: WOMAN: You saw me in the photograph. I was always in it. # at: 14.62 # hold: 4.042
+}
+{
+- called_meera: WOMAN: You called her again. You never think about who taught her to call you. # at: 14.62 # hold: 4.386
+}
+{
+- replayed_cassette: WOMAN: You listened to the end. Most people stop when a child says no. # at: 19.78 # hold: 4.73
+}
+AARAV: What did I do? # at: 21.5 # hold: 2.58
+WOMAN: You left her. # at: 25.8 # hold: 2.408
+AARAV: Who? # at: 29.24 # hold: 2.064
+WOMAN: Me. # at: 32.68 # hold: 2.236
+Her feet are bare. The heels point toward you. # at: 36.98 # hold: 3.784
+AARAV: Chudail… # at: 42.14 # hold: 2.15
+WOMAN: That is what they called me. # at: 45.58 # hold: 3.01
+WOMAN: Before they forgot my name. # at: 50.74 # hold: 3.526
 -> truth
 
-// ─────────────────────────────────────────────────────────── SCENE 6
 === truth ===
-// Bedroom, one candle. Your mother's diary.
-You thought you remembered that night. # scene: truth
-The rain. The voice. Opening the door.
-But you never remembered what happened after.
-DIARY: 17 August 1992.
-DIARY: The girl from the crossing came again. She asked for shelter. I told her to leave.
-DIARY: Aarav heard her crying. Meera opened the door.
-DIARY: I should have stopped them.
-The truth is in front of you.
-Now you have to decide what to do with it.
-* [Burn the diary # dir: left] -> ending_forgetting
-* [Read the final page # dir: ahead] -> ending_remembering
-* [Leave the house and go to the crossing # dir: right] -> ending_return
+On the table is your mother's diary, open to the date you have never forgotten. # scene: truth # at: 0.43 # hold: 3.526
+DIARY: 17 August 1992. # at: 5.16 # hold: 2.494
+DIARY: The girl from the crossing came again. She asked for shelter. I told her to leave. # at: 8.6 # hold: 4.128
+DIARY: Meera heard her crying. You watched from the window. # at: 13.76 # hold: 3.182
+DIARY: I thought someone else would open a door. # at: 18.06 # hold: 3.096
+DIARY: Meera opened ours. # at: 22.36 # hold: 2.752
+You came here for a voice. The house has something harder to hear. # at: 26.66 # hold: 3.698
+* [Burn the diary. Let the family keep its secret # dir: left] -> ending_forgetting
+* [Read the final page. Whatever it says about you # dir: ahead] -> ending_remembering
+* [Take what you know back to the crossing # dir: right] -> ending_return
 
-// ─────────────────────────────────────────────────────────── SCENE 7 — ENDINGS
 === ending_forgetting ===
 ~ ending = "forgetting"
-Some memories are better left buried. # scene: ending_forgetting
-// Black. Three knocks — from the player's side of the screen.
-{replayed_cassette: MEERA: Bhaiya… you left me outside.}
+The corner of the page curls first. Then the date. Then the hand that wrote it. # scene: ending_forgetting # at: 0.43 # hold: 3.956
+You protect the family that asked her to leave. # at: 6.02 # hold: 3.096
+There is no one left to tell you what you saw. # at: 10.32 # hold: 3.44
+The rain stops. # at: 15.48 # hold: 2.752
+Three knocks come from behind you. # at: 19.78 # hold: 3.01
+{replayed_cassette: MEERA: Bhaiya… you left me outside. # at: 24.94 # hold: 3.87}
+-> END
+
+=== ending_waiting ===
+~ ending = "waiting"
+You stay. You don't go to the house. # scene: ending_waiting # at: 0.43 # hold: 3.01
+MEERA: Bhaiya… # at: 5.16 # hold: 2.15
+The kettle is warm. Her voice asks for nothing. It is easy to stay. # at: 9.46 # hold: 3.956
+You let the house keep what it knows. # at: 15.48 # hold: 3.44
+When the first light reaches the road, the radio falls silent. # at: 20.64 # hold: 3.87
+There is no tape left to rewind. # at: 26.66 # hold: 3.182
+The house is still there. So is the page you never read. # at: 31.82 # hold: 4.128
 -> END
 
 === ending_remembering ===
 ~ ending = "remembering"
 ~ remembered_truth = true
-DIARY: Meera opened the door. The girl from the crossing was standing outside. # scene: ending_remembering
-DIARY: She asked for help. Meera went with her.
-DIARY: Aarav watched. He did not stop her.
-DIARY: I told everyone that Meera had run away. But she never left the village.
-WOMAN: You remember now.
-AARAV: I'm sorry.
-WOMAN: I know.
-WOMAN: But she is still waiting.
+The last page holds your mother's confession. The last four words are yours. # scene: ending_remembering # at: 0.43 # hold: 3.698
+AARAV: Main dekh raha tha. Main kuch nahi kiya. # at: 5.16 # hold: 3.354
+DIARY: You told me, "I thought you would stop her." # at: 9.46 # hold: 3.268
+DIARY: I let you think the silence was yours alone. # at: 13.76 # hold: 3.096
+DIARY: The girl waited outside. Meera went with her. She left her horse by your bed. # at: 17.2 # hold: 4.042
+DIARY: Meera looked back at you. You saw her hand. You did not move. # at: 22.36 # hold: 3.784
+DIARY: I told everyone she ran away. She never left the village. # at: 27.52 # hold: 3.612
+AARAV: I watched her go. # at: 32.68 # hold: 2.838
+WOMAN: You remember now. # at: 36.98 # hold: 2.924
+AARAV: I'm sorry. # at: 41.28 # hold: 2.408
+WOMAN: I know. # at: 45.58 # hold: 2.408
+WOMAN: But she is still waiting. # at: 49.88 # hold: 3.784
 {
-- entered_bedroom: Beneath the crossing, a little girl is holding a wooden horse.
-- else: Beneath the crossing, a little girl is looking at her empty hands, as if something should be there.
+- entered_bedroom:
+Beneath the far barrier, Meera holds the horse in both hands. # scene: ending_remembering_horse # at: 0.43 # hold: 3.44
+- else:
+Beneath the far barrier, Meera holds her empty hands as if something should be there. # scene: ending_remembering_empty # at: 0.43 # hold: 3.784
 }
-CHILD: Bhaiya?
+CHILD: Bhaiya? # at: 4.73 # hold: 3.096
 -> END
 
 === ending_return ===
 ~ ending = "return"
-# scene: ending_return
-{captured_at_crossing: She is standing exactly where she stood behind you the night you arrived. This time, you don't turn around.}
-WOMAN: You came back.
-AARAV: Where is Meera?
-WOMAN: Where you left her.
-// The train passes. When it is gone, you are gone. She stands on the near side now. Her feet face forward. She smiles.
-WOMAN: Now you can remember.
+The rain follows you back to the rails. # scene: ending_return # at: 0.43 # hold: 2.924
+{
+- captured_at_crossing:
+This time, you don't look behind you. # at: 4.3 # hold: 2.838
+}
+You put the cassette on the wet ground between the tracks. # scene: ending_return # at: 8.6 # hold: 3.44
+{
+- entered_bedroom:
+You put the horse beside it. # scene: ending_return_horse # at: 12.9 # hold: 3.01
+}
+AARAV: I remember. Is that enough? # at: 16.34 # hold: 3.268
+WOMAN: You came back. # at: 20.64 # hold: 2.752
+AARAV: Where is Meera? # at: 24.94 # hold: 2.494
+WOMAN: Where you left her. # at: 29.24 # hold: 2.752
+The rails begin to hum. # at: 33.54 # hold: 2.752
+The train passes. When it is gone, you are gone. # at: 39.56 # hold: 3.698
+She stands on the near side now. Her feet face forward. She smiles. # at: 46.44 # hold: 4.73
+WOMAN: Now you can remember. # at: 53.32 # hold: 3.44
 -> END

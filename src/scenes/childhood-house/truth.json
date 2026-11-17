@@ -1,0 +1,184 @@
+{
+  "sceneId": "truth",
+  "environment": "childhood-house",
+  "duration": 33.54,
+  "shots": [
+    {
+      "id": "the_open_diary",
+      "type": "slow_push",
+      "duration": 10.32,
+      "from": [
+        0.5,
+        1.55,
+        -6.22
+      ],
+      "lookAt": [
+        0.85,
+        0.91,
+        -8.7
+      ],
+      "fov": 35,
+      "fovPortrait": 52,
+      "to": [
+        1.45,
+        1.35,
+        -7.45
+      ],
+      "eyeLight": 4.344,
+      "focus": {
+        "object": "diary",
+        "local": [
+          0,
+          0.03,
+          0
+        ],
+        "radius": 0.18
+      }
+    },
+    {
+      "id": "the_date",
+      "type": "focus",
+      "duration": 8.6,
+      "from": [
+        0.83,
+        1.3,
+        -7.85
+      ],
+      "lookAt": [
+        0.85,
+        0.904,
+        -8.7
+      ],
+      "fov": 31,
+      "fovPortrait": 50,
+      "to": [
+        0.83,
+        1.22,
+        -7.94
+      ],
+      "eyeLight": 0.572,
+      "focus": {
+        "object": "diary",
+        "local": [
+          0,
+          0.03,
+          0
+        ],
+        "radius": 0.18
+      }
+    },
+    {
+      "id": "what_will_you_do",
+      "type": "slow_push",
+      "duration": 14.62,
+      "from": [
+        -0.2,
+        1.65,
+        -5.1
+      ],
+      "lookAt": [
+        0.3,
+        1.32,
+        -8
+      ],
+      "fov": 37,
+      "fovPortrait": 55,
+      "to": [
+        -0.16,
+        1.61,
+        -5.45
+      ],
+      "eyeLight": 5.7
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.7,
+    "fogDensity": 0.006,
+    "exposure": 1.65,
+    "moon": 0.36,
+    "gi": 0.7
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "rain_indoor",
+        "volume": 0.24
+      },
+      {
+        "sound": "night_drone",
+        "volume": 0.14
+      },
+      {
+        "sound": "fan_ceiling",
+        "volume": 0.2
+      }
+    ],
+    "music": null
+  },
+  "cues": [
+    {
+      "at": 0,
+      "action": "light",
+      "target": "dawn",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "light",
+      "target": "mirror_sodium",
+      "mode": "off"
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "taxi",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "driver",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "meera",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "chudail",
+      "visible": false
+    },
+    {
+      "at": 0,
+      "action": "entity",
+      "target": "aarav",
+      "visible": true,
+      "position": [
+        -0.57,
+        0.176,
+        -6.2
+      ],
+      "rotationY": 3.141592653589793,
+      "anim": "idle"
+    },
+    {
+      "at": 19.78,
+      "action": "light",
+      "target": "room_candle",
+      "mode": "flicker"
+    },
+    {
+      "at": 20.726,
+      "action": "light",
+      "target": "room_candle",
+      "mode": "on"
+    }
+  ],
+  "props": {
+    "horse": "inventory"
+  }
+}

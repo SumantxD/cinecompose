@@ -2,6 +2,15 @@
   "sceneId": "p1_turn",
   "environment": "railway-crossing",
   "duration": 32,
+  "props": {
+    "groundMist": {
+      "center": [0, 0, 17],
+      "width": 11,
+      "length": 18,
+      "height": 0.3,
+      "opacity": 0.095
+    }
+  },
   "shots": [
     {
       "id": "he_turns",
@@ -18,7 +27,8 @@
         14.5
       ],
       "fov": 30,
-      "fovPortrait": 44
+      "fovPortrait": 44,
+      "eyeLight": 140
     },
     {
       "id": "walk_to_us",
@@ -36,6 +46,7 @@
       ],
       "fov": 34,
       "fovPortrait": 50,
+      "eyeLight": 80,
       "to": [
         -0.3,
         0.6,
@@ -63,6 +74,7 @@
       ],
       "fov": 34,
       "fovPortrait": 50,
+      "eyeLight": 55,
       "to": [
         -0.35,
         0.62,

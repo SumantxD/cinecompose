@@ -1,4 +1,5 @@
-import { AbandonedRailwayCrossing, groundLevel, roadRamp } from '../../components/AbandonedRailwayCrossing'
+import type { ReactNode } from 'react'
+import { AbandonedRailwayCrossing, groundLevel, railwaySurfaceHeight, roadRamp } from '../../components/AbandonedRailwayCrossing'
 import { VillageRoad, Milestone } from '../../components/VillageRoad'
 import { ForestEnvironment } from '../../components/ForestEnvironment'
 import { FlickeringLight } from '../../components/FlickeringLight'
@@ -6,6 +7,7 @@ import { RainSystem } from '../../components/RainSystem'
 import { FogSystem } from '../../components/FogSystem'
 import { Entity } from '../../components/Entity'
 import { NightSky } from '../../components/NightSky'
+import { GroundMist } from '../../components/GroundMist'
 import { Actor, DRIVER_LOOK } from '../../components/Actor'
 import { Taxi } from '../../components/Taxi'
 import { useStore } from '../../state/store'
@@ -24,6 +26,7 @@ const NEAR: Vec3 = [-2.3, 6.2, 9]
 const NEAR_TARGET: Vec3 = [0.3, 0, 22]
 const DEEP: Vec3 = [-2.2, 6.1, -48]
 const DEEP_TARGET: Vec3 = [0, 0, -44]
+const MIST_LIGHTS = [SODIUM, NEAR, DEEP]
 const SHEETS = [
   { z: -17, y: 2.6, w: 70, h: 7, opacity: 0.22 },
   { z: -27, y: 3, w: 90, h: 9, opacity: 0.3 },
@@ -47,16 +50,18 @@ function LampPost({ base, head }: { base: Vec3; head: Vec3 }) {
   )
 }
 
-export function RailwayCrossingEnv({ lighting }: { lighting: SceneConfig['lighting'] }) {
+export function RailwayCrossingEnv({ lighting, scene, children, groundedActors = true, softFill = false, nearIntensity = 900 }: { lighting: SceneConfig['lighting']; scene?: SceneConfig; children?: ReactNode; groundedActors?: boolean; softFill?: boolean; nearIntensity?: number }) {
   const low = useStore((s) => s.quality === 'low')
   return (
     <group>
       <FogSystem color={lighting.fogColor ?? '#232d39'} density={lighting.fogDensity} sheets={SHEETS} glowPos={SODIUM} glowColor="#ff9a40" />
       <NightSky intensity={lighting.gi ?? 0.6} />
       <hemisphereLight args={['#3a4a5e', '#0a0c0e', lighting.ambientIntensity]} />
+      {softFill && <ambientLight color='#9eacb8' intensity={lighting.ambientIntensity * 2.2} />}
       {/* Moonlight through cloud: cool key from behind the crossing — rims silhouettes, keeps the night readable. */}
       <directionalLight position={[-20, 30, -40]} intensity={lighting.moon ?? 0.5} color="#7f93b4" />
 
+      {scene?.props?.groundMist && <GroundMist config={scene.props.groundMist} surfaceAt={railwaySurfaceHeight} lamps={MIST_LIGHTS} layers={low ? 2 : 3} />}
       <ForestEnvironment clear={clear} terrain={groundLevel} trees={low ? 260 : 420} bushes={low ? 260 : 500} grass={low ? 1200 : 2600} />
       <VillageRoad terrain={roadRamp} />
       <AbandonedRailwayCrossing />
@@ -67,19 +72,20 @@ export function RailwayCrossingEnv({ lighting }: { lighting: SceneConfig['lighti
       <LampPost base={[-3.7, 0, 9]} head={NEAR} />
       <FlickeringLight id="sodium_far" kind="spot" color="#ff9a40" intensity={280} position={SODIUM} target={SODIUM_TARGET}
         angle={0.75} castShadow shadowSize={low ? 512 : 1024} bulb="sodium" glow={1.3} beam seed={3} />
-      <FlickeringLight id="sodium_near" kind="spot" color="#ff9a40" intensity={900} position={NEAR} target={NEAR_TARGET}
+      <FlickeringLight id="sodium_near" kind="spot" color="#ff9a40" intensity={nearIntensity} position={NEAR} target={NEAR_TARGET}
         angle={0.8} castShadow shadowSize={low ? 512 : 1024} bulb="sodium" glow={1.2} seed={7} />
       <FlickeringLight id="sodium_deep" kind="spot" color="#ff9440" intensity={90} position={DEEP} target={DEEP_TARGET}
         angle={0.7} bulb="sodium" glow={1.1} beam seed={9} />
       <FlickeringLight id="gate_tube" kind="point" color="#d6f2e4" intensity={30} position={TUBE} distance={18}
         bulb="tube" glow={0.9} hum="hum" seed={5} />
 
-      <Entity id="chudail" position={[0.7, 0, -9.5]} />
-      <Actor id="aarav" />
-      <Actor id="driver" look={DRIVER_LOOK} height={1.7} />
+      <Entity id="chudail" position={[0.7, 0, -9.5]} surfaceAt={groundedActors ? railwaySurfaceHeight : undefined} />
+      <Actor id="aarav" groundAt={groundedActors ? railwaySurfaceHeight : undefined} />
+      <Actor id="driver" groundAt={groundedActors ? railwaySurfaceHeight : undefined} look={DRIVER_LOOK} height={1.7} />
       <Taxi id="taxi" lowShadows={low} />
       {/* splash height follows the road's ramp up to the rails (same formula as roadRamp) */}
       <RainSystem count={low ? 5000 : 9000} splashes={low ? 400 : 700} ground="0.665 * (1.0 - smoothstep(2.0, 10.0, abs(p.z)))" />
+      {children}
     </group>
   )
 }

@@ -1,0 +1,14 @@
+{
+  "extends": "/private/tmp/kaali-threert-runtime/ThreeRT.app/Contents/Resources/sdk/engine/tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "typeRoots": ["/private/tmp/kaali-threert-runtime/ThreeRT.app/Contents/Resources/sdk/engine/node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "@threert/scene": ["/private/tmp/kaali-threert-runtime/ThreeRT.app/Contents/Resources/sdk/engine/packages/scene/src/index.ts"],
+      "@threert/gameplay": ["/private/tmp/kaali-threert-runtime/ThreeRT.app/Contents/Resources/sdk/engine/packages/gameplay/src/index.ts"],
+      "@threert/net": ["/private/tmp/kaali-threert-runtime/ThreeRT.app/Contents/Resources/sdk/engine/../packages/net/src/index.ts"]
+    }
+  },
+  "include": ["*.ts", "src/**/*.ts"]
+}
