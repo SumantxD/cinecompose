@@ -19,6 +19,10 @@ interface StudioState {
   playing: boolean
   guides: boolean
   navSpeed: number
+  /** Timeline pixels per second. Zoom scales the whole timeline. */
+  timelineZoom: number
+  /** Snap playhead and cue drags to shot boundaries, cue times and a 0.05s grid. */
+  snap: boolean
   cameraEnd: boolean
   editAim: boolean
   gizmoDragging: boolean
@@ -74,6 +78,8 @@ export const useStudio = create<StudioState>((set, get) => ({
   playing: false,
   guides: true,
   navSpeed: 1,
+  timelineZoom: 26,
+  snap: true,
   cameraEnd: false,
   editAim: false,
   gizmoDragging: false,

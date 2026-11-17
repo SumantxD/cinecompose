@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type PointerEvent as RPointerEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent } from 'react'
 import { Howler } from 'howler'
 import { Stage } from '../app/Stage'
 import * as player from '../app/player'
@@ -24,7 +24,9 @@ const SHOT_TYPES: [ShotType, string][] = [
   ['pan', 'Pan / turn'], ['focus', 'Focus move'], ['over_shoulder', 'Over the shoulder'], ['low_angle', 'Low angle'],
   ['high_angle', 'High angle'], ['first_person', 'Through his eyes'], ['pov_walk', 'Walking POV'], ['security', 'Security camera'],
 ]
-const PX = 26 // timeline pixels per second
+const SNAP_GRID = 0.05 // seconds
+const TIME_STEPS = [0.1, 0.25, 0.5, 1, 2, 5, 10, 15, 30, 60] // ruler tick spacing choices
+const fmtTime = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}.${String(Math.floor((sec % 1) * 100)).padStart(2, '0')}`
 const r2 = (n: number) => Math.round(n * 100) / 100
 const vec = (v: { x: number; y: number; z: number }): Vec3 => [r2(v.x), r2(v.y), r2(v.z)]
 
@@ -194,6 +196,8 @@ export function Studio() {
   })
 
   const t = st.playing ? clock.t : st.t
+  const px = st.timelineZoom
+  const scrollRef = useRef<HTMLDivElement>(null)
   const shotStarts = cfg.shots.reduce<number[]>((a, _, i) => (a.push(i ? a[i - 1] + cfg.shots[i - 1].duration : 0), a), [])
   const curShot = Math.max(0, shotStarts.reduce((k, s0, i) => (s0 <= t + 1e-6 ? i : k), 0))
   const shot = sel?.kind === 'shot' ? cfg.shots[sel.index] : null
@@ -212,11 +216,55 @@ export function Studio() {
   }
   const dragOnTimeline = (e: RPointerEvent, onMove: (sec: number) => void) => {
     const box = (e.currentTarget.closest('.st-tracks') as HTMLElement).getBoundingClientRect()
-    const move = (ev: PointerEvent) => onMove((ev.clientX - box.left) / PX)
+    const move = (ev: PointerEvent) => onMove((ev.clientX - box.left) / useStudio.getState().timelineZoom)
     const up = () => (window.removeEventListener('pointermove', move), window.removeEventListener('pointerup', up))
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
   }
+
+  // Snap to shot/cue boundaries within a few pixels, otherwise the fine time grid.
+  const snapTargets = useMemo(() => {
+    const list = [0, cfg.duration, ...shotStarts, ...shotStarts.map((s0, i) => s0 + cfg.shots[i].duration), ...cues.map(({ c }) => c.at)]
+    return list.sort((a, b) => a - b)
+  }, [cfg.duration, shotStarts.join(','), cues.map(({ c }) => c.at).join(',')])
+  const snapTime = (sec: number) => {
+    const clamped = Math.max(0, Math.min(cfg.duration, sec))
+    if (!useStudio.getState().snap) return r2(clamped)
+    const threshold = 7 / px
+    let best = clamped, bestDist = threshold
+    for (const target of snapTargets) { const d = Math.abs(target - clamped); if (d < bestDist) { best = target; bestDist = d } }
+    return r2(bestDist < threshold ? best : Math.round(clamped / SNAP_GRID) * SNAP_GRID)
+  }
+  const zoomBy = (factor: number, anchor?: number) => {
+    const next = Math.min(240, Math.max(6, px * factor))
+    st.set({ timelineZoom: next })
+    const el = scrollRef.current
+    if (el && anchor !== undefined) { const x = anchor - el.getBoundingClientRect().left; const at = (x + el.scrollLeft) / px; requestAnimationFrame(() => { el.scrollLeft = at * next - x }) }
+  }
+  const fitTimeline = () => { const el = scrollRef.current; if (el) st.set({ timelineZoom: Math.max(6, Math.min(240, (el.clientWidth - 16) / Math.max(0.1, cfg.duration))) }); el?.scrollTo({ left: 0, behavior: 'smooth' }) }
+  const step = TIME_STEPS.find((s) => s * px >= 44) ?? 60
+  const minor = step / 5
+  const ticks = useMemo(() => { const out: number[] = []; for (let s = 0; s <= cfg.duration + 1e-6; s += minor) out.push(Math.round(s * 1000) / 1000); return out }, [cfg.duration, minor])
+
+  // Ctrl/Cmd + wheel zooms at the cursor. Native listener because React's onWheel is passive.
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return
+      e.preventDefault()
+      zoomBy(e.deltaY > 0 ? 0.88 : 1.14, e.clientX)
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [px, cfg.duration])
+  // Keep the playhead in view while playing.
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el || !st.playing) return
+    const x = t * px
+    if (x < el.scrollLeft + 24 || x > el.scrollLeft + el.clientWidth - 48) el.scrollLeft = x - el.clientWidth / 3
+  }, [t, px, st.playing])
 
   return (
     <div className="studio">
@@ -356,26 +404,52 @@ export function Studio() {
       </div>
 
       <footer className="st-timeline">
-        <div className="st-tracks" style={{ width: cfg.duration * PX + 40 }} onPointerDown={(e) => { if ((e.target as HTMLElement).classList.contains('st-tracks') || (e.target as HTMLElement).classList.contains('st-ruler')) { seek((e.clientX - e.currentTarget.getBoundingClientRect().left) / PX); dragOnTimeline(e, seek) } }}>
-          <div className="st-ruler">{Array.from({ length: Math.ceil(cfg.duration) + 1 }, (_, s) => <span key={s} style={{ left: s * PX }}>{s % 5 ? '' : `${s}s`}</span>)}</div>
-          <div className="st-row-shots">
-            {cfg.shots.map((s, i) => (
-              <div key={i} className={`st-shot ${sel?.kind === 'shot' && sel.index === i ? 'sel' : ''}`} style={{ left: shotStarts[i] * PX, width: s.duration * PX - 2 }} onPointerDown={(e) => { e.stopPropagation(); st.set({ sel: { kind: 'shot', index: i } }) }} title={`${s.id} — ${s.duration.toFixed(1)}s`}>
-                {s.id}
-                <i className="st-edge" onPointerDown={(e) => { e.stopPropagation(); st.set({ sel: { kind: 'shot', index: i } }); dragOnTimeline(e, (sec) => editShotDuration(i, Math.max(0.3, r2(sec - shotStarts[i])))) }} />
+        <div className="st-tl-bar">
+          <button onClick={() => seek(0)} title="Back to the start">⏮</button>
+          <span className="st-tl-time" title="Current time / total duration">{fmtTime(t)} <span className="st-tl-total">/ {fmtTime(cfg.duration)}</span></span>
+          <span className="st-tl-spacer" />
+          <button className={st.snap ? 'on' : ''} onClick={() => st.set({ snap: !st.snap })} title="Snap to shot boundaries, cue times and a 0.05s grid">🧲 Snap</button>
+          <button onClick={() => zoomBy(0.8)} title="Zoom out (⌘/Ctrl + scroll)">−</button>
+          <input className="st-tl-zoom" type="range" min={6} max={240} step={1} value={px} aria-label="Timeline zoom" title="Timeline pixels per second" onChange={(e) => zoomBy(Number(e.target.value) / px)} />
+          <span className="st-tl-zoomvalue">{Math.round(px)}px/s</span>
+          <button onClick={() => zoomBy(1.25)} title="Zoom in (⌘/Ctrl + scroll)">+</button>
+          <button onClick={fitTimeline} title="Fit the whole scene to the timeline width">Fit</button>
+        </div>
+        <div className="st-tl-body">
+          <div className="st-lane-labels">
+            <div className="st-ruler-spacer" />
+            <div>Shots</div>
+            <div>Cues</div>
+            <div>Dialogue</div>
+          </div>
+          <div className="st-tl-scroll" ref={scrollRef}>
+            <div className="st-tracks" style={{ width: cfg.duration * px + 40 }} onPointerDown={(e) => { if ((e.target as HTMLElement).classList.contains('st-tracks') || (e.target as HTMLElement).classList.contains('st-ruler')) { seek(snapTime((e.clientX - e.currentTarget.getBoundingClientRect().left) / px)); dragOnTimeline(e, (sec) => seek(snapTime(sec))) } }}>
+              <div className="st-ruler">
+                {ticks.map((s) => { const major = Math.abs(s / step - Math.round(s / step)) < 1e-6; return <span key={s} className={major ? 'st-tick major' : 'st-tick minor'} style={{ left: s * px }}>{major ? fmtTime(s) : ''}</span> })}
               </div>
-            ))}
+              <div className="st-row-shots">
+                {cfg.shots.map((s, i) => (
+                  <div key={i} className={`st-shot ${sel?.kind === 'shot' && sel.index === i ? 'sel' : ''}`} style={{ left: shotStarts[i] * px, width: s.duration * px - 2 }} onPointerDown={(e) => { e.stopPropagation(); st.set({ sel: { kind: 'shot', index: i } }) }} title={`${s.id} — ${s.duration.toFixed(1)}s`}>
+                    <span className="st-shot-name">{s.id}</span>
+                    <span className="st-shot-dur">{s.duration.toFixed(1)}s</span>
+                    <i className="st-edge" title="Drag to change duration (snaps)" onPointerDown={(e) => { e.stopPropagation(); st.set({ sel: { kind: 'shot', index: i } }); dragOnTimeline(e, (sec) => editShotDuration(i, Math.max(0.3, r2(snapTime(sec) - shotStarts[i])))) }} />
+                  </div>
+                ))}
+              </div>
+              <div className="st-row-cues">
+                {cues.map(({ c, i, own }, k) => (
+                  <span key={k} className={`st-cue ${own ? '' : 'macro'} ${sel?.kind === 'cue' && sel.index === i ? 'sel' : ''}`} style={{ left: c.at * px }} title={own ? cueLabel(c) : `${cueLabel(c)} (from a technique macro — edit in the JSON)`}
+                    onPointerDown={(e) => { e.stopPropagation(); if (!own) return; st.set({ sel: { kind: 'cue', index: i } }); dragOnTimeline(e, (sec) => st.edit((cc) => void (cc.cues[i].at = snapTime(sec)))) }}>◆</span>
+                ))}
+              </div>
+              <div className="st-row-lines">
+                {paced.filter((l) => !l.silent).map((l, k) => <span key={k} className="st-line" style={{ left: l.at * px, width: l.hold * px }} title={l.text}>{l.speaker === 'NARRATOR' ? '' : l.speaker + ': '}{l.text}</span>)}
+              </div>
+              <div className="st-playhead" style={{ left: t * px }} title="Drag to scrub">
+                <span className="st-playhead-grab" onPointerDown={(e) => { e.stopPropagation(); dragOnTimeline(e, (sec) => seek(snapTime(sec))) }} />
+              </div>
+            </div>
           </div>
-          <div className="st-row-cues">
-            {cues.map(({ c, i, own }, k) => (
-              <span key={k} className={`st-cue ${own ? '' : 'macro'} ${sel?.kind === 'cue' && sel.index === i ? 'sel' : ''}`} style={{ left: c.at * PX }} title={own ? cueLabel(c) : `${cueLabel(c)} (from a technique macro — edit in the JSON)`}
-                onPointerDown={(e) => { e.stopPropagation(); if (!own) return; st.set({ sel: { kind: 'cue', index: i } }); dragOnTimeline(e, (sec) => st.edit((cc) => void (cc.cues[i].at = Math.max(0, Math.round(sec * 20) / 20)))) }}>◆</span>
-            ))}
-          </div>
-          <div className="st-row-lines">
-            {paced.filter((l) => !l.silent).map((l, k) => <span key={k} className="st-line" style={{ left: l.at * PX, width: l.hold * PX }} title={l.text}>{l.speaker === 'NARRATOR' ? '' : l.speaker + ': '}{l.text}</span>)}
-          </div>
-          <div className="st-playhead" style={{ left: t * PX }} />
         </div>
       </footer>
       {jsonOpen && <JsonEditor onClose={() => setJsonOpen(false)} />}

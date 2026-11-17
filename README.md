@@ -124,10 +124,18 @@ Click **✦ Effect** then pick one: **light**, **entity**, **sound**, **ambience
 
 ### The timeline
 
-- The **ruler** marks seconds (labels every 5s).
-- **Shot bars** are draggable/selectable — click one to edit its type, duration, position/aim, or duplicate it.
-- **Cue ticks** are coloured by action (`💡` light, `👣` entity, `🔊` sound, `🌧` ambience, `🅣` title, `⬛/⬜` fade). Cues from technique macros show greyed and edit in the JSON.
-- **Caption strips** show each line's speaker and text, sized by its hold duration.
+The timeline is designed to feel like a professional NLE (Non-Linear Editor).
+
+![Polished timeline interface](docs/screenshots/studio-timeline.png)
+
+- **Zooming:** Scroll with `⌘/Ctrl` to zoom at the cursor, or use the timeline slider. 
+- **Snapping:** A toggle switch enables magnetic snapping to shot boundaries, cue times, and a 0.05s grid.
+- **The Ruler:** Displays adaptive ticks (0.1s to 60s) with precise timecodes (mm:ss.cs).
+- **Playhead:** A vertical grab handle enables scrubbing to any position in the scene timeline.
+- **Tracks:**
+  - **Shots:** Define your camera moves. Resize them using the draggable right edge.
+  - **Cues:** Small diamonds indicate timed audio, lighting, or entity events.
+  - **Dialogue:** Compact strips represent every spoken line, sized by its exact hold duration.
 
 ### Studio shortcuts
 
