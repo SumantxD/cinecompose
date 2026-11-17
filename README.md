@@ -78,6 +78,8 @@ The film view is read-only. You author camera moves by moving the director camer
 
 > Touch: one finger orbits, two fingers pinch-dolly and pan. Authoring keys are never created by navigation — only real edits make keys.
 
+![Free fly-through navigation](docs/screenshots/studio-nav-fly.png)
+
 ### Orthographic placement views
 
 | Key | Effect |
@@ -110,7 +112,9 @@ In an ortho view, **dragging drops you back into FREE orbit** at that exact spot
 ![Curved bezier paths](docs/screenshots/studio-bezier-paths-curved.png)
 
 ![Numbered camera points](docs/screenshots/studio-numbered-points.png)
+![Placed camera points — final layout](docs/screenshots/studio-points-final.png)
 ![Drag to insert a point](docs/screenshots/studio-drag-insert.png)
+![Segment plus handles](docs/screenshots/studio-segment-plus.png)
 
 ### Effects at the playhead
 
