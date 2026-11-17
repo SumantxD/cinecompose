@@ -7,7 +7,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "typecheck": "tsc --noEmit",
-    "check": "node --check scripts/audit-scenes.mjs && node --check scripts/play-episode.mjs && node scripts/check-episode.mjs && node scripts/check-curves.mjs && node scripts/check-views.mjs && node scripts/check-character.mjs && node scripts/check-animation-library.mjs && node scripts/check-frame.mjs && node scripts/check-assets.mjs"
+    "check": "node --check scripts/audit-scenes.mjs && node --check scripts/play-episode.mjs && node scripts/check-episode.mjs && node scripts/check-curves.mjs && node scripts/check-views.mjs && node scripts/check-character.mjs && node scripts/check-animation-library.mjs && node scripts/check-environment.mjs && node scripts/check-world.mjs && node scripts/check-rendering.mjs && node scripts/check-frame.mjs && node scripts/check-assets.mjs"
   },
   "type": "module",
   "dependencies": {
@@ -17,6 +17,7 @@
     "gsap": "^3.15.1",
     "howler": "^2.2.4",
     "inkjs": "^2.4.0",
+    "n8ao": "2.1.0",
     "postprocessing": "^6.39.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

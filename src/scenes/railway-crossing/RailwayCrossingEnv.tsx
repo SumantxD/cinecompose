@@ -55,7 +55,7 @@ export function RailwayCrossingEnv({ lighting, scene, children, groundedActors =
   return (
     <group>
       <FogSystem color={lighting.fogColor ?? '#232d39'} density={lighting.fogDensity} sheets={SHEETS} glowPos={SODIUM} glowColor="#ff9a40" />
-      <NightSky intensity={lighting.gi ?? 0.6} />
+      {!scene?.rendering?.environment && <NightSky intensity={lighting.gi ?? 0.6} />}
       <hemisphereLight args={['#3a4a5e', '#0a0c0e', lighting.ambientIntensity]} />
       {softFill && <ambientLight color='#9eacb8' intensity={lighting.ambientIntensity * 2.2} />}
       {/* Moonlight through cloud: cool key from behind the crossing — rims silhouettes, keeps the night readable. */}

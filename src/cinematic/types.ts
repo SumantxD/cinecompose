@@ -91,6 +91,81 @@ export interface RainConfig {
   wind?: [number, number]
 }
 
+export type EnvironmentEffectType = 'lightning' | 'tornado' | 'earthquake' | 'flood'
+
+interface EnvironmentEffectBase {
+  id: string
+  /** Seconds on the scene clock when the effect begins. */
+  at: number
+  /** Active window in seconds. Flood uses it as the rise time, then stays. */
+  duration: number
+  /** Scale multiplier, 0–4. */
+  intensity: number
+}
+
+/** Editor-authored environmental set pieces. Everything reads clock.t and seeded randomness. */
+export type EnvironmentEffect =
+  | (EnvironmentEffectBase & { type: 'lightning'; seed?: number; position?: Vec3 })
+  | (EnvironmentEffectBase & { type: 'tornado'; position: Vec3; radius?: number; height?: number; seed?: number })
+  | (EnvironmentEffectBase & { type: 'earthquake'; frequency?: number })
+  | (EnvironmentEffectBase & { type: 'flood'; level: number; color?: string })
+
+/**
+ * Editor-authored WebGL rendering quality. Optional: a scene with no `rendering` block keeps
+ * the legacy image exactly. A partial block is completed from the legacy baseline.
+ */
+export type QualityProfile = 'ultra' | 'high' | 'performance'
+export type AntiAliasing = 'none' | 'msaa' | 'smaa'
+export type AoQuality = 'performance' | 'low' | 'medium' | 'high' | 'ultra'
+export type ShadowType = 'basic' | 'pcf' | 'pcf-soft'
+export type ToneMapping = 'aces' | 'neutral' | 'none'
+export type HdriId = 'moonless_golf'
+
+export interface RenderSettings {
+  profile: QualityProfile
+  /** Maximum device pixel ratio / output resolution. */
+  renderScale: number
+  antialias: AntiAliasing
+  msaaSamples: number
+  shadows: boolean
+  shadowType: ShadowType
+  shadowMapSize: number
+  textureAnisotropy: number
+  toneMapping: ToneMapping
+  ao: { enabled: boolean; radius: number; intensity: number; quality: AoQuality; halfRes: boolean }
+  dof: { enabled: boolean; focusDistance: number; focalLength: number; fStop: number; bokeh: number }
+  bloom: { enabled: boolean; intensity: number; threshold: number }
+  grade: { saturation: number; contrast: number }
+  vignette: { enabled: boolean; darkness: number }
+  grain: { enabled: boolean; opacity: number }
+  chromatic: { enabled: boolean; offset: number }
+  godRays: { enabled: boolean; position: Vec3; intensity: number; density: number; decay: number }
+  /** Local, provenance-recorded HDRI; omit for the environments' procedural night fill. */
+  environment?: { hdri: HdriId; intensity: number; rotation: number }
+}
+
+/** JSON-friendly partial authoring form. Missing fields retain the legacy rendering baseline. */
+export interface RenderSettingsPatch {
+  profile?: QualityProfile
+  renderScale?: number
+  antialias?: AntiAliasing
+  msaaSamples?: number
+  shadows?: boolean
+  shadowType?: ShadowType
+  shadowMapSize?: number
+  textureAnisotropy?: number
+  toneMapping?: ToneMapping
+  ao?: Partial<RenderSettings['ao']>
+  dof?: Partial<RenderSettings['dof']>
+  bloom?: Partial<RenderSettings['bloom']>
+  grade?: Partial<RenderSettings['grade']>
+  vignette?: Partial<RenderSettings['vignette']>
+  grain?: Partial<RenderSettings['grain']>
+  chromatic?: Partial<RenderSettings['chromatic']>
+  godRays?: Partial<RenderSettings['godRays']>
+  environment?: RenderSettings['environment']
+}
+
 export interface GroundMistConfig {
   center: Vec3
   width: number
@@ -106,10 +181,14 @@ export interface SceneConfig {
   duration: number
   shots: Shot[]
   lighting: { ambientIntensity: number; fogDensity: number; exposure?: number; fogColor?: string; moon?: number; /** image-based fill (NightSky) intensity */ gi?: number }
+  /** Optional rendering-quality authoring. Omitted scenes retain the legacy image. */
+  rendering?: RenderSettingsPatch
   audio: { ambience: { sound: string; volume: number }[]; music: string | null }
   cues: Cue[]
+  /** Optional environmental effects authored in the Studio. Empty by default. */
+  effects?: EnvironmentEffect[]
   /** Set dressing selected by the story branch. */
-  props?: { horse?: 'room' | 'carried' | 'meera' | 'absent' | 'inventory'; footprints?: boolean; cassette?: boolean; paperBurn?: { at: number; duration: number }; groundMist?: GroundMistConfig; rain?: RainConfig }
+  props?: { horse?: 'room' | 'carried' | 'meera' | 'absent' | 'inventory'; footprints?: boolean; cassette?: boolean; paperBurn?: { at: number; duration: number }; groundMist?: GroundMistConfig; rain?: RainConfig; world?: import('../world/types').SceneSpecification }
   /** Technique macros (cinematic/techniques.ts) — expanded into cues at build time. */
   techniques?: import('./techniques').TechniqueUse[]
 }

@@ -9,6 +9,7 @@ Every external asset, with its license. If an asset isn't listed here, it isn't 
 | `textures/damaged_plaster/` | Poly Haven — Damaged Plaster, 1K source maps; WebP conversions | CC0 1.0 | https://polyhaven.com/a/damaged_plaster · https://creativecommons.org/publicdomain/zero/1.0/ | 2026-11-12 |
 | `textures/denim_fabric/` | Poly Haven — Denim Fabric, 1K source maps; WebP conversions | CC0 1.0 | https://polyhaven.com/a/denim_fabric · https://creativecommons.org/publicdomain/zero/1.0/ | 2026-11-12 |
 | `audio/vo/part1_opening_hi.wav` | Kokoro-82M / hexgrad, `hm_omega`; Hindi text phonemised with espeak-ng and generated locally. **Provisional AI narrator, not human acting.** | Apache 2.0 (upstream declaration); full text included beside the audio | https://huggingface.co/hexgrad/Kokoro-82M · https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.1 | 2026-11-13 |
+| `environments/moonless_golf_1k.hdr`, `environments/manifest.json` | Moonless Golf HDRI, Greg Zaal / Poly Haven; local 1K environment-lighting source. | CC0 1.0 (verified at https://polyhaven.com/license) | https://polyhaven.com/a/moonless_golf · https://creativecommons.org/publicdomain/zero/1.0/ | 2026-11-17 |
 | — | All other visuals, motion presets and audio are procedural (generated in code) | n/a | — | 2026-11-08 |
 
 The Hindi narrator's source hashes, phonemes, settings, output hash and limits are in `audio/vo/provenance.json`. Model weights and the female comparison are not bundled. AI generation was explicitly authorised after rejection of the English prototype.

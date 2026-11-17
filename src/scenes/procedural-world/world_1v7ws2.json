@@ -1,0 +1,153 @@
+{
+  "sceneId": "world_1v7ws2",
+  "environment": "procedural-world",
+  "duration": 16,
+  "shots": [
+    {
+      "id": "path_arrival",
+      "type": "slow_push",
+      "duration": 8,
+      "from": [
+        0,
+        -4.8500000000000005,
+        36
+      ],
+      "to": [
+        0,
+        -4.8500000000000005,
+        34
+      ],
+      "lookAt": [
+        0,
+        -4.6000000000000005,
+        -35
+      ],
+      "fov": 50,
+      "fovPortrait": 72
+    },
+    {
+      "id": "world_overview",
+      "type": "high_angle",
+      "duration": 8,
+      "from": [
+        24,
+        16.35,
+        16
+      ],
+      "to": [
+        20,
+        16.139196625822635,
+        12
+      ],
+      "lookAt": [
+        0,
+        -6.6000000000000005,
+        -8
+      ],
+      "fov": 54,
+      "fovPortrait": 72
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.8,
+    "moon": 0.65,
+    "exposure": 1.5,
+    "fogDensity": 0.008,
+    "fogColor": "#283941",
+    "gi": 0.65
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "night_drone",
+        "volume": 0.12
+      }
+    ],
+    "music": null
+  },
+  "cues": [],
+  "props": {
+    "world": {
+      "version": 1,
+      "seed": 2009,
+      "biome": "Random terraced",
+      "source": {
+        "kind": "random",
+        "description": "Random terraced",
+        "reconstructed": false,
+        "notes": [
+          "Seeded procedural layout."
+        ]
+      },
+      "terrain": {
+        "profile": "terraced",
+        "size": 180,
+        "relief": 16,
+        "waterLevel": -30,
+        "groundColor": "#79644c",
+        "skyColor": "#172631",
+        "fogColor": "#283941",
+        "fogDensity": 0.008,
+        "vegetation": {
+          "asset": "classic/dead-tree",
+          "density": 0.04
+        }
+      },
+      "landmarks": [
+        {
+          "id": "lookout",
+          "assembly": "classic/wood-watchtower",
+          "position": [
+            0,
+            -35
+          ],
+          "tags": [
+            "destination"
+          ],
+          "rotation": -0.16851361049339175,
+          "scale": 0.9
+        }
+      ],
+      "routes": [
+        {
+          "id": "approach",
+          "kind": "path",
+          "surface": "ground",
+          "points": [
+            [
+              0,
+              38
+            ],
+            [
+              -1.5691686179488897,
+              18
+            ],
+            [
+              1.5465855821967125,
+              -10
+            ],
+            [
+              0,
+              -35
+            ]
+          ],
+          "width": 2.4,
+          "clearance": 2
+        }
+      ],
+      "lighting": {
+        "moon": 0.65,
+        "ambient": 0.8,
+        "exposure": 1.5,
+        "azimuth": -0.6
+      },
+      "camera": {
+        "position": [
+          0,
+          36
+        ],
+        "target": "lookout"
+      }
+    }
+  }
+}

@@ -59,6 +59,7 @@ function sceneSave(): Plugin {
             const id = (cfg as { sceneId?: string })?.sceneId
             if (id !== file.split('/')[1].replace('.json', '')) errors.unshift('sceneId must match the filename.')
             if (errors.length) return void (res.statusCode = 422, res.end(errors.join('\n')))
+            mkdirSync(`src/scenes/${file.split('/')[0]}`, { recursive: true })
             writeFileSync(`src/scenes/${file}`, body)
             res.end('ok')
           } catch (e) {

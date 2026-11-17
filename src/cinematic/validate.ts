@@ -1,6 +1,8 @@
 import { expandTechniques } from './techniques.ts'
 import { PRESETS } from './presets.ts'
 import type { SceneConfig } from './types.ts'
+import { validateWorld } from '../world/types.ts'
+import { validateRenderSettings } from './rendering.ts'
 
 const record = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v)
 const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
@@ -49,8 +51,12 @@ export function validateScene(value: unknown): string[] {
 
   if (!record(value) || typeof value.sceneId !== 'string' || !/^[a-z][\w-]*$/.test(value.sceneId)) err('sceneId must start with a lowercase letter and contain only letters, numbers, _ or -.')
   if (typeof value.environment !== 'string' || !value.environment) err('environment is required.')
+  const props = record(value.props) ? value.props : null
+  if (value.environment === 'procedural-world' && !record(props?.world)) err('procedural-world scenes need props.world.')
+  if (record(props?.world)) errors.push(...validateWorld(props.world))
   if (!finite(value.duration) || value.duration <= 0) err('duration must be a positive number.')
   if (!record(value.lighting) || !finite(value.lighting.ambientIntensity) || !finite(value.lighting.fogDensity)) err('lighting needs numeric ambientIntensity and fogDensity.')
+  errors.push(...validateRenderSettings(value.rendering))
   if (!record(value.audio) || !Array.isArray(value.audio.ambience)) err('audio.ambience must be an array.')
   else value.audio.ambience.forEach((a, i) => {
     if (!record(a) || typeof a.sound !== 'string' || !finite(a.volume)) err(`ambience ${i + 1} needs a sound id and numeric volume.`)
@@ -63,6 +69,32 @@ export function validateScene(value: unknown): string[] {
   if (rain !== undefined && (!record(rain) || (rain.enabled !== undefined && typeof rain.enabled !== 'boolean') || (rain.count !== undefined && (!finite(rain.count) || rain.count < 0 || rain.count > 20000)) || (rain.wind !== undefined && (!Array.isArray(rain.wind) || rain.wind.length !== 2 || rain.wind.some((v: unknown) => !finite(v) || Math.abs(v as number) > 6))))) err('rain needs enabled?: boolean, count 0–20000 and wind [x, z] within ±6.')
   const mist = record(value.props) ? value.props.groundMist : undefined
   if (mist !== undefined && (!record(mist) || !vector(mist.center) || !finite(mist.width) || mist.width <= 0 || mist.width > 24 || !finite(mist.length) || mist.length <= 0 || mist.length > 48 || (mist.height !== undefined && (!finite(mist.height) || mist.height < 0.1 || mist.height > 0.4)) || (mist.opacity !== undefined && (!finite(mist.opacity) || mist.opacity < 0 || mist.opacity > 0.12)))) err('groundMist needs a center, bounded positive width/length, a low height and restrained opacity.')
+
+  if (value.effects !== undefined) {
+    if (!Array.isArray(value.effects)) err('effects must be an array.')
+    else {
+      const ids = value.effects.filter(record).map((e) => e.id).filter((v) => typeof v === 'string')
+      if (new Set(ids).size !== ids.length) err('effect ids must be unique.')
+      value.effects.forEach((fx, i) => {
+        const label = `effect ${i + 1}`
+        if (!record(fx) || typeof fx.id !== 'string' || !fx.id) return void err(`${label} needs an id.`)
+        if (!['lightning', 'tornado', 'earthquake', 'flood'].includes(String(fx.type))) err(`${label} has an unknown type.`)
+        if (!finite(fx.at) || fx.at < 0) err(`${label} needs a non-negative at.`)
+        if (!finite(fx.duration) || fx.duration <= 0 || fx.duration > 120) err(`${label} duration must be within 0–120s.`)
+        if (!finite(fx.intensity) || fx.intensity < 0 || fx.intensity > 4) err(`${label} intensity must be within 0–4.`)
+        if (fx.type === 'lightning' && fx.seed !== undefined && !Number.isInteger(fx.seed)) err(`${label} seed must be an integer.`)
+        if (fx.type === 'lightning' && fx.position !== undefined && !vector(fx.position)) err(`${label} lightning position must be [x, y, z].`)
+        if (fx.type === 'flood' && fx.color !== undefined && typeof fx.color !== 'string') err(`${label} flood colour must be a string.`)
+        if (fx.type === 'tornado') {
+          if (!vector(fx.position)) err(`${label} tornado needs a position [x, y, z].`)
+          if (fx.radius !== undefined && (!finite(fx.radius) || fx.radius <= 0 || fx.radius > 12)) err(`${label} tornado radius must be within 0–12m.`)
+          if (fx.height !== undefined && (!finite(fx.height) || fx.height < 3 || fx.height > 60)) err(`${label} tornado height must be within 3–60m.`)
+        }
+        if (fx.type === 'earthquake' && fx.frequency !== undefined && (!finite(fx.frequency) || fx.frequency <= 0 || fx.frequency > 30)) err(`${label} earthquake frequency must be within 0–30.`)
+        if (fx.type === 'flood' && (!finite(fx.level) || fx.level < 0 || fx.level > 12)) err(`${label} flood needs a level within 0–12m.`)
+      })
+    }
+  }
 
   const shots = Array.isArray(value.shots) ? value.shots : []
   if (!shots.length) err('at least one shot is required.')

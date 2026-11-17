@@ -9,7 +9,7 @@ import type { ViewMode } from './viewpoints.ts'
 
 export type Selection = { kind: 'shot' | 'cue'; index: number; node?: number } | null
 
-interface StudioState {
+export interface StudioState {
   sceneId: string
   cfg: SceneConfig
   saved: string
@@ -28,6 +28,9 @@ interface StudioState {
   gizmoDragging: boolean
   view: ViewMode
   aspect: '9:16' | '16:9'
+  panelTab: 'scene' | 'render' | 'world' | 'fx'
+  /** Live renderer telemetry for the render panel. Editor-only; not visual clock state. */
+  metrics?: { fps: number; calls: number; triangles: number; textures: number; geometries: number; programs: number }
   sel: Selection
   camera: THREE.Camera | null
   target: THREE.Vector3 | null
@@ -45,7 +48,7 @@ interface StudioState {
 const KEY = 'kr-studio'
 const remembered = (() => {
   try {
-    return JSON.parse(sessionStorage.getItem(KEY) ?? '{}') as { sceneId?: string; t?: number; aspect?: '9:16' | '16:9' }
+    return JSON.parse(sessionStorage.getItem(KEY) ?? '{}') as { sceneId?: string; t?: number; aspect?: '9:16' | '16:9'; panelTab?: 'scene' | 'render' | 'world' | 'fx' }
   } catch {
     return {}
   }
@@ -85,6 +88,7 @@ export const useStudio = create<StudioState>((set, get) => ({
   gizmoDragging: false,
   view: 'orbit',
   aspect: remembered.aspect ?? '9:16',
+  panelTab: remembered.panelTab && ['scene', 'render', 'world', 'fx'].includes(remembered.panelTab) ? remembered.panelTab : 'scene',
   sel: null,
   camera: null,
   target: null,
@@ -123,7 +127,7 @@ export const useStudio = create<StudioState>((set, get) => ({
 
 useStudio.subscribe((s) => {
   try {
-    sessionStorage.setItem(KEY, JSON.stringify({ sceneId: s.sceneId, t: s.t, aspect: s.aspect }))
+    sessionStorage.setItem(KEY, JSON.stringify({ sceneId: s.sceneId, t: s.t, aspect: s.aspect, panelTab: s.panelTab }))
     const key = `${KEY}-draft:${s.sceneId}`
     if (JSON.stringify(s.cfg) !== s.saved) localStorage.setItem(key, JSON.stringify({ base: s.saved, cfg: s.cfg }))
     else localStorage.removeItem(key)

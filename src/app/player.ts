@@ -13,7 +13,7 @@ export const getRainState = () => AudioManager.getRainState()
 export const getVoiceState = () => AudioManager.getVoiceState()
 import { Howler } from 'howler'
 
-export const studio = new URLSearchParams(location.search).has('studio')
+export const studio = import.meta.env.DEV && new URLSearchParams(location.search).has('studio')
 
 // Plays the story: Ink beat → scene config → one scrubbed timeline on the scene clock → choices or next beat.
 

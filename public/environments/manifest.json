@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "moonless_golf",
+      "file": "moonless_golf_1k.hdr",
+      "type": "HDRI environment lighting",
+      "author": "Greg Zaal — Poly Haven",
+      "license": "CC0 1.0",
+      "source": "https://polyhaven.com/a/moonless_golf",
+      "download": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/moonless_golf_1k.hdr",
+      "licenseText": "https://polyhaven.com/license",
+      "resolution": [1024, 512],
+      "lines": "Verified CC0 at https://polyhaven.com/license on 2026-11-17",
+      "sha256": "4f597078024bd81429431e872d466d8808653ad62a8bc8c61d8052af7466c3aa",
+      "added": "2026-11-17"
+    }
+  ]
+}

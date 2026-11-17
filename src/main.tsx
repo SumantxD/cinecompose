@@ -5,7 +5,13 @@ import './app/styles.css'
 
 if (matchMedia('(pointer: coarse)').matches || navigator.hardwareConcurrency <= 4) useStore.getState().set({ quality: 'low' })
 
-createRoot(document.getElementById('root')!).render(<App />)
+// Generated scene JSON invalidates the registry; preserve one app root through Vite HMR.
+const rootScope = globalThis as { __cinecomposeRoot?: ReturnType<typeof createRoot> }
+const root = import.meta.env.DEV
+  ? (rootScope.__cinecomposeRoot ??= createRoot(document.getElementById('root')!))
+  : createRoot(document.getElementById('root')!)
+if (import.meta.hot) import.meta.hot.accept()
+root.render(<App />)
 
 if (import.meta.env.DEV) {
   // Dev console helpers: kr.start('part1'), kr.skip(12), kr.choose(0)

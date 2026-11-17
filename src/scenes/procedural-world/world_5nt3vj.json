@@ -1,0 +1,192 @@
+{
+  "sceneId": "world_5nt3vj",
+  "environment": "procedural-world",
+  "duration": 16,
+  "shots": [
+    {
+      "id": "path_arrival",
+      "type": "slow_push",
+      "duration": 8,
+      "from": [
+        0,
+        0.9632603600172526,
+        35
+      ],
+      "to": [
+        0,
+        0.9718630338946017,
+        33
+      ],
+      "lookAt": [
+        0,
+        0.9908672828537672,
+        -38
+      ],
+      "fov": 50,
+      "fovPortrait": 72
+    },
+    {
+      "id": "world_overview",
+      "type": "high_angle",
+      "duration": 8,
+      "from": [
+        24,
+        16.292526981309194,
+        16
+      ],
+      "to": [
+        20,
+        16.057187460272047,
+        12
+      ],
+      "lookAt": [
+        0,
+        -0.7951875289781091,
+        -8
+      ],
+      "fov": 54,
+      "fovPortrait": 72
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.8,
+    "moon": 0.65,
+    "exposure": 1.5,
+    "fogDensity": 0.019,
+    "fogColor": "#283941",
+    "gi": 0.65
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "night_drone",
+        "volume": 0.12
+      }
+    ],
+    "music": null
+  },
+  "cues": [],
+  "props": {
+    "world": {
+      "version": 1,
+      "seed": 2009,
+      "biome": "An abandoned Indian village with an old temple at the end of",
+      "source": {
+        "kind": "story",
+        "description": "An abandoned Indian village with an old temple at the end of the road and a well beside it",
+        "reconstructed": false,
+        "notes": [
+          "Assembly hints were matched from the authoring terms in the description.",
+          "Place/scale layout is inferred where the description does not specify a relationship."
+        ]
+      },
+      "terrain": {
+        "profile": "rolling",
+        "size": 180,
+        "relief": 3.4,
+        "waterLevel": -30,
+        "groundColor": "#35432d",
+        "skyColor": "#172631",
+        "fogColor": "#283941",
+        "fogDensity": 0.019,
+        "vegetation": {
+          "asset": "classic/banyan",
+          "density": 0.46
+        }
+      },
+      "landmarks": [
+        {
+          "id": "story_0",
+          "assembly": "classic/stone-temple",
+          "tags": [
+            "destination",
+            "religious"
+          ],
+          "position": [
+            0,
+            -38
+          ],
+          "scale": 0.9
+        },
+        {
+          "id": "story_1",
+          "assembly": "classic/stone-well",
+          "tags": [
+            "water"
+          ],
+          "position": [
+            6.735557395310443e-16,
+            -27
+          ],
+          "scale": 1
+        }
+      ],
+      "routes": [
+        {
+          "id": "approach",
+          "kind": "path",
+          "surface": "ground",
+          "points": [
+            [
+              0,
+              38
+            ],
+            [
+              0,
+              10
+            ],
+            [
+              0,
+              -30
+            ],
+            [
+              0,
+              -38
+            ]
+          ],
+          "width": 3.4,
+          "clearance": 2
+        },
+        {
+          "id": "watercourse",
+          "kind": "stream",
+          "surface": "water",
+          "points": [
+            [
+              -18,
+              45
+            ],
+            [
+              -16,
+              14
+            ],
+            [
+              -20,
+              -12
+            ],
+            [
+              -14,
+              -46
+            ]
+          ],
+          "width": 3.2,
+          "clearance": 3,
+          "level": -0.65
+        }
+      ],
+      "lighting": {
+        "moon": 0.65,
+        "ambient": 0.8,
+        "exposure": 1.5,
+        "azimuth": -0.6
+      },
+      "camera": {
+        "position": [
+          0,
+          35
+        ],
+        "target": "story_0"
+      }
+    }
+  }
+}

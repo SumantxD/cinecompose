@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
-import { clock } from '../cinematic/clock'
-import { rng } from '../utils/random'
+import { clock } from '../cinematic/clock.ts'
+import { rng } from '../utils/random.ts'
 
 // Procedural vegetation: seeded archetypes (geometry built once) drawn as InstancedMeshes.
 // Trees = tapered curved trunk + branches (bark) and alpha-cut leaf cards (foliage) with crown-spherical normals.
@@ -9,7 +9,7 @@ import { rng } from '../utils/random'
 type Rand = () => number
 
 /** Tapered tube along a curve. Radius goes r0 → r1. */
-function limb(curve: THREE.Curve<THREE.Vector3>, r0: number, r1: number, segs: number, radial: number) {
+export function limb(curve: THREE.Curve<THREE.Vector3>, r0: number, r1: number, segs: number, radial: number) {
   const g = new THREE.TubeGeometry(curve, segs, 1, radial, false)
   const p = g.attributes.position as THREE.BufferAttribute
   const c = new THREE.Vector3(), v = new THREE.Vector3()

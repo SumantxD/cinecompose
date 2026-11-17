@@ -20,6 +20,17 @@ for (const [kind, asset] of Object.entries(SURFACES)) {
 }
 const credits = fs.readFileSync('public/CREDITS.md', 'utf8')
 assert(credits.includes('Poly Haven') && credits.includes('KinemIQ'))
+const environments = JSON.parse(fs.readFileSync('public/environments/manifest.json', 'utf8'))
+assert.equal(environments.version, 1)
+for (const asset of environments.assets) {
+  assert.equal(asset.license, 'CC0 1.0', `${asset.id}: verified license required`)
+  assert.match(asset.source, /^https:\/\/polyhaven\.com\/a\//, `${asset.id}: source page required`)
+  const data = fs.readFileSync(`public/environments/${asset.file}`)
+  assert.equal(data.length > 500_000, true, `${asset.id}: truncated HDRI`)
+  assert.equal(data.toString('ascii', 0, 11).trim(), '#?RADIANCE', `${asset.id}: RGBE HDRI required`)
+  assert.equal(createHash('sha256').update(data).digest('hex'), asset.sha256, `${asset.id}: source hash mismatch`)
+  assert(credits.includes(asset.file), `${asset.id}: CREDITS.md entry required`)
+}
 for (const file of ['public/textures/POLY-HAVEN-LICENSE.txt', 'public/textures/provenance.json', 'public/animations/KinemIQ-CC0-LICENSE.txt']) {
   assert(fs.statSync(file).size > 0, `Missing license/provenance: ${file}`)
 }

@@ -6,10 +6,10 @@ import { Environment, Lightformer } from '@react-three/drei'
  * sodium lamps. Fills shadows softly from every direction and gives wet surfaces something to reflect.
  * `intensity` comes from scene lighting (`gi`); tune with the Studio.
  */
-export function NightSky({ intensity = 1 }: { intensity?: number }) {
+export function NightSky({ intensity = 1, color = '#0d1219' }: { intensity?: number; color?: string }) {
   return (
     <Environment frames={1} resolution={128} environmentIntensity={intensity}>
-      <color attach="background" args={['#0d1219']} />
+      <color attach="background" args={[color]} />
       <Lightformer form="rect" intensity={0.9} color="#5d7290" position={[0, 12, 0]} rotation-x={Math.PI / 2} scale={[40, 40, 1]} />
       <Lightformer form="rect" intensity={1.6} color="#6f7f96" position={[0, 2, -30]} scale={[80, 6, 1]} />
       <Lightformer form="rect" intensity={0.8} color="#52627a" position={[0, 2, 30]} rotation-y={Math.PI} scale={[80, 5, 1]} />

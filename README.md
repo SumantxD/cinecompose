@@ -4,7 +4,7 @@ A high-performance, deterministic authoring suite for producing **branching, int
 
 ![Director Studio — dual view](docs/screenshots/studio-director.png)
 
-> **Not a game engine.** It's a *cinematic production pipeline*. It is designed to generate branching, interactive cinema (like *KAALI RAAT*) where users make decisions that lead to high-quality, pre-rendered video segments, rather than playing a real-time game. Three.js/R3F is the authoring layer; ThreeRT (native Rust/wgpu path tracer) is the offline render backend.
+> **Not a game engine.** It's a *cinematic authoring pipeline* for branching, decision-driven cinema (like *KAALI RAAT*). Three.js/R3F is the rendering and authoring layer. Studio can record the actual film camera; no native ray tracer or separate story runtime is included.
 
 **Reference output:** [*KAALI RAAT — The Road That Remembers*](https://github.com/SumantxD/cinecompose), the first complete episode produced with this engine (78 validated paths, four endings, death/retry).
 
@@ -34,7 +34,7 @@ npm run build      # static dist/, deployable anywhere
 
 ---
 
-## The three tools
+## Authoring tools
 
 ### 1. Director Studio (`/?studio`)
 Dual-view film editor: a free director camera on the left, the live film camera on the right. Everything you touch writes straight into the scene's JSON — no separate project file, no export step.
@@ -47,6 +47,14 @@ A specialized rig and motion editor for procedural character performance.
 
 ### 3. Story pipeline (`src/story/episode-001.ink`)
 Branching narrative authored in **Ink**. The story decides *what happens*; the scene JSON decides *how you experience it*. Never mix the two.
+
+### 4. World Builder (Studio workspace)
+
+Generate an editable scene from a seed, a short story description, or a reference image. The same specification drives terrain, routes, landmarks, lighting and framing; output is ordinary scene JSON in `src/scenes/procedural-world/`. Existing scenes are never overwritten.
+
+![World Builder on mobile](docs/screenshots/studio-world-mobile.png)
+
+Story parsing is an offline grammar adapter, not an LLM. Images provide measured pixels plus horizon/vegetation observations; optional supplied depth produces bounded, labelled relative 2.5D observations, not a complete reconstruction. The depth model is not bundled, and image inputs do not invent unmentioned buildings. Save the generated world, then use the normal camera, weather, effects and Rendering panels to refine it.
 
 ---
 
@@ -126,6 +134,45 @@ The right-hand panel edits the scene's environment directly — changes write in
 - **Weather:** toggle outdoor **rain** on/off, set **rain density** (GPU streaks; `0` keeps the environment's own default), and drift direction with **Wind X / Wind Z**. Rain is shelter-aware — it won't fall through roofs. Ambience audio is authored separately as audio cues.
 
 These are authored per scene and saved like any other edit (`⌘S`). Everything still reads the shared `clock.t`, so the preview and the final render stay in sync.
+
+### Rendering quality
+
+Open **Rendering** in the Studio workspace switcher. Apply **Ultra**, **High**, or **Performance**, then adjust only what the shot needs.
+
+![Rendering controls in Director Studio](docs/screenshots/studio-rendering.png)
+
+| Profile | Output DPR cap | Antialiasing | Occlusion | Shadows |
+|---|---|---|---|---|
+| **Ultra** | 2 | SMAA Ultra | N8AO Ultra, full resolution | PCF soft, 2048 |
+| **High** | 1.5 | SMAA Medium | N8AO Medium, half resolution | PCF soft, 1024 |
+| **Performance** | 1 | SMAA Medium | N8AO Performance, half resolution | PCF, 512 |
+
+The workspace also controls shadow resolution, trilinear texture filtering, DOF, bloom, grade, vignette, grain, chromatic aberration, tone mapping and optional light shafts. DOF focus depth is the compositor's normalized depth; aperture maps to the installed effect's bokeh scale. **God rays** uses a real scene-space source, not a screen-space glare imitation.
+
+- **Apply a profile to opt in.** A scene with no `rendering` block retains its legacy grade, DPR, shadow and vegetation behavior. **Customize** enters editing without replacing that legacy image.
+- **Reset rendering** restores the scene's last saved rendering block. Normal save/undo applies.
+- **Save preset / Load preset** transfers validated, portable rendering settings as JSON. Loading a preset does not upload anything.
+- **Environment light** can use the local **Moonless Golf 1K HDRI** for restrained illumination; procedural night fill remains the default. Greg Zaal's CC0 source and the downloaded file's SHA-256 are in `public/CREDITS.md` and `public/environments/manifest.json`.
+- Texture filtering is not a fake resolution downgrade: anisotropy is clamped to each GPU's capability, while all three profiles retain the source texture detail.
+
+The budget readout samples the composed film renderer after its effects—not the guide-only director viewport. It is for comparing settings, not a promise of 30/60 FPS. Profile changes are functionally tested on desktop and at a 390×844 mobile layout; actual phone-GPU, thermal and per-scene art approval still need real-device checks. See [performance and budgets](docs/world/performance.md).
+
+### Environment FX toolkit
+
+These are **optional, reusable editor tools**, not events automatically added to KAALI RAAT. A scene has no environmental effects until you add one. Existing story scenes remain unchanged.
+
+Use the **Environment FX** panel below Weather:
+
+![Environment FX in the Studio](docs/screenshots/studio-tornado.png)
+
+*This tornado is an unsaved test draft in the editor, not an authored KAALI RAAT event.*
+
+1. Choose **Tornado**, **Lightning**, **Earthquake**, or **Flood** and click **＋ Add**.
+2. Set **At**, **Duration**, and **Intensity**. Effects fade in/out at the ends of their active window.
+3. Edit the type-specific parameters: funnel position/radius/height and debris, storm position and deterministic seed, rumble frequency, or flood level and water colour.
+4. Scrub the timeline to preview exactly at a given time. **× Delete** removes the effect; undo and normal `⌘S` scene saving apply.
+
+The configuration lives in the scene's `effects: []` array. Motion reads the scene clock and seeded randomness, so replaying a frame gives the same effect. The systems are controlled cinematic approximations: debris does not run a rigid-body simulation, the flood does not solve fluid dynamics, and earthquakes move the camera rather than destroying the set. No unrelated story logic is added.
 
 ### Effects at the playhead
 
@@ -216,25 +263,6 @@ src/story/episode-001.ink      →  StoryEngine  →  beats (scene id + lines + 
 
 ---
 
-## Offline rendering with ThreeRT
-
-`threert/` is the **production render backend**: a native Rust/wgpu path tracer used offline to render the branch videos on this Mac.
-
-```bash
-threert dev threert --port 8790     # dev server against the render project
-threert check threert --json        # validate the scene
-threert shot -o out.png --history 32
-threert render threert -o out.png --spp 256   # converged offline frame
-```
-
-- **Native, not a browser plugin.** Hardware ray tracing via wgpu — validated on Apple M4 Pro (`hwrt: true`).
-- **Offline Rendering:** Generate production-ready branch videos (MP4/WebM) frame-by-frame.
-- **Zero Drift:** Because the story/camera is authoritative in the browser, ThreeRT renders the exact same frames that users experience in the interactive version.
-
-![Editor guides](docs/screenshots/studio-guides.png)
-
-![ThreeRT traced frame](docs/screenshots/threert-raytraced.png)
-
 ---
 
 ## Assets & licensing
@@ -279,8 +307,10 @@ The full decision log is in [`docs/decisions.md`](docs/decisions.md). Production
 
 **Built:** the complete interactive episode (78 validated paths, four endings, death/retry), real tea-stall / childhood-house / return-road environments, Director Studio, Character Lab with 135 motions, layered shelter-aware rain, indoor sound profiles, ground mist, local fonts/textures, deterministic cameras and story/clock plumbing.
 
+**Also built:** the optional Studio Environment FX toolkit (lightning, tornado, earthquake and flood, never added to story scenes unless authored).
+
 **In progress:**
-- **Branch videos** — the browser delivery is moving to pre-rendered videos with decision overlays. The offline render pipeline (`threert/`) and the branch-video player are the current focus.
+- **Branch-video export and player** — the Studio currently captures the live film view with MediaRecorder. A complete offline branch-video library and player have not been built.
 - **Full Hindi voiceover** — 149 clips are generated and the opening is wired; the rest of the episode is captioned. Timing collisions across conditional branches are being resolved before the full dub ships.
 
 **Known gaps:** episode characters are procedural mannequins in close-up (licensed human/hair assets not yet integrated); no public hosting provider is configured yet.

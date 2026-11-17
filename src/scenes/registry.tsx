@@ -1,5 +1,7 @@
 import type { ComponentType } from 'react'
 import type { SceneConfig } from '../cinematic/types'
+
+import { WorldEnvironment } from '../world/WorldEnvironment'
 import { RailwayCrossingEnv } from './railway-crossing/RailwayCrossingEnv'
 import { TeaStallEnv } from './tea-stall/TeaStallEnv'
 import { ChildhoodHouseEnv } from './childhood-house/ChildhoodHouseEnv'
@@ -13,6 +15,7 @@ export const ENVIRONMENTS: Record<string, ComponentType<EnvironmentProps>> = {
   'tea-stall': TeaStallEnv,
   'childhood-house': ChildhoodHouseEnv,
   'return-road': ReturnRoadEnv,
+  'procedural-world': ({ scene }) => scene.props?.world ? <WorldEnvironment spec={scene.props.world} shots={scene.shots} lighting={scene.lighting} rain={scene.props.rain} /> : null,
   void: () => null,
 }
 

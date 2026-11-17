@@ -141,6 +141,7 @@ export function CharacterLab() {
       <button title="Download the editable clip document" onClick={() => saveData(JSON.stringify(state.doc, null, 2), `${clip.name || clip.id}.json`, 'application/json')}>Clip JSON</button>
       {state.recovery && <button title="Download the previous, unreadable draft" onClick={() => saveData(state.recovery!, 'character-recovery.json', 'application/json')}>Recovery JSON</button>}
       <a className="char-scene-link" href="/?studio">Scene</a>
+      <a className="char-episode-link" href="/?start=part1" title="Play the reference episode">Episode</a>
     </header>
     <div className="char-main">
       <aside className="char-motion">

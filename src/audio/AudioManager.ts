@@ -195,9 +195,12 @@ export const AudioManager = {
   },
 
   listener(pos: Vec3, forward: Vec3) {
-    if (!Howler.ctx || Howler.ctx.state !== 'running') return
-    Howler.pos(pos[0], pos[1], pos[2])
-    Howler.orientation(forward[0], forward[1], forward[2], 0, 1, 0)
+    const context = Howler.ctx
+    if (!context || context.state !== 'running') return
+    try {
+      Howler.pos(pos[0], pos[1], pos[2])
+      Howler.orientation(forward[0], forward[1], forward[2], 0, 1, 0)
+    } catch { /* AudioContext may be torn down during navigation or hot reload. */ }
   },
 
   hasLoop(id: string) {

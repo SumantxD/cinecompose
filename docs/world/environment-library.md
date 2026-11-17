@@ -13,6 +13,11 @@ Rule: the fog colour must be *lighter* than near silhouettes, or depth won't lay
 GPU line streaks in a camera-following box, brightened near up to 3 registered lights. Props: `count`, `box`, `wind`.
 📋 Puddle ripples. 📋 Drips from roofs and trees. 📋 An indoor variant (rain only seen through windows).
 
+## Environment FX — `environment/EnvironmentEffects.tsx` ✅
+Opt-in per-scene `effects` array, authored and previewed in the Studio. **Lightning** builds seeded branching bolts and double-pulsed lights; **Tornado** renders a procedural funnel and instanced orbiting debris; **Earthquake** applies deterministic camera rumble without accumulating drift; **Flood** raises a standard-material water surface to its authored level. Every effect has id/type/start/duration/intensity, and no story scene receives one by default.
+
+These are controllable cinematic approximations, not fluid dynamics, rigid-body destruction or a universal weather simulation. Optional type parameters include lightning position/seed, tornado position/radius/height/debris/seed, earthquake frequency, and flood level/colour. Existing rain, fog and shelter logic remain separate.
+
 ## Terrain — inside `ForestEnvironment` 🔧
 A 320 m ground plane displaced by fbm, flattened near the road, plus a `terrain(x, z)` offset from the set (for example `groundLevel` for the track embankment).
 📋 Extract into `Terrain.tsx` with a shared `height(x, z)` export so props can sit on it without each set re-deriving it.

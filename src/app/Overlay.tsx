@@ -26,7 +26,7 @@ function Gate() {
     }
   }
   return (
-    <button className="gate" onClick={() => begin(error)} disabled={loading}>
+    <button className="gate" onClick={() => begin(error)} disabled={loading} aria-label="Enter KAALI RAAT episode 1">
       <span className="gate-hint">Headphones. Lights off.</span>
       <span className="gate-hint hi">हेडफ़ोन लगाइए। बत्ती बुझाइए।</span>
       <span className="gate-cta">{loading ? '…' : error ? 'Start over' : 'Tap to begin'}</span>

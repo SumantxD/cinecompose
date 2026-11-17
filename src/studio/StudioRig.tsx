@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
-import { Html, TransformControls } from '@react-three/drei'
+import { TransformControls } from '@react-three/drei'
+import { ScreenOverlay as Html } from './ScreenOverlay'
 import { OrbitControls as OrbitImpl } from 'three-stdlib'
 import type { TransformControls as TransformImpl } from 'three-stdlib'
 import * as THREE from 'three'
@@ -90,8 +91,7 @@ function selectedFocusPoint(): Vec3 | null {
 }
 
 function PointNumber({ number, end, selected, onClick }: { number: number; end: boolean; selected: boolean; onClick: () => void }) {
-  return <Html center zIndexRange={[2, 0]}><button className={`st-point-number ${end ? 'end' : 'start'} ${selected ? 'sel' : ''}`}
-    title={`Point ${number}: show in film preview`} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); onClick() }}>{number}</button></Html>
+  return <Html label={String(number)} className={`st-point-number ${end ? 'end' : 'start'} ${selected ? 'sel' : ''}`} title={`Point ${number}: show in film preview`} onClick={onClick} button />
 }
 
 type HandleField = 'in' | 'out' | 'aimIn' | 'aimOut'
@@ -103,7 +103,7 @@ function PathHandle({ shotIndex, nodeIndex, field, active, onSelect }: { shotInd
   const change = (v: Vec3) => useStudio.getState().change((c) => movePathHandle(c.shots[shotIndex].path!, nodeIndex, field, v))
   const label = field === 'in' ? 'IN' : field === 'out' ? 'OUT' : field === 'aimIn' ? 'AIM IN' : 'AIM OUT'
   const colour = field.startsWith('aim') ? '#b599ca' : '#92b3c7'
-  const contents = <><mesh><sphereGeometry args={[0.22, 12, 8]} /><meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} /></mesh><Marker color={colour} scale={0.5} /><Html center wrapperClass="st-pass-through" zIndexRange={[2, 0]}><span className="st-handle-label">{label}</span></Html></>
+  const contents = <><mesh><sphereGeometry args={[0.22, 12, 8]} /><meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} /></mesh><Marker color={colour} scale={0.5} /><Html label={label} className="st-handle-label" title={label} passThrough /></>
   return active ? <DragTransform value={value} onChange={change}>{contents}</DragTransform>
     : <group position={value} onPointerDown={(e) => { e.stopPropagation(); onSelect() }}>{contents}</group>
 }
@@ -112,7 +112,7 @@ function AimPoint({ shotIndex, nodeIndex, active, onSelect }: { shotIndex: numbe
   const shot = useStudio((s) => s.cfg.shots[shotIndex])
   const value = getCameraPoint(shot, nodeIndex).aim
   const change = (v: Vec3) => useStudio.getState().change((c) => moveCameraAim(c.shots[shotIndex], nodeIndex, v))
-  const contents = <><mesh><sphereGeometry args={[0.22, 12, 8]} /><meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} /></mesh><Marker color="#b599ca" scale={0.65} /><Html center wrapperClass="st-pass-through" zIndexRange={[2, 0]}><span className="st-handle-label">AIM</span></Html></>
+  const contents = <><mesh><sphereGeometry args={[0.22, 12, 8]} /><meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} /></mesh><Marker color="#b599ca" scale={0.65} /><Html label="AIM" className="st-handle-label" title="AIM" passThrough /></>
   return active ? <DragTransform value={value} onChange={change}>{contents}</DragTransform>
     : <group position={value} onPointerDown={(e) => { e.stopPropagation(); onSelect() }}>{contents}</group>
 }
@@ -242,7 +242,7 @@ function CameraPipe({ samples, index }: { samples: CameraSample[]; index: number
         onPointerUp={(e) => up(e, id, start, end)}>
         <sphereGeometry args={[0.38, 12, 8]} /><meshBasicMaterial transparent opacity={0} depthTest={false} depthWrite={false} /></mesh>
       <mesh><sphereGeometry args={[0.14, 12, 8]} /><meshBasicMaterial color="#70d5a1" depthTest={false} depthWrite={false} /></mesh>
-      <Html center wrapperClass="st-pass-through" zIndexRange={[2, 0]}><span className="st-add-point-label" title="Drag inside this segment to insert a point">＋</span></Html>
+      <Html label="＋" className="st-add-point-label" title="Drag inside this segment to insert a point" passThrough />
     </group>)}
   </group>
 }
@@ -306,6 +306,12 @@ export function StudioRig() {
   const getScene = useThree((s) => s.get)
   const controls = useRef(orbitControls), keys = useRef(new Set<string>())
   const perspective = useRef(camera as THREE.PerspectiveCamera)
+  const sceneId = useStudio((s) => s.sceneId)
+  useEffect(() => {
+    if (!useStudio.getState().cfg.props?.world) return
+    const frame = requestAnimationFrame(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Home' })))
+    return () => cancelAnimationFrame(frame)
+  }, [sceneId])
   const orthographic = useMemo(() => new THREE.OrthographicCamera(), [])
   const pivot = useRef(new THREE.Vector3(0, 1, -4))
   const numberBuffer = useRef(''), numberTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -428,8 +434,11 @@ export function StudioRig() {
       if (e.code === 'Home') {
         e.preventDefault()
         perspective.current.up.set(0, 1, 0)
-        perspective.current.position.set(13, 8, 19)
-        pivot.current.set(0, 1, -4)
+        const homeShot = useStudio.getState().cfg.props?.world
+          ? useStudio.getState().cfg.shots.find((shot) => shot.id === 'world_overview') ?? useStudio.getState().cfg.shots[0]
+          : null
+        perspective.current.position.set(...(homeShot?.from ?? [13, 8, 19]))
+        pivot.current.set(...(homeShot?.lookAt ?? [0, 1, -4]))
         control?.target.copy(pivot.current)
         useStudio.getState().set({ view: 'orbit' })
       }

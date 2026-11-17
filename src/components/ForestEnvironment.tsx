@@ -1,6 +1,8 @@
-import { useMemo } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useMemo, useRef } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { clock } from '../cinematic/clock'
+import { useRenderSettings } from '../cinematic/rendering'
 import { fbm, rng } from '../utils/random'
 import { ground } from '../utils/textures'
 import { salTree, bush, grassClump, leafTexture, grassTexture, barkTexture, withWind } from './vegetation'
@@ -36,6 +38,12 @@ function fill(im: THREE.InstancedMesh | null, list: Placement[]) {
 /** Monsoon sal forest: seeded tree/bush archetypes, instanced, wind-driven, on an uneven mud floor. */
 export function ForestEnvironment({ clear, terrain = () => 0, trees = 420, bushes = 500, grass = 2600, seed = 5 }: Props) {
   const groundTex = useMemo(ground, [])
+  const render = useRenderSettings()
+  const camera = useThree((s) => s.camera)
+  const treeMeshes = useRef<(THREE.InstancedMesh | null)[]>([])
+  const bushMeshes = useRef<(THREE.InstancedMesh | null)[]>([])
+  const bladeMesh = useRef<THREE.InstancedMesh | null>(null)
+  const cullState = useRef({ tick: -1, position: camera.position.clone() })
 
   const height = useMemo(
     () => (x: number, z: number) => {
@@ -115,6 +123,32 @@ export function ForestEnvironment({ clear, terrain = () => 0, trees = 420, bushe
     kit.leaves.tick()
     kit.bushLeaves.tick()
     kit.blades.tick()
+    if (!render) return
+    // Distance LOD for profile-authored scenes. Culled order is camera position + authored clock.t, never random.
+    const radius = render.profile === 'performance'
+      ? { trees: 105, bushes: 72, grass: 55 }
+      : render.profile === 'ultra'
+        ? { trees: Infinity, bushes: Infinity, grass: Infinity }
+        : { trees: 170, bushes: 118, grass: 92 }
+    const tick = Math.floor(clock.t * 2)
+    const moved = cullState.current.position.distanceToSquared(camera.position) > 16
+    if (tick === cullState.current.tick && !moved) return
+    cullState.current = { tick, position: camera.position.clone() }
+    const within = (list: Placement[], max: number) => {
+      if (!Number.isFinite(max)) return list
+      const { x: cx, z: cz } = camera.position
+      return list.filter((p) => {
+        const dx = p.m.elements[12] - cx, dz = p.m.elements[14] - cz
+        return dx * dx + dz * dz <= max * max
+      })
+    }
+    kit.trees.forEach((_, i) => {
+      const list = within(placed.trees[i], radius.trees)
+      fill(treeMeshes.current[i * 2] ?? null, list)
+      fill(treeMeshes.current[i * 2 + 1] ?? null, list)
+    })
+    kit.bushes.forEach((_, i) => fill(bushMeshes.current[i] ?? null, within(placed.bushes[i], radius.bushes)))
+    fill(bladeMesh.current, within(placed.blades, radius.grass))
   })
 
   return (
@@ -124,14 +158,14 @@ export function ForestEnvironment({ clear, terrain = () => 0, trees = 420, bushe
       </mesh>
       {kit.trees.map((t, i) => (
         <group key={i}>
-          <instancedMesh ref={(im) => fill(im, placed.trees[i])} args={[t.bark, kit.bark.mat, Math.max(1, placed.trees[i].length)]} castShadow receiveShadow />
-          <instancedMesh ref={(im) => fill(im, placed.trees[i])} args={[t.leaves, kit.leaves.mat, Math.max(1, placed.trees[i].length)]} receiveShadow />
+          <instancedMesh ref={(im) => { treeMeshes.current[i * 2] = im; fill(im, placed.trees[i]) }} args={[t.bark, kit.bark.mat, Math.max(1, placed.trees[i].length)]} castShadow receiveShadow />
+          <instancedMesh ref={(im) => { treeMeshes.current[i * 2 + 1] = im; fill(im, placed.trees[i]) }} args={[t.leaves, kit.leaves.mat, Math.max(1, placed.trees[i].length)]} receiveShadow />
         </group>
       ))}
       {kit.bushes.map((g, i) => (
-        <instancedMesh key={i} ref={(im) => fill(im, placed.bushes[i])} args={[g, kit.bushLeaves.mat, Math.max(1, placed.bushes[i].length)]} receiveShadow />
+        <instancedMesh key={i} ref={(im) => { bushMeshes.current[i] = im; fill(im, placed.bushes[i]) }} args={[g, kit.bushLeaves.mat, Math.max(1, placed.bushes[i].length)]} receiveShadow />
       ))}
-      <instancedMesh ref={(im) => fill(im, placed.blades)} args={[kit.grass, kit.blades.mat, Math.max(1, placed.blades.length)]} />
+      <instancedMesh ref={(im) => { bladeMesh.current = im; fill(im, placed.blades) }} args={[kit.grass, kit.blades.mat, Math.max(1, placed.blades.length)]} />
     </group>
   )
 }
