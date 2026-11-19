@@ -8,7 +8,7 @@
       "type": "track_lateral",
       "duration": 7,
       "from": [
-        0.0,
+        0,
         1.1,
         17.4
       ],
@@ -37,7 +37,7 @@
       ],
       "lookAt": [
         -0.4,
-        1.0,
+        1,
         1.6
       ],
       "fov": 30,
@@ -77,9 +77,9 @@
   "lighting": {
     "ambientIntensity": 0.7,
     "fogDensity": 0.028,
-    "exposure": 1.0,
+    "exposure": 1,
     "moon": 0.6,
-    "gi": 1.0
+    "gi": 1
   },
   "audio": {
     "ambience": [
@@ -176,5 +176,37 @@
       "use": "EDT-01",
       "at": 12.6
     }
-  ]
+  ],
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1.5,
+    "antialias": "smaa",
+    "shadowType": "pcf-soft",
+    "shadowMapSize": 1024,
+    "textureAnisotropy": 4,
+    "ao": {
+      "enabled": true,
+      "radius": 1.1,
+      "intensity": 2.2,
+      "quality": "medium",
+      "halfRes": true
+    },
+    "bloom": {
+      "enabled": true,
+      "intensity": 0.34,
+      "threshold": 0.97
+    },
+    "vignette": {
+      "enabled": true,
+      "darkness": 0.78
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.17
+    },
+    "grade": {
+      "saturation": -0.22,
+      "contrast": 0.08
+    }
+  }
 }

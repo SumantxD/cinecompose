@@ -61,6 +61,8 @@ export interface Shot {
   exposure?: number
   /** Soft cool fill riding on the camera (film "eye light") so close subjects read. 0 = off. */
   eyeLight?: number
+  /** Optional source-image placeholder for a reference study. Never recovered 3D geometry. */
+  reference?: import('../reference/compose').ReferenceFrame
   /** Camera roll in radians (Dutch angle, CAM-10). Keep under 0.12. */
   roll?: number
   rollTo?: number
@@ -119,7 +121,7 @@ export type AntiAliasing = 'none' | 'msaa' | 'smaa'
 export type AoQuality = 'performance' | 'low' | 'medium' | 'high' | 'ultra'
 export type ShadowType = 'basic' | 'pcf' | 'pcf-soft'
 export type ToneMapping = 'aces' | 'neutral' | 'none'
-export type HdriId = 'moonless_golf'
+export type HdriId = 'moonless_golf' | 'kloppenheim_02_puresky'
 
 export interface RenderSettings {
   profile: QualityProfile
@@ -141,7 +143,20 @@ export interface RenderSettings {
   chromatic: { enabled: boolean; offset: number }
   godRays: { enabled: boolean; position: Vec3; intensity: number; density: number; decay: number }
   /** Local, provenance-recorded HDRI; omit for the environments' procedural night fill. */
-  environment?: { hdri: HdriId; intensity: number; rotation: number }
+  environment?: { hdri: HdriId; intensity: number; rotation: number; background?: boolean; backgroundIntensity?: number; backgroundBlurriness?: number; backgroundRotation?: number }
+}
+
+export interface ForestSettings {
+  seed: number
+  density: number
+  textureScale: number
+  normalStrength: number
+  /** Physical bump amplitude in metres. Optional for older saved forest scenes. */
+  relief?: number
+  wetness: number
+  wind: number
+  mist: number
+  puddles: boolean
 }
 
 /** JSON-friendly partial authoring form. Missing fields retain the legacy rendering baseline. */
@@ -188,7 +203,7 @@ export interface SceneConfig {
   /** Optional environmental effects authored in the Studio. Empty by default. */
   effects?: EnvironmentEffect[]
   /** Set dressing selected by the story branch. */
-  props?: { horse?: 'room' | 'carried' | 'meera' | 'absent' | 'inventory'; footprints?: boolean; cassette?: boolean; paperBurn?: { at: number; duration: number }; groundMist?: GroundMistConfig; rain?: RainConfig; world?: import('../world/types').SceneSpecification }
+  props?: { horse?: 'room' | 'carried' | 'meera' | 'absent' | 'inventory'; footprints?: boolean; cassette?: boolean; paperBurn?: { at: number; duration: number }; groundMist?: GroundMistConfig; rain?: RainConfig; forest?: ForestSettings; referenceStudy?: import('../reference/compose').ReferenceStudy; choreography?: import('./choreography').ChoreographyPlan; cce?: import('../cce/types').CceTrack; world?: import('../world/types').SceneSpecification }
   /** Technique macros (cinematic/techniques.ts) — expanded into cues at build time. */
   techniques?: import('./techniques').TechniqueUse[]
 }

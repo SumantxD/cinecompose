@@ -5,6 +5,8 @@ import type { SceneConfig, Cue, Vec3 } from './types'
 import type { Line } from '../story/StoryEngine'
 import { PRESETS } from './presets.ts'
 import { expandTechniques } from './techniques.ts'
+import { addChoreography } from '../cce/runtime.ts'
+import { compileCues } from '../cce/engine.ts'
 import { useStore } from '../state/store.ts'
 import { AudioManager } from '../audio/AudioManager.ts'
 import { clock } from './clock.ts'
@@ -97,9 +99,10 @@ export function buildTimeline(cfg: SceneConfig, lines: Line[]) {
   const { timed, end } = paceLines(lines)
 
   addShots(tl, cfg, cam)
+  addChoreography(tl, cfg)
 
   const fade = { v: useStore.getState().blackout }
-  for (const c of [...cfg.cues, ...expandTechniques(cfg.techniques)]) {
+  for (const c of [...cfg.cues, ...expandTechniques(cfg.techniques), ...compileCues(cfg, cfg.props?.cce)]) {
     if (c.action === 'fade')
       tl.to(fade, { v: c.to, duration: c.duration, ease: 'sine.inOut', onUpdate: () => useStore.getState().set({ blackout: fade.v }) }, c.at)
     else tl.call(runCue, [c], c.at)

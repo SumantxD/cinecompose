@@ -8,13 +8,18 @@ import { SCENES, SCENE_FILES } from '../scenes/registry'
 import { paceLines } from '../cinematic/timeline'
 import { moveCameraAim, moveCameraPoint, movePathHandle, pathFromShot, setNodeMode, setShotDuration, shotPointCount } from '../cinematic/curve.ts'
 import { expandTechniques } from '../cinematic/techniques'
+import { BY_ID, compileCues } from '../cce/engine'
 import { audioReady } from '../app/Overlay'
 import { useStudio, type StudioState } from './studioStore'
+import { DirectorFrameControls } from './DirectorFrameControls'
+import { ChoreographyPanel } from './ChoreographyPanel'
 import { EffectCreator, JsonEditor, NudgeCamera } from './AuthoringTools'
 import { EnvironmentFx } from './EnvironmentFx'
 import { WorldBuilder } from './WorldBuilder'
 import { RenderPanel } from './RenderPanel'
+import { reconcileReferenceFrames } from '../reference/compose.ts'
 import { validateScene } from '../cinematic/validate.ts'
+import { ChoreographyOverlay } from '../components/ChoreographyOverlay'
 import { linesForScene } from './lines'
 import type { Cue, SceneConfig, Shot, ShotType, Vec3 } from '../cinematic/types'
 import './studio.css'
@@ -34,7 +39,7 @@ const r2 = (n: number) => Math.round(n * 100) / 100
 const vec = (v: { x: number; y: number; z: number }): Vec3 => [r2(v.x), r2(v.y), r2(v.z)]
 
 type PanelTab = StudioState['panelTab']
-const PANEL_TABS: [PanelTab, string][] = [['scene', 'Scene'], ['render', 'Rendering'], ['world', 'World Builder'], ['fx', 'Environment FX']]
+const PANEL_TABS: [PanelTab, string][] = [['scene', 'Scene'], ['choreography', 'Choro.'], ['render', 'Rendering'], ['world', 'World Builder'], ['fx', 'Environment FX']]
 
 function cueLabel(c: Cue) {
   switch (c.action) {
@@ -82,7 +87,7 @@ export function Studio() {
   const [adding, setAdding] = useState(false)
   const [jsonOpen, setJsonOpen] = useState(false)
   const dirty = JSON.stringify(cfg) !== st.saved
-  const cues = useMemo(() => [...cfg.cues.map((c, i) => ({ c, i, own: true })), ...expandTechniques(cfg.techniques).map((c) => ({ c, i: -1, own: false }))], [cfg])
+  const cues = useMemo(() => [...cfg.cues.map((c, i) => ({ c, i, own: true })), ...expandTechniques(cfg.techniques).map((c) => ({ c, i: -1, own: false })), ...compileCues(cfg, cfg.props?.cce).map((c) => ({ c, i: -1, own: false }))], [cfg])
   const paced = useMemo(() => paceLines(lines).timed, [lines])
 
   const selectPanel = (tab: PanelTab) => {
@@ -98,7 +103,7 @@ export function Studio() {
   useEffect(() => {
     audioReady.then(() => player.previewScene(cfg, useStudio.getState().t, lines))
     player.setPaused(!useStudio.getState().playing)
-  }, [cfg, lines, st.sel])
+  }, [cfg, lines])
 
   // Playhead follows the clock while playing.
   useEffect(() => {
@@ -118,12 +123,14 @@ export function Studio() {
   }, [cfg.duration])
 
   const seek = (t: number) => {
+    if (useStudio.getState().exporting) return
     const tt = Math.max(0, Math.min(cfg.duration, t))
     st.set({ t: tt })
     player.previewScene(cfg, tt, lines)
     player.setPaused(!useStudio.getState().playing)
   }
   const play = (on: boolean) => {
+    if (useStudio.getState().exporting) return
     if (on && clock.t >= cfg.duration - 0.05) seek(0)
     st.set({ playing: on, t: clock.t })
     player.setPaused(!on)
@@ -159,6 +166,7 @@ export function Studio() {
       techniques: [],
     }
     next.sceneId = sceneId
+    reconcileReferenceFrames(next)
     next.duration = next.shots.reduce((sum, s) => sum + s.duration, 0)
     const errors = validateScene(next)
     if (errors.length) return setStatus(errors.join(' · '))
@@ -202,6 +210,7 @@ export function Studio() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
+      if (useStudio.getState().exporting) return
       const meta = e.metaKey || e.ctrlKey
       if (e.code === 'Space') { e.preventDefault(); play(!useStudio.getState().playing) }
       else if (e.key === 'ArrowLeft') seek(useStudio.getState().t - (e.shiftKey ? 1 : 0.1))
@@ -292,29 +301,30 @@ export function Studio() {
           <button onClick={() => selectPanel('render')} className={panelTab === 'render' ? 'on' : ''} title="Quality profiles, N8AO, anti-aliasing, grading and HDRI">Rendering</button>
           <button onClick={() => selectPanel('world')} className={panelTab === 'world' ? 'on' : ''} title="Create worlds from a description, seed or reference image">World Builder</button>
           <button onClick={() => selectPanel('fx')} className={panelTab === 'fx' ? 'on' : ''} title="Author optional lightning, tornado, earthquake and flood effects">Environment FX</button>
+          <button onClick={() => selectPanel('choreography')} className={panelTab === 'choreography' ? 'on' : ''} title="Beat outlines, camera choreography and director MP4 exports">Choreography / Reels</button>
           <a className="st-character-link" href="/?characters" title="Rig, procedural character motion, IK and keyframes">Character</a>
         </nav>
         <b>KAALI RAAT · Studio</b>
-        <select value={st.sceneId} onChange={(e) => st.load(e.target.value)} title="Which scene to edit">
+        <select value={st.sceneId} disabled={st.exporting} onChange={(e) => st.load(e.target.value)} title="Which scene to edit">
           {[...SCENES.keys()].map((id) => <option key={id}>{id}</option>)}
         </select>
-        <button onClick={() => createScene(false)} title="Create a blank scene in this environment">＋ New scene</button>
-        <button onClick={() => createScene(true)} title="Duplicate this scene, including unsaved edits">⧉ Duplicate</button>
+        <button onClick={() => createScene(false)} disabled={st.exporting} title="Create a blank scene in this environment">＋ New scene</button>
+        <button onClick={() => createScene(true)} disabled={st.exporting} title="Duplicate this scene, including unsaved edits">⧉ Duplicate</button>
         <button onClick={() => setJsonOpen(true)} title="Edit full scene JSON, including technique macros">{ } JSON</button>
-        <button onClick={() => play(!st.playing)} className="st-primary">{st.playing ? '❚❚ Pause' : '▶ Play'}</button>
+        <button onClick={() => play(!st.playing)} disabled={st.exporting} className="st-primary">{st.playing ? '❚❚ Pause' : '▶ Play'}</button>
         <button onClick={() => seek(0)} title="Back to the start">⏮</button>
-        <button onClick={st.undo} disabled={!st.past.length} title="Undo (⌘Z)" aria-label="Undo">↶</button>
-        <button onClick={st.redo} disabled={!st.future.length} title="Redo (⇧⌘Z)" aria-label="Redo">↷</button>
+        <button onClick={st.undo} disabled={st.exporting || !st.past.length} title="Undo (⌘Z)" aria-label="Undo">↶</button>
+        <button onClick={st.redo} disabled={st.exporting || !st.future.length} title="Redo (⇧⌘Z)" aria-label="Redo">↷</button>
         <span className="st-seg">
-          {(['9:16', '16:9'] as const).map((a) => <button key={a} className={st.aspect === a ? 'on' : ''} onClick={() => st.set({ aspect: a })}>{a === '9:16' ? '📱 9:16' : '🖥 16:9'}</button>)}
+          {(['9:16', '16:9'] as const).map((a) => <button key={a} disabled={st.exporting} className={st.aspect === a ? 'on' : ''} onClick={() => st.set({ aspect: a })}>{a === '9:16' ? '📱 9:16' : '🖥 16:9'}</button>)}
         </span>
         <button onClick={() => { play(false); setAdding(true); selectPanel('scene') }} className={adding ? 'on' : ''} title="Add a light, entity, sound, title or fade at the playhead">✦ Cue at playhead</button>
         <select className="st-nav-speed" value={st.navSpeed} onChange={(e) => st.set({ navSpeed: +e.target.value })} title="Director navigation and pan speed">{[0.5, 1, 2, 4].map((n) => <option key={n} value={n}>Nav {n}×</option>)}</select>
         <button onClick={() => st.set({ guides: !st.guides })} className={st.guides ? 'on' : ''} title="Numbered camera points, clickable pipes, effect handles and live camera">◈</button>
         <button aria-label={muted ? 'Unmute' : 'Mute'} onClick={() => { const m = !useStore.getState().muted; useStore.getState().set({ muted: m }); Howler.mute(!st.playing || m) }} title="Audio follows this setting during Play. Pause and scrubbing are always silent.">{muted ? '🔇' : '🔊'}</button>
         <span className="st-grow" />
-        <button onClick={record} disabled={recording} title="Plays this scene from the start and downloads it as a video">{recording ? '● Recording…' : '⏺ Record clip'}</button>
-        <button onClick={save} className={dirty ? 'st-save dirty' : 'st-save'} title="Write to the scene file (⌘S)">{dirty ? '💾 Save changes' : '✓ Saved'}</button>
+        <button onClick={record} disabled={recording || st.exporting} title="Real-time canvas capture with audio; use Choreography for deterministic frame-stepped export">{recording ? '● Recording…' : '⏺ Record clip'}</button>
+        <button onClick={save} disabled={st.exporting} className={dirty ? 'st-save dirty' : 'st-save'} title="Write to the scene file (⌘S)">{dirty ? '💾 Save changes' : '✓ Saved'}</button>
       </header>
 
       <div className="st-main">
@@ -327,6 +337,11 @@ export function Studio() {
               <button className={st.view === 'orbit' ? 'on' : ''} title="Free perspective" onClick={() => st.set({ view: 'orbit' })}>FREE</button>
               {(['top', 'bottom', 'left', 'right'] as const).map((v) => <button key={v} className={st.view === v ? 'on' : ''} title={`${v} view (${v[0].toUpperCase()})`} onClick={() => st.set({ view: v })}>{v[0].toUpperCase()}</button>)}
             </div>
+            <DirectorFrameControls
+              frame={() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyG' }))}
+              pair={() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyG', shiftKey: true }))}
+              step={(delta) => window.dispatchEvent(new KeyboardEvent('keydown', { code: delta < 0 ? 'BracketLeft' : 'BracketRight' }))}
+            />
             <div className="st-freehint">{st.view === 'orbit' ? <><span className="st-mousehelp">LMB orbit · RMB/MMB pan · scroll fly-through · WASD/QE fly · Shift fast · F focus · Home overview · T/B/L/R ortho</span><span className="st-touchhelp">Drag orbit · Two-finger pan · Overview frames</span></> : `${st.view.toUpperCase()} ORTHO · ${st.view === 'top' || st.view === 'bottom' ? 'X ↔ / Z ↕' : 'Z ↔ / Y ↕'} · RMB/MMB pan · scroll zoom · F focus · Home free`}</div>
             <div className={`st-preview ${st.aspect === '9:16' ? 'portrait' : 'landscape'}`}>
               <div className="st-preview-label">● FILM CAMERA · LIVE</div>
@@ -352,6 +367,7 @@ export function Studio() {
               }}>{label}</button>)}
           </nav>
           {adding && <EffectCreator onClose={() => setAdding(false)} />}
+          <div id="panel-choreography" role="tabpanel" aria-labelledby="tab-choreography" hidden={panelTab !== 'choreography'}><ChoreographyPanel onStatus={setStatus} /></div>
           <div id="panel-render" role="tabpanel" aria-labelledby="tab-render" hidden={panelTab !== 'render'}>
             <RenderPanel />
           </div>
@@ -364,6 +380,7 @@ export function Studio() {
             <Slider label="Ambient" hint="Flat fill from sky and ground" value={cfg.lighting.ambientIntensity} min={0} max={3} onChange={(v) => st.edit((c) => void (c.lighting.ambientIntensity = v))} />
             <Slider label="Fog" hint="How quickly distance disappears into haze" value={cfg.lighting.fogDensity} min={0} max={0.08} step={0.001} onChange={(v) => st.edit((c) => void (c.lighting.fogDensity = v))} />
             <label className="st-slider"><span>Fog colour</span><input type="color" value={cfg.lighting.fogColor ?? '#232d39'} onChange={(e) => st.edit((c) => void (c.lighting.fogColor = e.target.value))} /></label>
+            {cfg.props?.referenceStudy && <><label className="st-check"><input type="checkbox" checked={cfg.props.referenceStudy.showPlaceholders} onChange={(e) => st.edit((c) => { c.props!.referenceStudy!.showPlaceholders = e.target.checked })} /> Use reference-image placeholders</label><p className="st-hint">Original stills, local and reference-only. Not recovered 3D geometry or cleared release material. Turn this off to inspect the procedural set underneath.</p></>}
           </section>
 
           <section>
@@ -385,7 +402,7 @@ export function Studio() {
               <Slider label="Length (s)" value={shot.duration} min={0.3} max={30} step={0.1} onChange={(v) => st.edit((c) => { setShotDuration(c.shots[sel!.index], v); c.duration = c.shots.reduce((sum, s) => sum + s.duration, 0) })} />
               <Slider label="Lens (16:9)" hint="Vertical field of view in degrees: small = telephoto, big = wide" value={shot.fov} min={8} max={90} step={1} onChange={(v) => editShot((s) => void (s.fov = v))} />
               <Slider label="Lens (9:16)" hint="Same, for phones" value={shot.fovPortrait ?? shot.fov * 1.45} min={8} max={100} step={1} onChange={(v) => editShot((s) => void (s.fovPortrait = v))} />
-              <Slider label="Brightness" hint="This shot only (×scene)" value={shot.exposure ?? 1} min={0.3} max={3} onChange={(v) => editShot((s) => void (s.exposure = v))} />
+              {shot.reference && <p className="st-hint">Coarse 2D motion study · confidence {Math.round(shot.reference.motion.confidence * 100)}% · drift {shot.reference.motion.x.toFixed(3)}, {shot.reference.motion.y.toFixed(3)} · zoom {shot.reference.motion.zoom.toFixed(3)}/s. This is not a recovered lens or true camera position.</p>}              <Slider label="Brightness" hint="This shot only (×scene)" value={shot.exposure ?? 1} min={0.3} max={3} onChange={(v) => editShot((s) => void (s.exposure = v))} />
               <Slider label="Face light" hint="Soft light from the camera so close subjects read" value={shot.eyeLight ?? 0} min={0} max={160} onChange={(v) => editShot((s) => void (s.eyeLight = v))} />
               <Slider label="Tilt (Dutch)" value={shot.roll ?? 0} min={-0.2} max={0.2} onChange={(v) => editShot((s) => void (s.roll = v))} />
               <div className="st-row">
@@ -471,6 +488,7 @@ export function Studio() {
             <div className="st-ruler-spacer" />
             <div>Shots</div>
             <div>Cues</div>
+            <div>CCE</div>
             <div>Dialogue</div>
           </div>
           <div className="st-tl-scroll" ref={scrollRef}>
@@ -492,6 +510,9 @@ export function Studio() {
                   <span key={k} className={`st-cue ${own ? '' : 'macro'} ${sel?.kind === 'cue' && sel.index === i ? 'sel' : ''}`} style={{ left: c.at * px }} title={own ? cueLabel(c) : `${cueLabel(c)} (from a technique macro — edit in the JSON)`}
                     onPointerDown={(e) => { e.stopPropagation(); if (!own) return; st.set({ sel: { kind: 'cue', index: i } }); dragOnTimeline(e, (sec) => st.edit((cc) => void (cc.cues[i].at = snapTime(sec)))) }}>◆</span>
                 ))}
+              </div>
+              <div className="st-row-choreography">
+                {(cfg.props?.cce?.clips ?? []).map((clip, i) => <div key={clip.id} className={`st-cce-clip ${st.cceSelection === i ? 'sel' : ''}`} style={{ left: clip.at * px, width: Math.max(5, clip.duration * px - 2) }} title={`${BY_ID.get(clip.template)?.name ?? clip.template} · ${clip.at.toFixed(2)}–${(clip.at + clip.duration).toFixed(2)}s · intensity ${clip.intensity.toFixed(2)}`} onPointerDown={(e) => { e.stopPropagation(); st.set({ cceSelection: i, panelTab: 'choreography' }) }}>{BY_ID.get(clip.template)?.name ?? clip.template}</div>)}
               </div>
               <div className="st-row-lines">
                 {paced.filter((l) => !l.silent).map((l, k) => <span key={k} className="st-line" style={{ left: l.at * px, width: l.hold * px }} title={l.text}>{l.speaker === 'NARRATOR' ? '' : l.speaker + ': '}{l.text}</span>)}
@@ -556,7 +577,7 @@ function CameraPathEditor({ shotIndex }: { shotIndex: number }) {
 function PreviewOverlay() {
   const blackout = useStore((s) => s.blackout)
   const showTitle = useStore((s) => s.showTitle)
-  return <><div className="st-preview-blackout" style={{ opacity: blackout }} />{showTitle && <div className="st-preview-title">KAALI RAAT</div>}<Captions /></>
+  return <><div className="st-preview-blackout" style={{ opacity: blackout }} /><ChoreographyOverlay />{showTitle && <div className="st-preview-title">KAALI RAAT</div>}<Captions /></>
 }
 
 /** Captions over the preview (same text the player sees). */

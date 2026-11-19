@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { clock } from '../cinematic/clock'
+import { useRenderSettings } from '../cinematic/rendering'
 
 const vertexShader = /* glsl */ `
   varying vec2 vUv; varying vec3 vWorld;
@@ -30,12 +31,18 @@ interface Sheet { z: number; y: number; w: number; h: number; opacity: number }
  * Atmosphere: exponential fog, a sky whose horizon IS the fog colour (so distance dissolves into haze —
  * atmospheric perspective layers silhouettes), and slow mist sheets that separate depth planes.
  */
-export function FogSystem({ color = '#0c1117', density = 0.03, sheets = [] as Sheet[], glowPos = [0, -99, 0] as [number, number, number], glowColor = '#000000' }) {
+export function FogSystem({ color = '#0c1117', density = 0.03, sheets = [] as Sheet[], glowPos = [0, -99, 0] as [number, number, number], glowColor = '#000000', skyDome = true }) {
   const scene = useThree((s) => s.scene)
-  useMemo(() => {
-    scene.fog = new THREE.FogExp2(color, density)
-    scene.background = new THREE.Color(color)
-  }, [scene, color, density])
+  const domeVisible = skyDome && useRenderSettings()?.environment?.background !== true
+  useEffect(() => {
+    const fog = new THREE.FogExp2(color, density), previousBackground = scene.background
+    scene.fog = fog
+    if (domeVisible) scene.background = new THREE.Color(color)
+    return () => {
+      if (scene.fog === fog) scene.fog = null
+      if (domeVisible) scene.background = previousBackground
+    }
+  }, [scene, color, density, domeVisible])
 
   const mats = useMemo(
     () =>
@@ -65,7 +72,7 @@ export function FogSystem({ color = '#0c1117', density = 0.03, sheets = [] as Sh
 
   return (
     <>
-      <mesh material={sky} renderOrder={-1}>
+      <mesh material={sky} renderOrder={-1} visible={domeVisible}>
         <sphereGeometry args={[400, 32, 16]} />
       </mesh>
       {sheets.map((s, i) => (

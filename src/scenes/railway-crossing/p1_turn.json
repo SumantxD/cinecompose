@@ -4,7 +4,11 @@
   "duration": 32,
   "props": {
     "groundMist": {
-      "center": [0, 0, 17],
+      "center": [
+        0,
+        0,
+        17
+      ],
       "width": 11,
       "length": 18,
       "height": 0.3,
@@ -33,7 +37,7 @@
     {
       "id": "walk_to_us",
       "type": "track_lateral",
-      "duration": 12,
+      "duration": 4,
       "from": [
         -0.3,
         0.6,
@@ -50,13 +54,70 @@
       "to": [
         -0.3,
         0.6,
-        25.6
+        21.6
+      ],
+      "lookAtTo": [
+        -0.6,
+        0.75,
+        16.667
+      ]
+    },
+    {
+      "id": "walk_to_us-detail",
+      "type": "focus",
+      "duration": 4,
+      "from": [
+        -0.3,
+        0.6,
+        21.64
+      ],
+      "lookAt": [
+        -0.6,
+        0.75,
+        17.75
+      ],
+      "fov": 27,
+      "fovPortrait": 41,
+      "eyeLight": 80,
+      "to": [
+        -0.3,
+        0.6,
+        23.62
+      ],
+      "lookAtTo": [
+        -0.6,
+        0.75,
+        19.18
+      ]
+    },
+    {
+      "id": "walk_to_us-side",
+      "type": "track_lateral",
+      "duration": 4,
+      "from": [
+        -0.639,
+        0.6,
+        23.822
+      ],
+      "lookAt": [
+        -0.6,
+        0.75,
+        21
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "eyeLight": 80,
+      "to": [
+        -0.639,
+        0.6,
+        25.622
       ],
       "lookAtTo": [
         -0.6,
         0.75,
         21
-      ]
+      ],
+      "roll": 0.03
     },
     {
       "id": "two_shadows",
@@ -85,9 +146,9 @@
   "lighting": {
     "ambientIntensity": 0.7,
     "fogDensity": 0.028,
-    "exposure": 1.0,
+    "exposure": 1,
     "moon": 0.6,
-    "gi": 1.0
+    "gi": 1
   },
   "audio": {
     "ambience": [
@@ -226,7 +287,7 @@
       "use": "SND-03",
       "at": 9.6,
       "count": 13,
-      "hz": 1.0,
+      "hz": 1,
       "other": "anklets",
       "lag": 0.08,
       "extra": 1,
@@ -239,5 +300,37 @@
       "selfSilent": true,
       "volume": 0
     }
-  ]
+  ],
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1.5,
+    "antialias": "smaa",
+    "shadowType": "pcf-soft",
+    "shadowMapSize": 1024,
+    "textureAnisotropy": 4,
+    "ao": {
+      "enabled": true,
+      "radius": 1.1,
+      "intensity": 2.2,
+      "quality": "medium",
+      "halfRes": true
+    },
+    "bloom": {
+      "enabled": true,
+      "intensity": 0.34,
+      "threshold": 0.97
+    },
+    "vignette": {
+      "enabled": true,
+      "darkness": 0.78
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.17
+    },
+    "grade": {
+      "saturation": -0.22,
+      "contrast": 0.08
+    }
+  }
 }

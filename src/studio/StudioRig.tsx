@@ -8,13 +8,13 @@ import * as THREE from 'three'
 import { useStudio } from './studioStore'
 import { cam, cameraPaths, type CameraSample } from '../cinematic/timeline'
 import { freeDolly } from './navigation.ts'
-import { frameAxisView, type AxisView } from './viewpoints.ts'
+import { frameAxisView, directorOverview, directorFramePoints, type AxisView } from './viewpoints.ts'
+import { cameraPointFromNumber, currentCameraPoint, rememberCameraPoint } from './DirectorFrameControls'
 import {
   getCameraPoint, moveCameraAim, moveCameraPoint, movePathHandle, pathFromShot,
   sampleShot, shotPointCount, splitCameraPath,
 } from '../cinematic/curve.ts'
-import type { Cue, Vec3 } from '../cinematic/types'
-
+import type { Cue, Shot, Vec3 } from '../cinematic/types'
 const moved = (v: THREE.Vector3): Vec3 => [Math.round(v.x * 100) / 100, Math.round(v.y * 100) / 100, Math.round(v.z * 100) / 100]
 
 function DragTransform({ value, onChange, children }: { value: Vec3; onChange: (v: Vec3) => void; children: ReactNode }) {
@@ -63,6 +63,7 @@ function shotStart(index: number) {
 
 function selectCameraPoint(shotIndex: number, nodeIndex: number) {
   const st = useStudio.getState(), shot = st.cfg.shots[shotIndex]
+  rememberCameraPoint(st.sceneId, shotIndex, nodeIndex)
   const point = getCameraPoint(shot, nodeIndex)
   st.set({ sel: { kind: 'shot', index: shotIndex, node: nodeIndex }, cameraEnd: nodeIndex === shotPointCount(shot) - 1, playing: false, t: shotStart(shotIndex) + point.time })
 }
@@ -307,9 +308,43 @@ export function StudioRig() {
   const controls = useRef(orbitControls), keys = useRef(new Set<string>())
   const perspective = useRef(camera as THREE.PerspectiveCamera)
   const sceneId = useStudio((s) => s.sceneId)
+  const frameOverview = () => {
+    activeDirectorView()
+    const active = perspective.current
+    const { target } = directorOverview(active, useStudio.getState().cfg)
+    active.up.set(0, 1, 0)
+    active.lookAt(...target)
+    pivot.current.set(...target)
+    controls.current.target.copy(pivot.current)
+    controls.current.update()
+    useStudio.getState().set({ view: 'orbit', camera: active, target: pivot.current })
+  }
+  const framePoint = (number: number | undefined = currentCameraPoint().number, includeNext = false) => {
+    const st = useStudio.getState()
+    if (st.exporting) return
+    const point = cameraPointFromNumber(number)
+    selectCameraPoint(point.index, point.node)
+    const shot = st.cfg.shots[point.index]
+    const sample = getCameraPoint(shot, point.node)
+    numberBuffer.current = ''
+    clearTimeout(numberTimer.current)
+    activeDirectorView()
+    const active = perspective.current
+    active.up.set(0, 1, 0)
+    const next = includeNext && point.number < cameraPointTotal(st.cfg.shots) ? cameraPointFromNumber(point.number + 1) : undefined
+    const target: Vec3 = next
+      ? directorFramePoints(active, [sample.position, getCameraPoint(st.cfg.shots[next.index], next.node).position]).target
+      : sample.aim
+    if (!next) { active.fov = shot.fov; active.position.set(...sample.position) }
+    active.lookAt(...target)
+    active.updateProjectionMatrix()
+    pivot.current.set(...target)
+    controls.current.target.copy(pivot.current)
+    controls.current.update()
+    st.set({ view: 'orbit', camera: active, target: pivot.current })
+  }
   useEffect(() => {
-    if (!useStudio.getState().cfg.props?.world) return
-    const frame = requestAnimationFrame(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Home' })))
+    const frame = requestAnimationFrame(frameOverview)
     return () => cancelAnimationFrame(frame)
   }, [sceneId])
   const orthographic = useMemo(() => new THREE.OrthographicCamera(), [])
@@ -319,6 +354,8 @@ export function StudioRig() {
   const forward = useMemo(() => new THREE.Vector3(), [])
   const right = useMemo(() => new THREE.Vector3(), [])
   const renderCamera = (next: THREE.PerspectiveCamera | THREE.OrthographicCamera) => { controls.current.object = next; setScene({ camera: next }) }
+  const cameraPointTotal = (shots: Shot[]) => shots.reduce((sum, shot) => sum + shotPointCount(shot), 0)
+  const activeDirectorView = () => { renderCamera(perspective.current); useStudio.getState().set({ view: 'orbit' }) }
 
   useEffect(() => {
     controls.current.connect(gl.domElement)
@@ -433,14 +470,20 @@ export function StudioRig() {
       }
       if (e.code === 'Home') {
         e.preventDefault()
-        perspective.current.up.set(0, 1, 0)
-        const homeShot = useStudio.getState().cfg.props?.world
-          ? useStudio.getState().cfg.shots.find((shot) => shot.id === 'world_overview') ?? useStudio.getState().cfg.shots[0]
-          : null
-        perspective.current.position.set(...(homeShot?.from ?? [13, 8, 19]))
-        pivot.current.set(...(homeShot?.lookAt ?? [0, 1, -4]))
-        control?.target.copy(pivot.current)
-        useStudio.getState().set({ view: 'orbit' })
+        frameOverview()
+        return
+      }
+      if (e.code === 'KeyG') {
+        e.preventDefault()
+        framePoint(undefined, e.shiftKey)
+        return
+      }
+      if (e.code === 'BracketLeft' || e.code === 'BracketRight') {
+        e.preventDefault()
+        const current = currentCameraPoint().number, total = cameraPointTotal(useStudio.getState().cfg.shots)
+        const next = Math.max(1, Math.min(total, current + (e.code === 'BracketRight' ? 1 : -1)))
+        if (next !== current) framePoint(next)
+        return
       }
       if (e.code === 'KeyF') {
         e.preventDefault()

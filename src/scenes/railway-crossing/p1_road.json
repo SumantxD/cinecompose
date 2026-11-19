@@ -14,7 +14,7 @@
       ],
       "lookAt": [
         -1.3,
-        1.0,
+        1,
         24
       ],
       "fov": 34,
@@ -140,9 +140,9 @@
   "lighting": {
     "ambientIntensity": 0.7,
     "fogDensity": 0.028,
-    "exposure": 1.0,
+    "exposure": 1,
     "moon": 0.6,
-    "gi": 1.0
+    "gi": 1
   },
   "audio": {
     "ambience": [
@@ -199,12 +199,12 @@
       "target": "taxi",
       "visible": true,
       "position": [
-        -1.0,
+        -1,
         0,
         62
       ],
       "from": [
-        -1.0,
+        -1,
         0,
         24
       ],
@@ -238,7 +238,7 @@
         0,
         23.4
       ],
-      "speed": 1.0
+      "speed": 1
     },
     {
       "at": 11,
@@ -247,7 +247,7 @@
       "visible": false
     },
     {
-      "at": 13.0,
+      "at": 13,
       "action": "sfx",
       "sound": "tube_tick",
       "volume": 0.6,
@@ -258,7 +258,7 @@
       ]
     },
     {
-      "at": 13.0,
+      "at": 13,
       "action": "light",
       "target": "gate_tube",
       "mode": "dying"
@@ -269,7 +269,7 @@
       "target": "aarav",
       "visible": true,
       "keep": true,
-      "headYaw": 1.0
+      "headYaw": 1
     },
     {
       "at": 17.5,
@@ -283,7 +283,7 @@
       ]
     },
     {
-      "at": 19.0,
+      "at": 19,
       "action": "entity",
       "target": "aarav",
       "visible": true,
@@ -301,5 +301,37 @@
         -20
       ]
     }
-  ]
+  ],
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1.5,
+    "antialias": "smaa",
+    "shadowType": "pcf-soft",
+    "shadowMapSize": 1024,
+    "textureAnisotropy": 4,
+    "ao": {
+      "enabled": true,
+      "radius": 1.1,
+      "intensity": 2.2,
+      "quality": "medium",
+      "halfRes": true
+    },
+    "bloom": {
+      "enabled": true,
+      "intensity": 0.34,
+      "threshold": 0.97
+    },
+    "vignette": {
+      "enabled": true,
+      "darkness": 0.78
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.17
+    },
+    "grade": {
+      "saturation": -0.22,
+      "contrast": 0.08
+    }
+  }
 }

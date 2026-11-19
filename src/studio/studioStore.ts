@@ -4,6 +4,7 @@ import type { SceneConfig } from '../cinematic/types'
 import { validateScene } from '../cinematic/validate.ts'
 import { SCENES } from '../scenes/registry'
 import type { ViewMode } from './viewpoints.ts'
+import { reconcileReferenceFrames } from '../reference/compose.ts'
 
 // Studio state: one recoverable working copy, undo/redo, selection and 3D authoring guides.
 
@@ -17,6 +18,7 @@ export interface StudioState {
   future: string[]
   t: number
   playing: boolean
+  exporting: boolean
   guides: boolean
   navSpeed: number
   /** Timeline pixels per second. Zoom scales the whole timeline. */
@@ -28,10 +30,13 @@ export interface StudioState {
   gizmoDragging: boolean
   view: ViewMode
   aspect: '9:16' | '16:9'
-  panelTab: 'scene' | 'render' | 'world' | 'fx'
+  panelTab: 'scene' | 'render' | 'world' | 'fx' | 'choreography'
   /** Live renderer telemetry for the render panel. Editor-only; not visual clock state. */
   metrics?: { fps: number; calls: number; triangles: number; textures: number; geometries: number; programs: number }
   sel: Selection
+  pointLocks: Record<string, { index: number; node: number }>
+  /** Selected clip in the CCE lane; opens the live Choreography Studio. */
+  cceSelection: number | null
   camera: THREE.Camera | null
   target: THREE.Vector3 | null
   load: (sceneId: string) => void
@@ -48,7 +53,7 @@ export interface StudioState {
 const KEY = 'kr-studio'
 const remembered = (() => {
   try {
-    return JSON.parse(sessionStorage.getItem(KEY) ?? '{}') as { sceneId?: string; t?: number; aspect?: '9:16' | '16:9'; panelTab?: 'scene' | 'render' | 'world' | 'fx' }
+    return JSON.parse(sessionStorage.getItem(KEY) ?? '{}') as { sceneId?: string; t?: number; aspect?: '9:16' | '16:9'; panelTab?: 'scene' | 'render' | 'world' | 'fx' | 'choreography' }
   } catch {
     return {}
   }
@@ -68,7 +73,8 @@ function restored(sceneId: string) {
   return { cfg: clone(original), saved }
 }
 
-const first = remembered.sceneId && SCENES.has(remembered.sceneId) ? remembered.sceneId : [...SCENES.keys()][0]
+const direct = new URLSearchParams(location.search).get('scene')
+const first = SCENES.has(direct ?? '') ? direct! : remembered.sceneId && SCENES.has(remembered.sceneId) ? remembered.sceneId : [...SCENES.keys()][0]
 const initial = restored(first)
 
 export const useStudio = create<StudioState>((set, get) => ({
@@ -79,6 +85,7 @@ export const useStudio = create<StudioState>((set, get) => ({
   future: [],
   t: Math.min(remembered.t ?? 0, initial.cfg.duration),
   playing: false,
+  exporting: false,
   guides: true,
   navSpeed: 1,
   timelineZoom: 26,
@@ -88,36 +95,48 @@ export const useStudio = create<StudioState>((set, get) => ({
   gizmoDragging: false,
   view: 'orbit',
   aspect: remembered.aspect ?? '9:16',
-  panelTab: remembered.panelTab && ['scene', 'render', 'world', 'fx'].includes(remembered.panelTab) ? remembered.panelTab : 'scene',
+  panelTab: remembered.panelTab && ['scene', 'render', 'world', 'fx', 'choreography'].includes(remembered.panelTab) ? remembered.panelTab : 'scene',
   sel: null,
+  pointLocks: {},
+  cceSelection: null,
   camera: null,
   target: null,
   load: (sceneId) => {
+    if (get().exporting) return
+    const url = new URL(location.href)
+    if (url.searchParams.has('studio')) { url.searchParams.set('scene', sceneId); history.replaceState(null, '', url) }
     const r = restored(sceneId)
-    set({ sceneId, cfg: r.cfg, saved: r.saved, past: [], future: [], t: 0, sel: null, playing: false, cameraEnd: false, view: 'orbit' })
+    set({ sceneId, cfg: r.cfg, saved: r.saved, past: [], future: [], t: 0, sel: null, cceSelection: null, playing: false, cameraEnd: false, view: 'orbit' })
   },
   edit: (fn) => { get().begin(); get().change(fn) },
   begin: () => {
+    if (get().exporting) return
     const { cfg, past } = get()
     set({ past: [...past.slice(-99), JSON.stringify(cfg)], future: [] })
   },
   change: (fn) => {
+    if (get().exporting) return
     const next = clone(get().cfg)
     fn(next)
+    reconcileReferenceFrames(next)
     updateDuration(next)
     set({ cfg: next })
   },
   replace: (cfg) => {
+    if (get().exporting) return
     const next = clone(cfg)
+    reconcileReferenceFrames(next)
     updateDuration(next)
     set({ cfg: next, past: [...get().past.slice(-99), JSON.stringify(get().cfg)], future: [], sel: null })
   },
   undo: () => {
+    if (get().exporting) return
     const { past, cfg, future } = get()
     if (!past.length) return
     set({ cfg: JSON.parse(past.at(-1)!), past: past.slice(0, -1), future: [JSON.stringify(cfg), ...future] })
   },
   redo: () => {
+    if (get().exporting) return
     const { past, cfg, future } = get()
     if (!future.length) return
     set({ cfg: JSON.parse(future[0]), future: future.slice(1), past: [...past, JSON.stringify(cfg)] })

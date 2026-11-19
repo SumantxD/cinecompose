@@ -38,7 +38,7 @@ Entity visible in the background before the player enters. A figure that changes
 ## Capture and export
 
 - **Live capture (players):** a `MediaRecorder` on `canvas.captureStream(30)`, mixed with the Howler master output (`Howler.ctx.createMediaStreamDestination()`). That gives a WebM/MP4 of the actual playthrough. Overlay UI isn't in the canvas, so it's excluded automatically, and captions must then be drawn into the canvas for the clip. 📋
-- **Director export (our Reels):** deterministic frame stepping (`?export=<knot>` → `player.tick(1/30)` per frame → `canvas.toBlob` → local ffmpeg), 1080×1920, 15 s / 30 s cuts, burned-in captions, optional end card with the title, **no watermark during the horror**. See `docs/pipeline.md`. 📋
+- **Director export (our Reels):** local frame stepping (`player.step(1/30)` against a paused film clock), actual postprocessed preview frame capture, 1080×1920 (and 720×1280 draft), optional 15 s / 30 s In/Out, burned-in captions and optional decision end card, no editor/choice chrome. **Implemented in Studio → Choreography / Reels for local silent MP4 drafts.** Offline audio mix/mux remains pending. See `docs/pipeline.md`.
 - Recording must not cost gameplay performance: capture only when the user starts it.
 - Never include dev overlays (the scene id label is DEV-only) or choice buttons.
 

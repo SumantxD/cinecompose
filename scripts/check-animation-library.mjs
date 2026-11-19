@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { jointMap } from '../src/characters/retarget.ts'
 import { CharacterController } from '../src/characters/controller.ts'
 import { AnimationLibrary, CharacterAnimation, documentToAnimationClip } from '../src/characters/library.ts'
 import { LIBRARY_DEFINITIONS } from '../src/characters/motion-pack.ts'
@@ -29,6 +30,36 @@ for (const clip of source.animations) {
   for (const track of clip.tracks) assert.ok(track.times.length && [...track.times, ...track.values].every(Number.isFinite), `${clip.name}: invalid source track`)
 }
 const library = new AnimationLibrary({ source: { root: source.scene, animations: source.animations } })
+const poseDirection = (clip, a, b, fraction = .55) => {
+  const sampleScene = source.scene.clone(true), joints = jointMap(sampleScene), mixer = new THREE.AnimationMixer(sampleScene)
+  const action = mixer.clipAction(clip).play()
+  action.time = clip.duration * fraction; mixer.update(0); sampleScene.updateMatrixWorld(true)
+  const result = joints.get(b).getWorldPosition(new THREE.Vector3()).sub(joints.get(a).getWorldPosition(new THREE.Vector3())).normalize()
+  mixer.uncacheClip(clip)
+  return result
+}
+const targetPoseDirection = async (clip, a, b, fraction = .55) => {
+  const rig = createCharacterRig(), controller = new CharacterController(rig, {}, library)
+  controller.update(clip.duration * fraction, { clip, clipTime: clip.duration * fraction })
+  const result = rig.bones[b].getWorldPosition(new THREE.Vector3()).sub(rig.bones[a].getWorldPosition(new THREE.Vector3())).normalize()
+  rig.dispose()
+  return result
+}
+for (const [id, a, b] of [['idle-arms-folded-waiting', 'leftElbow', 'leftWrist'], ['punch-cross-right-2', 'rightElbow', 'rightWrist'], ['death-fall-backwards', 'leftHip', 'leftKnee']]) {
+  const clip = await library.getClip(id)
+  const sourceName = LIBRARY_DEFINITIONS.find(entry => entry.id === id)?.sourceClip
+  assert.ok(sourceName, `${id}: definition must name its source clip`)
+  const sourceClip = source.animations.find(sample => sample.name === sourceName)
+  assert.ok(sourceClip, `${id}: source clip must exist`)
+  const expected = poseDirection(sourceClip, a, b)
+  const actual = await targetPoseDirection(clip, a, b)
+  assert.ok(expected.dot(actual) > .97, `${id}: ${a} to ${b} direction is not retargeted (${expected.dot(actual).toFixed(3)})`)
+}
+const dodge = await library.getClip('dodge-roll'), dodgeSource = source.animations.find(clip => clip.name === 'Dodge_roll')
+assert.ok(dodgeSource)
+const firstHip = dodge.tracks.hips.position[0].v, lastHip = dodge.tracks.hips.position.at(-1).v
+assert.ok(Math.hypot(...lastHip.map((value, index) => value - firstHip[index])) > 1, 'Dodge Roll must preserve its final travel, not wrap to the opening pose')
+assert.ok(poseDirection(dodgeSource, 'leftHip', 'leftKnee', 1).dot(await targetPoseDirection(dodge, 'leftHip', 'leftKnee', 1)) > .97, 'Dodge Roll final pose must match the source end pose')
 const controller = new CharacterController(createCharacterRig(), {}, library)
 const minima = [], seams = [], motions = new Map()
 for (const definition of LIBRARY_DEFINITIONS) {
@@ -53,6 +84,12 @@ for (const definition of LIBRARY_DEFINITIONS) {
     minima.push({ id: definition.id, t, y: bounds.min.y, max: bounds.max.y })
   }
   assert.equal(JSON.stringify(clip), sourceBefore, `${definition.id}: playback mutated its clip`)
+  if (['idle-defensive', 'survival-aim', 'interaction-listen-door'].includes(definition.id)) {
+    controller.update(clip.duration * .2, { clip, clipTime: clip.duration * .2 })
+    const before = controller.rig.bones.head.quaternion.clone()
+    controller.update(clip.duration * .65, { clip, clipTime: clip.duration * .65 })
+    assert.ok(before.angleTo(controller.rig.bones.head.quaternion) > 1e-3, `${definition.id}: restrained idle motion must not freeze`)
+  }
   if (clip.loop) {
     let worstRatio = 1
     for (const [name, track] of Object.entries(clip.tracks)) {

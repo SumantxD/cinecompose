@@ -7,6 +7,7 @@ import { exportCharacterGLB, saveData } from './export.ts'
 import { LibraryPanel, type LibraryPanelHandle } from './LibraryPanel.tsx'
 import { boneLabel, sampleIKTarget } from './pose.ts'
 import { BONE_NAMES, retimeClip } from './types.ts'
+import { FacePanel } from './FacePanel.tsx'
 import type { CharacterClip, CharacterMotion, IKTarget, Vec3 } from './types.ts'
 import './character.css'
 
@@ -25,6 +26,7 @@ function Numbers({ values, onChange, step = 1 }: { values: number[]; onChange: (
 export function CharacterLab() {
   const controller = useMemo(() => createCharacter(), [])
   const camera = useRef<THREE.Camera | null>(null)
+  const focusFace = useCallback(() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF' })), [])
   const fileInput = useRef<HTMLInputElement>(null)
   const [ready, setReady] = useState(false)
   const [selected, setSelected] = useState('head')
@@ -33,7 +35,7 @@ export function CharacterLab() {
   const onPoseValues = useCallback((key: string, values: number[]) => setPoseValues({ key, values }), [])
   const [joints, setJoints] = useState(true)
   const [panel, setPanel] = useState<'pose'|'motion'|null>(null)
-  const [libraryMode, setLibraryMode] = useState(true)
+  const [panelMode, setPanelMode] = useState<'library'|'actor'|'face'>('library')
   const [preview, setPreview] = useState<CharacterClip>()
   const [previewFinished, setPreviewFinished] = useState(false)
   const library = useRef<LibraryPanelHandle>(null)
@@ -86,7 +88,7 @@ export function CharacterLab() {
     window.addEventListener('pointermove', seek); window.addEventListener('pointerup', end)
     window.addEventListener('pointercancel', end); track.addEventListener('lostpointercapture', end)
   }
-  useEffect(() => () => controller.rig.dispose(), [controller])
+  useEffect(() => () => controller.dispose(), [controller])
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
       if (event.target instanceof HTMLElement && event.target.closest('input,select,textarea')) return
@@ -145,8 +147,8 @@ export function CharacterLab() {
     </header>
     <div className="char-main">
       <aside className="char-motion">
-        <div className="char-library-tabs"><button className={libraryMode ? 'is-on' : ''} aria-pressed={libraryMode} onClick={() => setLibraryMode(true)}>Library</button><button className={!libraryMode ? 'is-on' : ''} aria-pressed={!libraryMode} onClick={() => { library.current?.stop(); setLibraryMode(false) }}>Actor controls</button></div>
-        {libraryMode ? <LibraryPanel ref={library} controller={controller} playing={state.playing} onPreview={setPreview} onFinish={setPreviewFinished} onStatus={setStatus} /> : <>
+        <div className="char-library-tabs"><button className={panelMode === 'library' ? 'is-on' : ''} aria-pressed={panelMode === 'library'} onClick={() => setPanelMode('library')}>Library</button><button className={panelMode === 'actor' ? 'is-on' : ''} aria-pressed={panelMode === 'actor'} onClick={() => { library.current?.stop(); setPanelMode('actor') }}>Actor controls</button><button className={panelMode === 'face' ? 'is-on' : ''} aria-pressed={panelMode === 'face'} onClick={() => { library.current?.stop(); setPanelMode('face') }}>Face</button></div>
+        {panelMode === 'face' ? <FacePanel controller={controller} onStatus={setStatus} onFocus={focusFace} /> : panelMode === 'library' ? <LibraryPanel ref={library} controller={controller} playing={state.playing} onPreview={setPreview} onFinish={setPreviewFinished} onStatus={setStatus} /> : <>
         <div className="char-section-heading"><h2>Procedural base</h2><span>Adjustment layer</span></div>
         <p className="char-note">A base layer beneath your hand-authored poses.</p>
         <Choice label="Movement" value={motion.movement} options={['idle','walk','creep']} onChange={(value) => patch('movement', value)} />
@@ -164,10 +166,10 @@ export function CharacterLab() {
         </>}
       </aside>
       <section className="char-stage" aria-label="Interactive character viewport">
-        <CharacterViewport controller={controller} selected={selected} mode={mode} joints={joints} onSelect={choose} onCamera={onCamera} preview={preview} onFinish={setPreviewFinished} onTogglePlayback={togglePlayback} onPoseValues={onPoseValues} />
-        <div className="char-view-label">{preview ? 'LIBRARY PREVIEW' : 'RIG PREVIEW'} <span>{preview ? `${preview.name} · saved clip unchanged` : 'THREE.Skeleton · SkinnedMesh'}</span></div>
+        <CharacterViewport controller={controller} selected={selected} mode={mode} joints={joints && panelMode !== 'face'} faceMode={panelMode === 'face'} onSelect={choose} onCamera={onCamera} preview={preview} onFinish={setPreviewFinished} onTogglePlayback={togglePlayback} onPoseValues={onPoseValues} />
+        <div className="char-view-label">{panelMode === 'face' ? 'FACE STUDIO' : preview ? 'LIBRARY PREVIEW' : 'RIG PREVIEW'} <span>{panelMode === 'face' ? 'Expressions, speech and face controls' : preview ? `${preview.name} · saved clip unchanged` : 'THREE.Skeleton · SkinnedMesh'}</span></div>
         <button className="char-home" aria-label="Overview" title="Home overview" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Home' }))}>Home</button>
-        <button className="char-joints" aria-pressed={joints} onClick={() => setJoints(!joints)}>{joints ? 'Hide joints' : 'Show joints'}</button>
+        <button className="char-joints" aria-pressed={joints && panelMode !== 'face'} onClick={() => setJoints(!joints)} disabled={panelMode === 'face'}>{panelMode === 'face' ? 'Face view' : joints ? 'Hide joints' : 'Show joints'}</button>
         <div className="char-nav-hint"><span className="char-mouse-hint">LMB orbit · RMB/MMB pan · WASD/QE fly · scroll zoom · F focus · Home overview</span><span className="char-touch-hint">Drag to orbit · Two fingers to pan/zoom</span></div>
       </section>
       <aside className="char-pose">

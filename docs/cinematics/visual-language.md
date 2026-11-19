@@ -34,7 +34,7 @@ Depth comes from **atmospheric perspective**: the fog colour sits *above* the da
 
 ## Camera
 
-Slow. Every move has a reason (see `horror-techniques.md`, CAM-*). No shake. The breathing drift is preset-controlled and should stay below 2 cm.
+Slow by default. Every move has a reason (see `horror-techniques.md`, CAM-*). No random shake. The breathing drift is preset-controlled and should stay below 2 cm. Opt-in CCE reaction/handheld clips use bounded, seeded offsets for a specific dramatic beat, never an always-on camera effect.
 
 ## Typography
 

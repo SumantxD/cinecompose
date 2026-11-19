@@ -1,12 +1,12 @@
 {
   "sceneId": "p1_after",
   "environment": "railway-crossing",
-  "duration": 17,
+  "duration": 17.01,
   "shots": [
     {
       "id": "empty_road",
       "type": "slow_push",
-      "duration": 17,
+      "duration": 5.67,
       "from": [
         3.5,
         5.5,
@@ -20,18 +20,78 @@
       "fov": 34,
       "fovPortrait": 50,
       "to": [
-        3.0,
-        5.2,
-        28.5
+        3.333,
+        5.4,
+        29.5
+      ],
+      "lookAtTo": [
+        -0.5,
+        0.5,
+        14
       ]
+    },
+    {
+      "id": "empty_road-detail",
+      "type": "focus",
+      "duration": 5.67,
+      "from": [
+        3.33,
+        5.398,
+        29.49
+      ],
+      "lookAt": [
+        -0.5,
+        0.5,
+        14
+      ],
+      "fov": 27,
+      "fovPortrait": 41,
+      "to": [
+        3.165,
+        5.299,
+        28.995
+      ],
+      "lookAtTo": [
+        -0.5,
+        0.5,
+        14
+      ]
+    },
+    {
+      "id": "empty_road-side",
+      "type": "slow_push",
+      "duration": 5.67,
+      "from": [
+        2.819,
+        5.29,
+        29.03
+      ],
+      "lookAt": [
+        -0.5,
+        0.5,
+        14
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "to": [
+        2.669,
+        5.2,
+        28.58
+      ],
+      "lookAtTo": [
+        -0.5,
+        0.5,
+        14
+      ],
+      "roll": 0.03
     }
   ],
   "lighting": {
     "ambientIntensity": 0.7,
     "fogDensity": 0.028,
-    "exposure": 1.0,
+    "exposure": 1,
     "moon": 0.6,
-    "gi": 1.0
+    "gi": 1
   },
   "audio": {
     "ambience": [
@@ -107,5 +167,37 @@
       "to": 0,
       "duration": 2.5
     }
-  ]
+  ],
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1.5,
+    "antialias": "smaa",
+    "shadowType": "pcf-soft",
+    "shadowMapSize": 1024,
+    "textureAnisotropy": 4,
+    "ao": {
+      "enabled": true,
+      "radius": 1.1,
+      "intensity": 2.2,
+      "quality": "medium",
+      "halfRes": true
+    },
+    "bloom": {
+      "enabled": true,
+      "intensity": 0.34,
+      "threshold": 0.97
+    },
+    "vignette": {
+      "enabled": true,
+      "darkness": 0.78
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.17
+    },
+    "grade": {
+      "saturation": -0.22,
+      "contrast": 0.08
+    }
+  }
 }

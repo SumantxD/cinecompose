@@ -1,12 +1,12 @@
 {
   "sceneId": "p1_walk_on",
   "environment": "railway-crossing",
-  "duration": 20,
+  "duration": 19.99,
   "shots": [
     {
       "id": "keep_walking",
       "type": "track_lateral",
-      "duration": 13,
+      "duration": 4.33,
       "from": [
         -0.3,
         0.6,
@@ -22,13 +22,68 @@
       "to": [
         -0.3,
         0.6,
-        33.5
+        28.233
+      ],
+      "lookAtTo": [
+        -0.6,
+        0.8,
+        23.667
+      ]
+    },
+    {
+      "id": "keep_walking-detail",
+      "type": "focus",
+      "duration": 4.33,
+      "from": [
+        -0.3,
+        0.6,
+        28.286
+      ],
+      "lookAt": [
+        -0.6,
+        0.8,
+        25
+      ],
+      "fov": 27,
+      "fovPortrait": 41,
+      "to": [
+        -0.3,
+        0.6,
+        30.893
+      ],
+      "lookAtTo": [
+        -0.6,
+        0.8,
+        26.76
+      ]
+    },
+    {
+      "id": "keep_walking-side",
+      "type": "track_lateral",
+      "duration": 4.33,
+      "from": [
+        -0.639,
+        0.6,
+        31.153
+      ],
+      "lookAt": [
+        -0.6,
+        0.8,
+        29
+      ],
+      "fov": 34,
+      "fovPortrait": 50,
+      "to": [
+        -0.639,
+        0.6,
+        33.523
       ],
       "lookAtTo": [
         -0.6,
         0.8,
         29
-      ]
+      ],
+      "roll": 0.03
     },
     {
       "id": "alone",
@@ -57,9 +112,9 @@
   "lighting": {
     "ambientIntensity": 0.7,
     "fogDensity": 0.028,
-    "exposure": 1.0,
+    "exposure": 1,
     "moon": 0.6,
-    "gi": 1.0
+    "gi": 1
   },
   "audio": {
     "ambience": [
@@ -170,7 +225,7 @@
       "use": "SND-03",
       "at": 0.4,
       "count": 16,
-      "hz": 1.0,
+      "hz": 1,
       "other": "anklets",
       "lag": 0.08,
       "otherVolume": 0.35,
@@ -182,5 +237,37 @@
       "selfSilent": true,
       "volume": 0
     }
-  ]
+  ],
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1.5,
+    "antialias": "smaa",
+    "shadowType": "pcf-soft",
+    "shadowMapSize": 1024,
+    "textureAnisotropy": 4,
+    "ao": {
+      "enabled": true,
+      "radius": 1.1,
+      "intensity": 2.2,
+      "quality": "medium",
+      "halfRes": true
+    },
+    "bloom": {
+      "enabled": true,
+      "intensity": 0.34,
+      "threshold": 0.97
+    },
+    "vignette": {
+      "enabled": true,
+      "darkness": 0.78
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.17
+    },
+    "grade": {
+      "saturation": -0.22,
+      "contrast": 0.08
+    }
+  }
 }

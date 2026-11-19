@@ -130,8 +130,8 @@ const idles = [
     q: { spine: [-4, 0, 0], chest: [-5, 0, -2], head: [pulse(u, .44, .065) * 10, pulse(u, .68, .045) * 7, curve(u, [[0, 0], [.32, 0], [.46, 17], [.65, 17], [.84, 0], [1, 0]])], leftShoulder: [0, 0, -5], rightShoulder: [0, 0, 5] },
     face: { eyes: .9, mouthOpen: .08 + pulse(u, .44, .065) * .25, browRaise: -.3 }, blink: false,
   }), { duration: 5.3, summary: 'Long stillness interrupted by one small, controlled movement.' }),
-  idle('idle-defensive', 'Defensive crouch', 17, () => ({
-    hips: [0, -.23, 0], q: { spine: [17, 0, 0], chest: [10, 0, 0], head: [13, 0, 0], leftHip: [-32, 0, -3], rightHip: [-29, 0, 4], leftKnee: [38, 0, 0], rightKnee: [35, 0, 0] },
+  idle('idle-defensive', 'Defensive crouch', 17, u => ({
+    hips: [sine(u) * .004, -.23, 0], q: { spine: [17 + sine(u) * .55, 0, 0], chest: [10 + sine(u) * .7, 0, 0], head: [13, sine(u, .5) * 1.5, 0], leftHip: [-32, 0, -3], rightHip: [-29, 0, 4], leftKnee: [38, 0, 0], rightKnee: [35, 0, 0] },
     hands: { left: [.15, 1.28, .36], right: [-.18, 1.32, .32] }, face: { eyes: .85, browAngle: .35 },
   }), { duration: 3.6 }),
   idle('idle-dead-eyes', 'Dead-eyed stare', -1, () => ({
@@ -252,7 +252,7 @@ const interactions = [
   action('interaction-push', 'Pushing with both hands', u => { const a = pulse(u, .41, .27); return { hips: [0, -.09 - a * .05, a * .06], q: { spine: [6 + a * 16, 0, 0] }, hands: { left: [.17, 1.13, .13 + a * .31], right: [-.17, 1.13, .13 + a * .31] } } }),
   action('interaction-hide', 'Hiding behind an object', u => ({ hips: [0, -.23 + sine(u, 2) * .006, 0], q: { spine: [21, sine(u, .5) * 3, 0], head: [0, curve(u, [[0, 0], [.25, 0], [.48, 29], [.68, 29], [1, 0]]), 0], leftHip: [-37, 0, -4], rightHip: [-35, 0, 4], leftKnee: [43, 0, 0], rightKnee: [43, 0, 0] }, face: { eyes: .7, browAngle: -.25 } }), { loop: true, duration: 5 }),
   action('interaction-reach', 'Reaching for something', u => { const a = curve(u, [[0, 0], [.22, 1], [.65, 1], [1, 0]]); return { q: { spine: [a * 5, 0, 0], head: [a * 7, 0, 0] }, hands: { right: [-.15, 1.05 + a * .36, .01 + a * .35] } } }),
-  action('interaction-listen-door', 'Listening at a door', () => ({ q: { spine: [7, -6, 0], head: [12, -18, 18] }, hands: { right: [-.2, 1.11, .29] }, face: { eyes: .36, eyeShift: -.25 } }), { loop: true, duration: 5.2 }),
+  action('interaction-listen-door', 'Listening at a door', u => ({ q: { spine: [7 + sine(u) * .6, -6, 0], head: [12 + sine(u) * .9, -18 + sine(u, .5) * 2, 18] }, hands: { right: [-.2, 1.11, .29] }, face: { eyes: .36, eyeShift: -.25 } }), { loop: true, duration: 5.2 }),
 ]
 
 const survival = [
@@ -260,7 +260,7 @@ const survival = [
   action('survival-block', 'Blocking with both arms', u => { const a = curve(u, [[0, 0], [.12, 1], [.58, 1], [1, 0]]); return { hips: [0, -a * .11, -a * .03], q: { spine: [a * 8, 0, 0], head: [a * 5, 0, 0] }, hands: { left: [.12, 1.05 + a * .36, .08 + a * .22], right: [-.12, 1.08 + a * .3, .1 + a * .24] }, face: { browAngle: a * .5, eyes: .6 + a * .25 } } }, 'Survival', { duration: 2.1 }),
   action('survival-dodge-left', 'Dodging to the left', u => { const a = pulse(u, .35, .25); return { hips: [a * .28, -a * .22, 0], q: { spine: [a * 17, 0, a * 16], head: [-a * 5, 0, -a * 8] }, gait: { stride: .12, lift: .07, sink: .13, side: 1 } } }, 'Survival', { duration: 1.7 }),
   action('survival-dodge-right', 'Dodging to the right', u => { const a = pulse(u, .35, .25); return { hips: [-a * .28, -a * .22, 0], q: { spine: [a * 17, 0, -a * 16], head: [-a * 5, 0, a * 8] }, gait: { stride: .12, lift: .07, sink: .13, side: -1 } } }, 'Survival', { duration: 1.7 }),
-  action('survival-aim', 'Aiming a handheld object', () => ({ q: { spine: [4, -8, 0], head: [0, 7, 0], leftElbow: [-22, 0, 0] }, hands: { right: [-.15, 1.47, .39], left: [.08, 1.4, .32] }, face: { eyes: .8, browAngle: .3, eyeShift: .2 } }), 'Survival', { loop: true, duration: 3.7, summary: 'Aiming posture for an object parented to the hand. No weapon is included.' }),
+  action('survival-aim', 'Aiming a handheld object', u => ({ q: { spine: [4 + sine(u) * .4, -8, 0], head: [sine(u) * .25, 7 + sine(u, .5) * .7, 0], leftElbow: [-22, 0, 0] }, hands: { right: [-.15, 1.47, .39], left: [.08, 1.4, .32] }, face: { eyes: .8, browAngle: .3, eyeShift: .2 } }), 'Survival', { loop: true, duration: 3.7, summary: 'Aiming posture for an object parented to the hand. No weapon is included.' }),
   action('survival-fire', 'Firing with recoil', u => { const a = pulse(u, .17, .09); return { hips: [0, -a * .05, -a * .015], q: { spine: [-a * 8, 0, 0], head: [-a * 4, 0, 0] }, hands: { right: [-.15, 1.47 + a * .03, .39 - a * .08], left: [.08, 1.4 + a * .03, .32 - a * .06] }, face: { eyes: .8 - a * .25, browAngle: .4 } } }, 'Survival', { duration: 1.6 }),
   action('survival-reload', 'Reloading', u => ({ hips: [0, -.02, 0], q: { spine: [5, -5, 0], head: [15, 0, 0] }, hands: { left: [.05 + sine(u) * .055, 1.32 + sine(u, 2) * .03, .27], right: [-.12, 1.34, .26] }, face: { eyes: .42 } }), 'Survival', { duration: 3.8, summary: 'Hand movements for a reload. Match the prop and magazine in the scene.' }),
   action('survival-hit-reaction', 'Hit to the torso', u => { const a = pulse(u, .23, .2); return { hips: [0, -a * .11, -a * .06], q: { spine: [-a * 17, a * 8, 0], head: [a * 12, -a * 8, 0] }, hands: { left: [.12, 1.27, .2], right: [-.17, 1.02, .2] }, face: { mouthOpen: a * .5, frown: a * .7, browAngle: -.5 } } }, 'Survival', { duration: 2.2 }),

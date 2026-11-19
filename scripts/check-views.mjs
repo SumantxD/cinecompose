@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
+import fs from 'node:fs'
 import * as THREE from 'three'
-import { frameAxisView } from '../src/studio/viewpoints.ts'
+import { frameAxisView, directorOverview, directorFramePoints } from '../src/studio/viewpoints.ts'
 
 const focus = [2, 3, -7]
 const origin = new THREE.Vector3(...focus)
@@ -26,3 +27,26 @@ for (const [view, test] of Object.entries(cases)) {
   }
 }
 console.log('✓ orthographic views: Top/Bottom = X/Z; Left/Right = Z/Y; focused centre and handedness')
+
+const cfg = JSON.parse(fs.readFileSync('src/scenes/railway-crossing/p1_car.json', 'utf8'))
+const { sampleShot } = await import('../src/cinematic/curve.ts')
+const before = JSON.stringify(cfg)
+const camera = new THREE.PerspectiveCamera(50, 1084 / 702.8125, .05, 600)
+const { target } = directorOverview(camera, cfg)
+camera.lookAt(...target)
+camera.updateMatrixWorld(true)
+assert.equal(JSON.stringify(cfg), before, 'director framing never edits film cameras')
+for (const shot of cfg.shots) for (let i = 0; i <= 32; i++) {
+  const projected = new THREE.Vector3(...sampleShot(shot, shot.duration * i / 32).position).project(camera)
+  assert.ok(Math.abs(projected.x) < 1 && Math.abs(projected.y) < 1 && projected.z < 1, 'overview includes every authored camera position')
+}
+console.log('✓ director overview keeps camera paths in view without changing scene JSON')
+
+camera.fov = 30; camera.updateProjectionMatrix()
+const pairTarget = directorFramePoints(camera, [cfg.shots[1].from, cfg.shots[1].to])
+camera.lookAt(...pairTarget.target); camera.updateMatrixWorld(true)
+for (const point of [cfg.shots[1].from, cfg.shots[1].to]) {
+  const projected = new THREE.Vector3(...point).project(camera)
+  assert(Math.abs(projected.x) < 1 && Math.abs(projected.y) < 1 && projected.z < 1, 'pair framing includes both numbered camera positions')
+}
+console.log('✓ current→next framing keeps both camera points in view')

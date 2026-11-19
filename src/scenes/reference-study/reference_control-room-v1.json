@@ -1,0 +1,811 @@
+{
+  "sceneId": "reference_control-room-v1",
+  "environment": "reference-study",
+  "duration": 27.64,
+  "shots": [
+    {
+      "id": "shot-01",
+      "type": "pan",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "to": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAtTo": [
+        -0.1875,
+        1.4127906976744187,
+        -0.4
+      ],
+      "duration": 2.3,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-01.jpg",
+        "sourceTime": 1.15,
+        "motion": {
+          "x": 0.0625,
+          "y": 0.03488372093023256,
+          "zoom": 0.0031724211599328243,
+          "confidence": 0.4419642857142857
+        },
+        "transition": "cut"
+      }
+    },
+    {
+      "id": "shot-02",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 2.2,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-02.jpg",
+        "sourceTime": 3.4,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0,
+          "confidence": 0
+        },
+        "transition": "cut"
+      }
+    },
+    {
+      "id": "shot-03",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 4.102,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-03.jpg",
+        "sourceTime": 6.5508335,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0.026090778900838413,
+          "confidence": 0.1953125
+        },
+        "transition": "cut"
+      }
+    },
+    {
+      "id": "shot-04",
+      "type": "pan",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "to": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAtTo": [
+        0.1875,
+        1.5,
+        -0.4
+      ],
+      "duration": 3.033,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-04.jpg",
+        "sourceTime": 10.1183335,
+        "motion": {
+          "x": -0.0625,
+          "y": 0,
+          "zoom": 0,
+          "confidence": 0.2745535714285714
+        },
+        "transition": "cut"
+      }
+    },
+    {
+      "id": "shot-05",
+      "type": "slow_push",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "to": [
+        0,
+        1.6,
+        4.275718160321767
+      ],
+      "lookAtTo": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 0.9,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-05.jpg",
+        "sourceTime": 12.085,
+        "motion": {
+          "x": -0.0625,
+          "y": -0.03488372093023256,
+          "zoom": 0.10133807489944767,
+          "confidence": 0.3780570652173913
+        },
+        "transition": "cut"
+      }
+    },
+    {
+      "id": "shot-06",
+      "type": "pull_back",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "to": [
+        0,
+        1.6,
+        4.830071026586274
+      ],
+      "lookAtTo": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 0.4,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-06.jpg",
+        "sourceTime": 12.735,
+        "motion": {
+          "x": -0.0625,
+          "y": 0,
+          "zoom": -0.0718971958082106,
+          "confidence": 0.3203125
+        },
+        "transition": "dissolve"
+      }
+    },
+    {
+      "id": "shot-07",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 0.4,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-07.jpg",
+        "sourceTime": 13.135000000000002,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0,
+          "confidence": 0
+        },
+        "transition": "dissolve"
+      }
+    },
+    {
+      "id": "shot-08",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 0.8,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-08.jpg",
+        "sourceTime": 13.735,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0,
+          "confidence": 0
+        },
+        "transition": "dissolve"
+      }
+    },
+    {
+      "id": "shot-09",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 0.4,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-09.jpg",
+        "sourceTime": 14.335,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0,
+          "confidence": 0
+        },
+        "transition": "dissolve"
+      }
+    },
+    {
+      "id": "shot-10",
+      "type": "pull_back",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "to": [
+        0,
+        1.6,
+        4.841590540291516
+      ],
+      "lookAtTo": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 0.402,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-10.jpg",
+        "sourceTime": 14.7358335,
+        "motion": {
+          "x": 0,
+          "y": 0.03488372093023256,
+          "zoom": -0.07549704384109886,
+          "confidence": 0.48177083333333337
+        },
+        "transition": "dissolve"
+      }
+    },
+    {
+      "id": "shot-11",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 0.333,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-11.jpg",
+        "sourceTime": 15.1033335,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0,
+          "confidence": 0
+        },
+        "transition": "dissolve"
+      }
+    },
+    {
+      "id": "shot-12",
+      "type": "pan",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "to": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAtTo": [
+        -0.1875,
+        1.5,
+        -0.4
+      ],
+      "duration": 2.567,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-12.jpg",
+        "sourceTime": 16.5533335,
+        "motion": {
+          "x": 0.0625,
+          "y": 0,
+          "zoom": 0.0042134833192243705,
+          "confidence": 0.2556818181818182
+        },
+        "transition": "cut"
+      }
+    },
+    {
+      "id": "shot-13",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 2.167,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-13.jpg",
+        "sourceTime": 18.92,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0.026670770053848776,
+          "confidence": 0.2109375
+        },
+        "transition": "cut"
+      }
+    },
+    {
+      "id": "shot-14",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 2.367,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-14.jpg",
+        "sourceTime": 21.1866665,
+        "motion": {
+          "x": 0.0625,
+          "y": 0,
+          "zoom": 0.047541318931761084,
+          "confidence": 0.14311079545454547
+        },
+        "transition": "cut"
+      }
+    },
+    {
+      "id": "shot-15",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 3.902,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-15.jpg",
+        "sourceTime": 24.3208335,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0.02123896023074392,
+          "confidence": 0.27294921875
+        },
+        "transition": "cut"
+      }
+    },
+    {
+      "id": "shot-16",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 0.167,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-16.jpg",
+        "sourceTime": 26.355,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0,
+          "confidence": 0
+        },
+        "transition": "dissolve"
+      }
+    },
+    {
+      "id": "shot-17",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 0.067,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-17.jpg",
+        "sourceTime": 26.471666499999998,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0,
+          "confidence": 0
+        },
+        "transition": "dissolve"
+      }
+    },
+    {
+      "id": "shot-18",
+      "type": "static",
+      "from": [
+        0,
+        1.6,
+        4.6
+      ],
+      "lookAt": [
+        0,
+        1.5,
+        -0.4
+      ],
+      "duration": 1.133,
+      "fov": 44,
+      "fovPortrait": 52,
+      "exposure": 0.9,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "reference": {
+        "url": "/__reference/control-room-v1/shots/shot-18.jpg",
+        "sourceTime": 27.0716665,
+        "motion": {
+          "x": 0,
+          "y": 0,
+          "zoom": 0.0028496794646338565,
+          "confidence": 0.24169921875
+        },
+        "transition": "cut"
+      }
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.45,
+    "exposure": 0.94,
+    "fogDensity": 0.009,
+    "fogColor": "#202b2b",
+    "moon": 0.5
+  },
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1,
+    "antialias": "smaa",
+    "shadowMapSize": 512,
+    "textureAnisotropy": 4,
+    "grade": {
+      "saturation": -0.07,
+      "contrast": 0.04
+    },
+    "bloom": {
+      "enabled": false
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.12
+    },
+    "ao": {
+      "enabled": true,
+      "radius": 0.6,
+      "intensity": 1.6,
+      "quality": "performance",
+      "halfRes": true
+    },
+    "dof": {
+      "enabled": false
+    }
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "night_drone",
+        "volume": 0.08
+      }
+    ],
+    "music": null
+  },
+  "cues": [],
+  "props": {
+    "referenceStudy": {
+      "version": 1,
+      "id": "control-room-v1",
+      "source": {
+        "filename": "WhatsApp Video 2026-11-18 at 1.21.29 PM.mp4",
+        "sha256": "1528687069b1be42aec3d58f6a7f4094c0c46ced8dd968c54ecc6ec605a2dbf7",
+        "rights": "reference-only"
+      },
+      "template": "control-room",
+      "showPlaceholders": true,
+      "frames": [
+        {
+          "shotId": "shot-01",
+          "url": "/__reference/control-room-v1/shots/shot-01.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-02",
+          "url": "/__reference/control-room-v1/shots/shot-02.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-03",
+          "url": "/__reference/control-room-v1/shots/shot-03.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-04",
+          "url": "/__reference/control-room-v1/shots/shot-04.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-05",
+          "url": "/__reference/control-room-v1/shots/shot-05.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-06",
+          "url": "/__reference/control-room-v1/shots/shot-06.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-07",
+          "url": "/__reference/control-room-v1/shots/shot-07.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-08",
+          "url": "/__reference/control-room-v1/shots/shot-08.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-09",
+          "url": "/__reference/control-room-v1/shots/shot-09.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-10",
+          "url": "/__reference/control-room-v1/shots/shot-10.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-11",
+          "url": "/__reference/control-room-v1/shots/shot-11.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-12",
+          "url": "/__reference/control-room-v1/shots/shot-12.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-13",
+          "url": "/__reference/control-room-v1/shots/shot-13.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-14",
+          "url": "/__reference/control-room-v1/shots/shot-14.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-15",
+          "url": "/__reference/control-room-v1/shots/shot-15.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-16",
+          "url": "/__reference/control-room-v1/shots/shot-16.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-17",
+          "url": "/__reference/control-room-v1/shots/shot-17.jpg",
+          "width": 304,
+          "height": 542
+        },
+        {
+          "shotId": "shot-18",
+          "url": "/__reference/control-room-v1/shots/shot-18.jpg",
+          "width": 304,
+          "height": 542
+        }
+      ]
+    }
+  }
+}

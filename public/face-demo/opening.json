@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "duration": 3.86,
+  "source": "rhubarb",
+  "cues": [
+    {
+      "t": 0,
+      "shape": "rest"
+    },
+    {
+      "t": 0.06,
+      "shape": "ee"
+    },
+    {
+      "t": 0.12,
+      "shape": "aa"
+    },
+    {
+      "t": 0.25,
+      "shape": "ee"
+    },
+    {
+      "t": 0.88,
+      "shape": "mbp"
+    },
+    {
+      "t": 1.05,
+      "shape": "ee"
+    },
+    {
+      "t": 1.15,
+      "shape": "oh"
+    },
+    {
+      "t": 1.36,
+      "shape": "mbp"
+    },
+    {
+      "t": 1.44,
+      "shape": "ee"
+    },
+    {
+      "t": 1.58,
+      "shape": "oo"
+    },
+    {
+      "t": 1.93,
+      "shape": "ee"
+    },
+    {
+      "t": 2,
+      "shape": "rest"
+    },
+    {
+      "t": 2.28,
+      "shape": "ee"
+    },
+    {
+      "t": 2.35,
+      "shape": "oh"
+    },
+    {
+      "t": 2.42,
+      "shape": "ee"
+    },
+    {
+      "t": 2.7,
+      "shape": "mbp"
+    },
+    {
+      "t": 2.84,
+      "shape": "ee"
+    },
+    {
+      "t": 2.89,
+      "shape": "ee"
+    },
+    {
+      "t": 2.93,
+      "shape": "ee"
+    },
+    {
+      "t": 3.14,
+      "shape": "oo"
+    },
+    {
+      "t": 3.21,
+      "shape": "ee"
+    },
+    {
+      "t": 3.28,
+      "shape": "ee"
+    },
+    {
+      "t": 3.7,
+      "shape": "rest"
+    }
+  ]
+}

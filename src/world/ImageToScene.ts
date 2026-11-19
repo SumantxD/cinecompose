@@ -1,5 +1,6 @@
 import { hashText, planEnvironment } from './EnvironmentPlanner.ts'
 import { validateWorld, type SceneSpecification } from './types.ts'
+import { projectDepthMesh, type DepthProjectionOptions } from './DepthProjection.ts'
 
 export interface PixelImage { width: number; height: number; data: Uint8ClampedArray }
 export interface DepthAnalysis {
@@ -63,7 +64,7 @@ function depthSamples(depth: PixelImage, image: PixelImage, near = 4, far = 52) 
  * Partial image reconstruction: pixel analysis is measured, layout around the observed sight lines is inferred.
  * Unseen surfaces and the reverse side of the world are never claimed as measured geometry.
  */
-export function imageToScene(image: PixelImage, depth?: DepthAnalysis, seed = hashText(`${image.width}:${image.height}:${image.data[0] ?? 0}`)): SceneSpecification {
+export function imageToScene(image: PixelImage, depth?: DepthAnalysis, seed = hashText(`${image.width}:${image.height}:${image.data[0] ?? 0}`), projection?: DepthProjectionOptions): SceneSpecification {
   const analysis = analyseImage(image)
   const source: SceneSpecification['source'] = {
     kind: 'image', description: `Image reference ${image.width}x${image.height}`,
@@ -92,7 +93,13 @@ export function imageToScene(image: PixelImage, depth?: DepthAnalysis, seed = ha
   spec.image = {
     width: image.width, height: image.height, palette: analysis.palette,
     vegetationFraction: analysis.vegetationFraction, horizon: analysis.horizon,
-    observation: depth ? { points: depthSamples(depth.depth, image, depth.near, depth.far), model: depth.model, note: 'Relative depth projection, not metric measurement.' } : undefined,
+    observation: depth ? { points: depthSamples(depth.depth, image, depth.near, depth.far), model: depth.model, note: 'Relative depth projection, not metric measurement.', ...(projection ? { projection: projectDepthMesh(image, depth.depth, projection) } : {}) } : undefined,
+  }
+  if (depth && projection) {
+    spec.camera.position = [0, 0]
+    spec.terrain.relief = 0
+    spec.terrain.vegetation.density = 0
+    spec.source.notes.push('Photo-textured 2.5D depth mesh: source illumination is baked into the photograph; movement is limited and hidden surfaces are not reconstructed.')
   }
   const errors = validateWorld(spec)
   if (errors.length) throw new Error(errors.join('\n'))

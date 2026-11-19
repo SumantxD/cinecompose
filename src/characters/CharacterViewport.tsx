@@ -11,15 +11,16 @@ import type { CharacterClip, IKTarget } from './types.ts'
 import { freeDolly, touchDollyPan } from '../studio/navigation.ts'
 
 export type CharacterPart = 'root' | string
-interface Props { controller: CharacterController; selected: CharacterPart; mode: 'rotate' | 'translate'; joints: boolean; onSelect: (part: string) => void; onCamera: (camera: THREE.Camera) => void; preview?: CharacterClip; onFinish?: (finished: boolean) => void; onTogglePlayback?: () => void; onPoseValues?: (key: string, values: number[]) => void }
+interface Props { controller: CharacterController; selected: CharacterPart; mode: 'rotate' | 'translate'; joints: boolean; faceMode?: boolean; onSelect: (part: string) => void; onCamera: (camera: THREE.Camera) => void; preview?: CharacterClip; onFinish?: (finished: boolean) => void; onTogglePlayback?: () => void; onPoseValues?: (key: string, values: number[]) => void }
 const HANDS: IKTarget[] = ['leftHand', 'rightHand']
 
-function BodyViewport({ controller, selected, mode, joints, onSelect, onCamera, preview, onFinish, onTogglePlayback, onPoseValues }: Props) {
+function BodyViewport({ controller, selected, mode, joints, faceMode = false, onSelect, onCamera, preview, onFinish, onTogglePlayback, onPoseValues }: Props) {
   const camera = useThree((state) => state.camera)
   const gl = useThree((state) => state.gl)
   const getScene = useThree((state) => state.get)
   const rig = controller.rig
   const orbit = useRef<OrbitImpl | null>(null)
+  const faceViewBackup = useRef<{ position: THREE.Vector3; target: THREE.Vector3; fov: number } | null>(null)
   const transform = useRef<TransformImpl | null>(null)
   const activeAxis = () => (transform.current as unknown as { axis: string | null } | null)?.axis
   const pick = (event: ThreeEvent<PointerEvent>, part: string) => {
@@ -130,26 +131,29 @@ function BodyViewport({ controller, selected, mode, joints, onSelect, onCamera, 
       const control = orbit.current
       if (!control) return
       if (event.code === 'Home') {
+        faceViewBackup.current = null
         const overview = fitPoseCamera(rig, camera as THREE.PerspectiveCamera)
         camera.position.copy(overview.position)
         control.target.copy(overview.target)
       }
       if (event.code === 'KeyF') {
-        const object = selected.startsWith('ik:') ? targetGroups[selected.slice(3) as IKTarget] : controller.rig.bones[selected]
+        const object = faceMode ? rig.bones.head : selected.startsWith('ik:') ? targetGroups[selected.slice(3) as IKTarget] : controller.rig.bones[selected]
+        if (faceMode) faceViewBackup.current ??= { position: camera.position.clone(), target: control.target.clone(), fov: (camera as THREE.PerspectiveCamera).fov }
         if (!object) return
-        const focus = selected === 'root' ? controller.rig.bones.root.localToWorld(new THREE.Vector3(0, 0.92, 0)) : object.getWorldPosition(new THREE.Vector3())
+        const focus = faceMode ? object.getWorldPosition(new THREE.Vector3()) : selected === 'root' ? controller.rig.bones.root.localToWorld(new THREE.Vector3(0, 0.92, 0)) : object.getWorldPosition(new THREE.Vector3())
         const offset = camera.position.clone().sub(control.target)
         if (offset.lengthSq() < 0.00001) offset.set(0.4, 0.2, 1)
-        offset.normalize().multiplyScalar(selected === 'root' ? 2.8 : 1.5)
+        offset.normalize().multiplyScalar(faceMode ? .62 : selected === 'root' ? 2.8 : 1.5)
         camera.position.copy(focus).add(offset)
         control.target.copy(focus)
+        if (faceMode) (camera as THREE.PerspectiveCamera).fov = 30
       }
       control.update()
     }
     dom.addEventListener('wheel', wheel, { passive: false, capture: true })
     window.addEventListener('keydown', keyboard)
     return () => { dom.removeEventListener('wheel', wheel, true); window.removeEventListener('keydown', keyboard) }
-  }, [camera, controller, gl, selected, targetGroups])
+  }, [camera, controller, gl, selected, targetGroups, faceMode])
 
   useFrame(({ camera }, delta) => {
     const state = useCharacter.getState(), clip = activeClip()
@@ -164,7 +168,7 @@ function BodyViewport({ controller, selected, mode, joints, onSelect, onCamera, 
       controller.resumeClip(time)
     } else controller.pauseClip(time)
     const layer = facePreview ? { clip, clipTime: time, transitionSeconds: 0 } : preview ? { transitionSeconds: 0 } : { clip, clipTime: time }
-    controller.update(time, { cameraPosition: camera.position, ...layer, groundY: 0 })
+    controller.update(time, { cameraPosition: camera.position, ...layer, groundY: 0, paused: !state.playing })
     let values: number[] | undefined
     if (selected.startsWith('ik:')) values = targetGroups[selected.slice(3) as IKTarget]?.position.toArray()
     else {
@@ -227,12 +231,24 @@ function BodyViewport({ controller, selected, mode, joints, onSelect, onCamera, 
   const clip = activeClip()
   const isIK = selected.startsWith('ik:')
   const object = isIK ? targetGroups[selected.slice(3) as IKTarget] : rig.bones[selected]
+  useEffect(() => {
+    if (faceMode || !faceViewBackup.current) return
+    camera.position.copy(faceViewBackup.current.position)
+    if (camera instanceof THREE.PerspectiveCamera) camera.fov = faceViewBackup.current.fov
+    camera.updateProjectionMatrix()
+    if (orbit.current) {
+      orbit.current.target.copy(faceViewBackup.current.target)
+      orbit.current.update()
+    }
+    faceViewBackup.current = null
+  }, [camera, controller, faceMode, rig])
   const gazeDriven = selected === 'head' && ['camera', 'target'].includes(clip.motion.gaze)
   return <>
     <color attach="background" args={['#111a22']} />
-    <ambientLight intensity={0.55} />
-    <hemisphereLight args={['#a8bbc4', '#30302b', 0.8]} />
+    <ambientLight intensity={0.75} />
+    <hemisphereLight args={['#a8bbc4', '#30302b', 1.05]} />
     <directionalLight castShadow position={[-3, 5, 4]} intensity={2.8} shadow-mapSize={[1024, 1024]} shadow-camera-near={0.1} shadow-camera-far={15} />
+    <directionalLight position={[2, 2, 5]} intensity={1.1} color="#c8d4d8" />
     <directionalLight position={[3, 2, -4]} intensity={1.5} color="#829eb8" />
     <mesh rotation-x={-Math.PI / 2} receiveShadow>
       <circleGeometry args={[6, 64]} />
@@ -257,7 +273,7 @@ function BodyViewport({ controller, selected, mode, joints, onSelect, onCamera, 
         </mesh>
       </primitive>)}
     </primitive>, rig.bones.root)}
-    {!preview && object && !gazeDriven && (!isIK || clip.motion.reach?.[selected.slice(3) as IKTarget]) && <TransformControls ref={transform} object={object} mode={isIK ? 'translate' : mode} space={isIK ? 'world' : 'local'} size={0.75}
+    {!faceMode && !preview && object && !gazeDriven && (!isIK || clip.motion.reach?.[selected.slice(3) as IKTarget]) && <TransformControls ref={transform} object={object} mode={isIK ? 'translate' : mode} space={isIK ? 'world' : 'local'} size={0.75}
       onMouseDown={() => { controller.stopClip(useCharacter.getState().time); useCharacter.getState().begin(); useCharacter.setState({ playing: false }); dragging.current = true; if (orbit.current) orbit.current.enabled = false }}
       onMouseUp={() => { dragging.current = false; if (orbit.current) orbit.current.enabled = true }}
       onObjectChange={() => {

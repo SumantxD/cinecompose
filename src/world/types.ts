@@ -30,6 +30,21 @@ export interface ImageObservation {
   points: { position: Vec3; color: string }[]
   model: 'Depth-Anything-V2-Small'
   note: string
+  /** Optional textured depth mesh. Photo URLs are local dev-only, private reference assets. */
+  projection?: {
+    columns: number
+    rows: number
+    positions: number[]
+    uvs: number[]
+    indices: number[]
+    photoUrl?: string
+    near: number
+    far: number
+    focalY: number
+    cameraHeight: number
+    maxOffset: number
+    skippedTriangles: number
+  }
 }
 
 export interface SceneSpecification {
@@ -104,7 +119,17 @@ export function validateWorld(value: unknown): string[] {
   if (w.image) {
     if (!Number.isInteger(w.image.width) || !Number.isInteger(w.image.height) || w.image.width <= 0 || w.image.height <= 0) errors.push('Image dimensions are invalid.')
     if (!Array.isArray(w.image.palette) || w.image.palette.some((v) => !colour(v))) errors.push('Image palette is invalid.')
-    if (w.image.observation && (w.image.observation.points.length > 4096 || w.image.observation.points.some((p) => !Array.isArray(p.position) || p.position.length !== 3 || !p.position.every(finite) || !colour(p.color)))) errors.push('Image observation must contain at most 4096 coloured 3D points.')
+    if (w.image.observation && (!Array.isArray(w.image.observation.points) || w.image.observation.points.length > 4096 || w.image.observation.points.some((p) => !Array.isArray(p.position) || p.position.length !== 3 || !p.position.every(finite) || !colour(p.color)))) errors.push('Image observation must contain at most 4096 coloured 3D points.')
+    const projection = w.image.observation?.projection
+    if (projection) {
+      const count = (Number.isInteger(projection.columns) ? projection.columns : 0) * (Number.isInteger(projection.rows) ? projection.rows : 0)
+      if (count < 4 || count > 8192) errors.push('Depth mesh needs a grid of 4–8192 vertices.')
+      if (!Array.isArray(projection.positions) || projection.positions.length !== count * 3 || !projection.positions.every(finite) || !Array.isArray(projection.uvs) || projection.uvs.length !== count * 2 || !projection.uvs.every(finite)) errors.push('Depth mesh positions/UVs must be finite and match its grid.')
+      if (!Array.isArray(projection.indices) || projection.indices.length > 49152 || projection.indices.some((i) => !Number.isInteger(i) || i < 0 || i >= count)) errors.push('Depth mesh indices must be bounded grid indices.')
+      if (projection.photoUrl !== undefined && !/^\/__depth\/[a-z][\w-]{2,63}\/photo\.jpg$/.test(projection.photoUrl)) errors.push('Depth photo must use a local private study URL.')
+      if (![projection.near, projection.far, projection.focalY, projection.cameraHeight, projection.maxOffset].every(finite) || projection.near <= 0 || projection.far <= projection.near || projection.maxOffset < 0 || projection.maxOffset > .5 || projection.cameraHeight < .4 || projection.cameraHeight > 2.2) errors.push('Depth mesh camera envelope is invalid.')
+      if (!Number.isInteger(projection.skippedTriangles) || projection.skippedTriangles < 0) errors.push('Depth mesh skipped-triangle count is invalid.')
+    }
   }
   return errors
 }

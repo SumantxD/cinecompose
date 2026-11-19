@@ -28,16 +28,16 @@
     {
       "id": "push_to_barrier",
       "type": "slow_push",
-      "duration": 15,
+      "duration": 5,
       "from": [
         -0.5,
         1.15,
         16
       ],
       "to": [
-        -0.2,
-        1.35,
-        6.5
+        -0.4,
+        1.217,
+        12.833
       ],
       "lookAt": [
         0.4,
@@ -45,12 +45,67 @@
         -8
       ],
       "lookAtTo": [
+        0.467,
+        1.133,
+        -8.333
+      ],
+      "fov": 30,
+      "fovPortrait": 44
+    },
+    {
+      "id": "push_to_barrier-detail",
+      "type": "focus",
+      "duration": 5,
+      "from": [
+        -0.398,
+        1.218,
+        12.77
+      ],
+      "to": [
+        -0.299,
+        1.284,
+        9.635
+      ],
+      "lookAt": [
+        0.5,
+        1.15,
+        -8.5
+      ],
+      "lookAtTo": [
+        0.544,
+        1.172,
+        -8.72
+      ],
+      "fov": 23,
+      "fovPortrait": 35
+    },
+    {
+      "id": "push_to_barrier-side",
+      "type": "slow_push",
+      "duration": 5,
+      "from": [
+        -0.63,
+        1.29,
+        9.332
+      ],
+      "to": [
+        -0.54,
+        1.35,
+        6.482
+      ],
+      "lookAt": [
+        0.6,
+        1.2,
+        -9
+      ],
+      "lookAtTo": [
         0.6,
         1.2,
         -9
       ],
       "fov": 30,
-      "fovPortrait": 44
+      "fovPortrait": 44,
+      "roll": 0.03
     },
     {
       "id": "hold_on_crossing",
@@ -73,7 +128,7 @@
   "lighting": {
     "ambientIntensity": 0.7,
     "fogDensity": 0.03,
-    "exposure": 1.0
+    "exposure": 1
   },
   "audio": {
     "ambience": [
@@ -120,13 +175,13 @@
       "visible": false
     },
     {
-      "at": 3.0,
+      "at": 3,
       "action": "light",
       "target": "gate_tube",
       "mode": "dying"
     },
     {
-      "at": 3.0,
+      "at": 3,
       "action": "sfx",
       "sound": "tube_tick",
       "volume": 0.5,
@@ -149,7 +204,7 @@
       "tilt": 0.12
     },
     {
-      "at": 22.0,
+      "at": 22,
       "action": "title",
       "visible": true
     },
@@ -163,7 +218,7 @@
   "techniques": [
     {
       "use": "ENT-04",
-      "at": 9.0,
+      "at": 9,
       "entity": "chudail",
       "position": [
         0.7,
@@ -178,5 +233,37 @@
       "light": "sodium_far",
       "entity": "chudail"
     }
-  ]
+  ],
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1.5,
+    "antialias": "smaa",
+    "shadowType": "pcf-soft",
+    "shadowMapSize": 1024,
+    "textureAnisotropy": 4,
+    "ao": {
+      "enabled": true,
+      "radius": 1.1,
+      "intensity": 2.2,
+      "quality": "medium",
+      "halfRes": true
+    },
+    "bloom": {
+      "enabled": true,
+      "intensity": 0.34,
+      "threshold": 0.97
+    },
+    "vignette": {
+      "enabled": true,
+      "darkness": 0.78
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.17
+    },
+    "grade": {
+      "saturation": -0.22,
+      "contrast": 0.08
+    }
+  }
 }

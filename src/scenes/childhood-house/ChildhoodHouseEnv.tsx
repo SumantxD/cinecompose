@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { FogSystem } from '../../components/FogSystem'
-import { ForestEnvironment } from '../../components/ForestEnvironment'
+import { ForestEnvironment, forestFloor } from '../../components/ForestEnvironment'
+import { RoadsideNature } from '../../components/RoadsideNature'
 import { RainSystem } from '../../components/RainSystem'
 import { FlickeringLight } from '../../components/FlickeringLight'
 import { Entity } from '../../components/Entity'
@@ -104,7 +105,8 @@ export function ChildhoodHouseEnv({ lighting, scene }: EnvironmentProps) {
     <ambientLight color='#9eacb8' intensity={lighting.ambientIntensity * 2.5} />
     <directionalLight position={[-6, 9, 9]} color='#8ba5b7' intensity={lighting.moon ?? 0.24} />
     <mesh rotation-x={-Math.PI / 2} receiveShadow><planeGeometry args={[65, 65]} /><meshStandardMaterial map={ground(18)} roughness={0.8} /></mesh>
-    <ForestEnvironment clear={clear} trees={low ? 24 : 38} bushes={low ? 30 : 60} grass={low ? 100 : 240} />
+    <ForestEnvironment clear={clear} trees={low ? 18 : 30} bushes={low ? 24 : 44} grass={low ? 90 : 200} />
+    <RoadsideNature clear={clear} heightAt={(x, z) => forestFloor(() => 0, x, z)} seed={23} density={.7} zMin={-26} zMax={26} />
     <IndoorRain low={low} scene={scene} />
     <WoodBox position={[0, 0.08, -1.5]} size={[6.8, 0.16, 18]} material={dado} />
     {[0, 1, 2].map(step => <WoodBox key={step} position={[0, 0.027 + step * 0.053, 8.1 - step * 0.36]} size={[2.4, 0.052, 0.48]} material={dado} />)}
@@ -153,10 +155,10 @@ export function ChildhoodHouseEnv({ lighting, scene }: EnvironmentProps) {
     <Flame />
     {scene.props?.footprints && <Footprints />}
     {(scene.props?.horse === 'room' || (scene.props?.horse === 'inventory' && !hasHorse)) && <Grounded position={[-0.05, 0, -7.95]} floor={GROUND} visible={roomHorse}><WoodenHorse id='horse' position={[0, 0, 0]} scale={0.58} rotationY={-0.4} /></Grounded>}
-    <FlickeringLight id='porch_tube' kind='point' color='#d6f2e4' intensity={22} position={[-1.7, 2.65, 6.5]} distance={12} bulb='tube' glow={0.65} seed={4} />
-    <FlickeringLight id='corridor_tube' kind='point' color='#d6f2e4' intensity={practicalIntensity([0, 2.6, 0.7], [0, 1.6, 0.7], 2.2)} position={[0, 2.6, 0.7]} distance={10} bulb='tube' glow={0.58} hum='hum' seed={3} />
+    <FlickeringLight id='porch_tube' kind='point' color='#d6f2e4' intensity={5} position={[-1.7, 2.65, 6.5]} distance={12} bulb='tube' glow={0.3} seed={4} />
+    <FlickeringLight id='corridor_tube' kind='point' color='#d6f2e4' intensity={practicalIntensity([0, 2.6, 0.7], [0, 1.6, 0.7], 1.5)} position={[0, 2.6, 0.7]} distance={10} bulb='tube' glow={0.38} hum='hum' seed={3} />
     <FlickeringLight id='room_candle' kind='point' color='#ffc080' intensity={practicalIntensity([0.85, 1.17, -8.68], [0.85, 0.89, -8.7], 0.65)} position={[0.85, 1.17, -8.68]} distance={5} glow={0.2} seed={14} />
-    <FlickeringLight id='window_blue' kind='point' color='#99b6c4' intensity={practicalIntensity([-1.5, 1.72, -11.3], [-0.7, 1, -10.5], 0.9)} position={[-1.5, 1.72, -11.3]} distance={8} />
+    <FlickeringLight id='window_blue' kind='point' color='#99b6c4' intensity={practicalIntensity([-1.5, 1.72, -11.3], [-0.7, 1, -10.5], 0.5)} position={[-1.5, 1.72, -11.3]} distance={8} />
     <Entity id='chudail' position={[0, GROUND, -6.8]} />
     <Actor id='aarav' carrying={carrying} steps={['house_exterior', 'road_footsteps'].includes(scene.sceneId) ? 'footstep' : 'footstep_wood'} groundAt={porchHeight} />
   </group>

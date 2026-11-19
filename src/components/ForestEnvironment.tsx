@@ -1,10 +1,10 @@
 import { useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
+import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { clock } from '../cinematic/clock'
 import { useRenderSettings } from '../cinematic/rendering'
 import { fbm, rng } from '../utils/random'
-import { ground } from '../utils/textures'
 import { salTree, bush, grassClump, leafTexture, grassTexture, barkTexture, withWind } from './vegetation'
 import type { Terrain } from './VillageRoad'
 
@@ -35,9 +35,24 @@ function fill(im: THREE.InstancedMesh | null, list: Placement[]) {
   im.computeBoundingSphere()
 }
 
+/** Shared forest-floor height: the ground mesh and every rooted prop read this same function. */
+export function forestFloor(terrain: Terrain, x: number, z: number) {
+  const away = THREE.MathUtils.smoothstep(Math.abs(x), 3.5, 10)
+  return terrain(x, z) - 0.03 + ((fbm(x * 0.05, z * 0.05) - 0.5) * 2.2 + (fbm(x * 0.4, z * 0.4) - 0.5) * 0.25) * away
+}
+
 /** Monsoon sal forest: seeded tree/bush archetypes, instanced, wind-driven, on an uneven mud floor. */
 export function ForestEnvironment({ clear, terrain = () => 0, trees = 420, bushes = 500, grass = 2600, seed = 5 }: Props) {
-  const groundTex = useMemo(ground, [])
+  const groundTex = useTexture({
+    map: '/textures/forest_ground_04/color.webp', normalMap: '/textures/forest_ground_04/normal.webp',
+    roughnessMap: '/textures/forest_ground_04/roughness.webp', aoMap: '/textures/forest_ground_04/ao.webp',
+  })
+  useMemo(() => Object.entries(groundTex).forEach(([name, texture]) => {
+    texture.colorSpace = name === 'map' ? THREE.SRGBColorSpace : THREE.NoColorSpace
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+    texture.repeat.setScalar(46)
+    texture.anisotropy = 4
+  }), [groundTex])
   const render = useRenderSettings()
   const camera = useThree((s) => s.camera)
   const treeMeshes = useRef<(THREE.InstancedMesh | null)[]>([])
@@ -45,13 +60,7 @@ export function ForestEnvironment({ clear, terrain = () => 0, trees = 420, bushe
   const bladeMesh = useRef<THREE.InstancedMesh | null>(null)
   const cullState = useRef({ tick: -1, position: camera.position.clone() })
 
-  const height = useMemo(
-    () => (x: number, z: number) => {
-      const away = THREE.MathUtils.smoothstep(Math.abs(x), 3.5, 10)
-      return terrain(x, z) - 0.03 + ((fbm(x * 0.05, z * 0.05) - 0.5) * 2.2 + (fbm(x * 0.4, z * 0.4) - 0.5) * 0.25) * away
-    },
-    [terrain],
-  )
+  const height = useMemo(() => (x: number, z: number) => forestFloor(terrain, x, z), [terrain])
 
   const groundGeo = useMemo(() => {
     const g = new THREE.PlaneGeometry(320, 320, 160, 160)
@@ -154,7 +163,7 @@ export function ForestEnvironment({ clear, terrain = () => 0, trees = 420, bushe
   return (
     <group>
       <mesh geometry={groundGeo} receiveShadow>
-        <meshStandardMaterial map={groundTex} roughness={0.85} />
+        <meshStandardMaterial {...groundTex} color="#434c4c" roughness={0.93} normalScale={[0.5, 0.5]} envMapIntensity={0} />
       </mesh>
       {kit.trees.map((t, i) => (
         <group key={i}>

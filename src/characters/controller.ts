@@ -6,8 +6,11 @@ import { samplePositionKeys, sampleRotationKeys, sampleScalarKeys, solveTwoBone 
 import { CharacterAnimation, sharedAnimationLibrary, ANIMATION_STATES } from './library.ts'
 import type { ClipPlayOptions } from './library.ts'
 import type { AuthoringSettings } from './motion-pack.ts'
+import { FacialAnimationController } from './facial.ts'
+import { createFaceAdapter } from './adapters.ts'
+import { DialogueController } from './lipsync.ts'
 
-const euler = new THREE.Euler(), clipRotation = new THREE.Quaternion(), clipPosition = new THREE.Vector3()
+const euler = new THREE.Euler(), clipRotation = new THREE.Quaternion(), clipPosition = new THREE.Vector3(), eyeDirection = new THREE.Vector3()
 const FACE_CHANNELS: FacialChannel[] = ['mouthOpen', 'smile', 'frown', 'eyes', 'browAngle', 'browRaise', 'eyeShift']
 
 interface FacialOverride {
@@ -21,6 +24,8 @@ interface FacialOverride {
 
 export class CharacterController {
   readonly rig: CharacterRig
+  readonly facial: FacialAnimationController
+  readonly dialogue: DialogueController
   motion: CharacterMotion
   private from: Record<string, THREE.Quaternion> | null = null
   private started = 0
@@ -36,6 +41,8 @@ export class CharacterController {
     this.rig = rig
     this.motion = { ...DEFAULT_MOTION, ...motion }
     this.library = library
+    this.facial = new FacialAnimationController(createFaceAdapter(this))
+    this.dialogue = new DialogueController()
   }
 
   get animations(): CharacterAnimation { return this.animationPlayer ??= new CharacterAnimation(this.library) }
@@ -61,7 +68,7 @@ export class CharacterController {
     return id ? this.playClip(id, options) : Promise.reject(new Error(`Unknown animation state: ${state}`))
   }
 
-  pauseClip(time = this.lastTime): void { this.animationPlayer?.pause(time); this.clipPausedAt = time }
+  pauseClip(time = this.lastTime): void { this.animationPlayer?.pause(time); this.clipPausedAt = time; this.dialogue.pause() }
   resumeClip(time = this.lastTime): void {
     const frozen = this.clipPausedAt
     if (frozen !== undefined) {
@@ -114,13 +121,13 @@ export class CharacterController {
     const influences = this.rig.face.mouth.morphTargetInfluences ?? [0, 0, 0]
     return {
       mouthOpen: influences[0], smile: influences[1] ?? 0, frown: influences[2] ?? 0,
-      eyes: this.rig.face.eyes[0].scale.y, browAngle: -this.rig.face.brows[0].rotation.z / .3,
-      browRaise: (this.rig.face.brows[0].position.y - this.rig.face.browRest[0].y) / .024,
-      eyeShift: (this.rig.face.eyes[0].position.x - this.rig.face.eyeRest[0].x) / .005,
+      eyes: this.rig.face.eyes[0].scale.y / .7, browAngle: -this.rig.face.brows[0].rotation.z / .3,
+      browRaise: (this.rig.face.brows[0].position.y - this.rig.face.browRest[0].y) / .012,
+      eyeShift: this.facial.pose.pupilX,
     }
   }
 
-  private applyFace(clipTime: number, m: CharacterMotion, time: number, externalClip?: CharacterClip, evaluation?: ReturnType<CharacterAnimation['sample']>): void {
+  private applyFace(clipTime: number, m: CharacterMotion, time: number, externalClip?: CharacterClip, evaluation?: ReturnType<CharacterAnimation['sample']>, context?: AnimationContext): void {
     const rig = this.rig
     const current = this.faceValues(externalClip, clipTime, m)
     if (evaluation?.previousClip) {
@@ -148,16 +155,25 @@ export class CharacterController {
       if (externalClip?.faceHead) this.faceOffset.setFromEuler(euler.set(...externalClip.faceHead))
     }
     rig.bones.head.quaternion.multiply(this.faceOffset)
-    const dictionary = rig.face.mouth.morphTargetDictionary ?? {}, influences = rig.face.mouth.morphTargetInfluences!
-    for (const channel of ['mouthOpen', 'smile', 'frown'] as const) if (dictionary[channel] !== undefined) influences[dictionary[channel]] = current[channel]
-    rig.face.eyes.forEach((eye, i) => {
-      eye.scale.y = current.eyes
-      eye.position.copy(rig.face.eyeRest[i]).x += current.eyeShift * .005
-    })
-    rig.face.brows.forEach((brow, i) => {
-      brow.rotation.z = (i ? 1 : -1) * current.browAngle * .3
-      brow.position.copy(rig.face.browRest[i]).y += current.browRaise * .024
-    })
+    this.dialogue.restore(externalClip?.faceAnimation?.speech)
+    this.facial.setLegacy(current)
+    this.facial.bind(externalClip?.faceAnimation, time, context?.paused === true)
+    if (externalClip?.faceAnimation?.eyeTracking && context?.cameraPosition) {
+      eyeDirection.copy(context.cameraPosition)
+      rig.bones.head.worldToLocal(eyeDirection)
+      const depth = Math.max(.03, Math.abs(eyeDirection.z))
+      this.facial.setEyeTarget(THREE.MathUtils.clamp(eyeDirection.x / depth, -.8, .8), THREE.MathUtils.clamp(eyeDirection.y / depth, -.5, .5))
+    } else this.facial.setEyeTarget(0, 0)
+    this.facial.update(time, externalClip?.faceAnimation?.events, this.dialogue.loaded ? this.dialogue.sample() : undefined)
+    const tilt = this.facial.pose.headTilt * -.22 + Math.sin(time * 16) * this.facial.pose.tremble * .05
+    if (Math.abs(tilt) > 1e-6) rig.bones.head.rotateZ(tilt)
+    rig.bones.head.scale.set(1 + this.facial.pose.squash * .08, 1 - this.facial.pose.squash * .035, 1)
+  }
+
+  dispose(): void {
+    this.dialogue.dispose()
+    this.facial.dispose()
+    this.rig.dispose()
   }
 
   /** Layered state: procedural locomotion → authored keys → gaze and contact IK. */
@@ -256,7 +272,7 @@ export class CharacterController {
       for (const [name, from] of Object.entries(this.from)) bones[name].quaternion.slerpQuaternions(from, bones[name].quaternion, amount)
       if (amount === 1 || time < this.started) this.from = null
     }
-    this.applyFace(clipTime, m, time, clip, evaluation)
+    this.applyFace(clipTime, m, time, clip, evaluation, context)
     rig.group.updateMatrixWorld(true)
   }
 }

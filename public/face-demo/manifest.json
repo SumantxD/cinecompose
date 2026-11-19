@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "audio": "/audio/vo/part1_opening_hi.wav",
+  "duration": 3.86,
+  "analysis": "rhubarb-lip-sync-1.15.0",
+  "toolLicense": "MIT",
+  "source": "public/audio/vo/part1_opening_hi.wav",
+  "note": "Offline timing cues for the existing provisional Hindi WAV. No new voice, source audio or recognition model. Approximate visemes, not final performance."
+}

@@ -1,0 +1,179 @@
+{
+  "sceneId": "world_1fsz2eg",
+  "environment": "procedural-world",
+  "duration": 16,
+  "shots": [
+    {
+      "id": "path_arrival",
+      "type": "slow_push",
+      "duration": 8,
+      "from": [
+        0,
+        0.9625414248645714,
+        36
+      ],
+      "to": [
+        0,
+        0.9700626700966265,
+        34
+      ],
+      "lookAt": [
+        0,
+        1.0499437618890513,
+        -35
+      ],
+      "fov": 50,
+      "fovPortrait": 72
+    },
+    {
+      "id": "world_overview",
+      "type": "high_angle",
+      "duration": 8,
+      "from": [
+        22,
+        18.122436082146383,
+        -3
+      ],
+      "to": [
+        18,
+        17.552519040270514,
+        -9
+      ],
+      "lookAt": [
+        0,
+        1.0499437618890513,
+        -35
+      ],
+      "fov": 54,
+      "fovPortrait": 72
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.8,
+    "moon": 0.65,
+    "exposure": 1.5,
+    "fogDensity": 0.019,
+    "fogColor": "#283941",
+    "gi": 0.65
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "night_drone",
+        "volume": 0.12
+      }
+    ],
+    "music": null
+  },
+  "cues": [],
+  "props": {
+    "world": {
+      "version": 1,
+      "seed": 2009,
+      "biome": "Random rolling",
+      "source": {
+        "kind": "random",
+        "description": "Random rolling",
+        "reconstructed": false,
+        "notes": [
+          "Seeded procedural layout."
+        ]
+      },
+      "terrain": {
+        "profile": "rolling",
+        "size": 180,
+        "relief": 3.4,
+        "waterLevel": -30,
+        "groundColor": "#35432d",
+        "skyColor": "#172631",
+        "fogColor": "#283941",
+        "fogDensity": 0.019,
+        "vegetation": {
+          "asset": "classic/sal",
+          "density": 0.72
+        }
+      },
+      "landmarks": [
+        {
+          "id": "lookout",
+          "assembly": "classic/wood-watchtower",
+          "position": [
+            0,
+            -35
+          ],
+          "tags": [
+            "destination"
+          ],
+          "rotation": -0.16851361049339175,
+          "scale": 0.9
+        }
+      ],
+      "routes": [
+        {
+          "id": "approach",
+          "kind": "path",
+          "surface": "ground",
+          "points": [
+            [
+              0,
+              38
+            ],
+            [
+              -1.5691686179488897,
+              18
+            ],
+            [
+              1.5465855821967125,
+              -10
+            ],
+            [
+              0,
+              -35
+            ]
+          ],
+          "width": 2.4,
+          "clearance": 2
+        },
+        {
+          "id": "watercourse",
+          "kind": "stream",
+          "surface": "water",
+          "points": [
+            [
+              -18,
+              45
+            ],
+            [
+              -16,
+              14
+            ],
+            [
+              -20,
+              -12
+            ],
+            [
+              -14,
+              -46
+            ]
+          ],
+          "width": 3.2,
+          "clearance": 3,
+          "level": -0.65
+        }
+      ],
+      "lighting": {
+        "moon": 0.65,
+        "ambient": 0.8,
+        "exposure": 1.5,
+        "azimuth": -0.6
+      },
+      "camera": {
+        "position": [
+          0,
+          36
+        ],
+        "target": "lookout"
+      }
+    }
+  }
+}

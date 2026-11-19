@@ -43,7 +43,7 @@ const streakVert = /* glsl */ `
 
 const streakFrag = /* glsl */ `
   varying vec3 vCol; varying float vA;
-  void main() { gl_FragColor = vec4(vCol * vA * 1.6, vA); }`
+  void main() { gl_FragColor = vec4(vCol * vA * 1.15, vA); }`
 
 const splashVert = /* glsl */ `
   uniform float uTime; uniform vec3 uCam; uniform float uRadius; uniform float uPx;
@@ -80,7 +80,7 @@ const splashFrag = /* glsl */ `
     float crown = smoothstep(0.35, 0.0, d) * smoothstep(0.25, 0.0, vPhase); // the initial hit
     float a = (ring * 0.9 + crown) * vFade;
     if (a < 0.01) discard;
-    gl_FragColor = vec4(vCol * a * 1.8, a);
+    gl_FragColor = vec4(vCol * a * 1.35, a);
   }`
 
 interface Props {

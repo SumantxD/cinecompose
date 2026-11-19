@@ -5,11 +5,15 @@ import { cam } from './timeline'
 import { clock } from './clock'
 import { PRESETS, STEP_HZ } from './presets'
 import { AudioManager } from '../audio/AudioManager'
+import { cceFrame } from '../cce/runtime'
 
 const PORTRAIT = 9 / 16
 const LANDSCAPE = 16 / 9
 const look = new THREE.Vector3()
 const fwd = new THREE.Vector3()
+const right = new THREE.Vector3()
+const vertical = new THREE.Vector3()
+const offset = new THREE.Vector3()
 
 /** Applies `cam` (written by the scene timeline) to the R3F camera, with aspect-aware FOV and preset drift. */
 export function CameraController() {
@@ -27,8 +31,17 @@ export function CameraController() {
       cam.py + Math.sin(w * 0.9 + 1.7) * p.drift * 0.7,
       cam.pz + Math.sin(w * 0.7 + 0.4) * p.drift * 0.5,
     )
+    if (cceFrame.dolly || cceFrame.truck || cceFrame.lift) {
+      fwd.subVectors(look, camera.position).normalize()
+      right.crossVectors(fwd, camera.up).normalize()
+      vertical.crossVectors(right, fwd).normalize()
+      camera.position.addScaledVector(fwd, cceFrame.dolly).addScaledVector(right, cceFrame.truck).addScaledVector(vertical, cceFrame.lift)
+    }
+    if (cceFrame.orbit) camera.position.copy(look).add(offset.subVectors(camera.position, look).applyAxisAngle(camera.up, cceFrame.orbit))
     camera.lookAt(look.set(cam.lx, cam.ly, cam.lz))
-    if (cam.roll) camera.rotateZ(cam.roll)
+    camera.rotateY(cceFrame.yaw)
+    camera.rotateX(cceFrame.pitch)
+    if (cam.roll || cceFrame.roll) camera.rotateZ(cam.roll + cceFrame.roll)
     if (p.bob) {
       // One dip per footstep, sway alternating left/right — applied in the camera's own frame.
       const s = Math.sin(clock.t * Math.PI * STEP_HZ)
@@ -38,7 +51,7 @@ export function CameraController() {
 
     // Portrait gets its own authored FOV; aspects in between blend so resizing never jumps.
     const k = THREE.MathUtils.clamp((size.width / size.height - PORTRAIT) / (LANDSCAPE - PORTRAIT), 0, 1)
-    const fov = THREE.MathUtils.lerp(cam.fovP, cam.fov, k)
+    const fov = THREE.MathUtils.clamp(THREE.MathUtils.lerp(cam.fovP, cam.fov, k) + cceFrame.fov, 8, 120)
     if (Math.abs(camera.fov - fov) > 0.01) {
       camera.fov = fov
       camera.updateProjectionMatrix()

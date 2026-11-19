@@ -21,7 +21,7 @@ export function Taxi({ id, position = [0, 0, 0], rotationY = 0, lowShadows = fal
     target.position.set(0, -0.5, 14)
     return { body, cabin, target, glow: radial() }
   }, [])
-  const paint = useMemo(() => new THREE.MeshStandardMaterial({ color: '#c9c4b6', roughness: 0.35, metalness: 0.2, side: THREE.DoubleSide }), [])
+  const paint = useMemo(() => new THREE.MeshStandardMaterial({ color: '#8f8a7c', roughness: 0.55, metalness: 0.12, side: THREE.DoubleSide }), [])
   const glass = useMemo(() => new THREE.MeshStandardMaterial({ color: '#05070a', roughness: 0.05, metalness: 0.6, transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false }), [])
 
   useFrame(() => update(0.08))
@@ -53,11 +53,11 @@ export function Taxi({ id, position = [0, 0, 0], rotationY = 0, lowShadows = fal
       {[-0.55, 0.55].map((x) => (
         <group key={x} position={[x, 0.78, 2.16]}>
           <mesh rotation-x={Math.PI / 2}><cylinderGeometry args={[0.11, 0.11, 0.04, 16]} /><meshBasicMaterial color={[3, 2.7, 2.1]} toneMapped={false} /></mesh>
-          <sprite position={[0, 0, 0.05]} scale={[0.9, 0.9, 1]}><spriteMaterial map={parts.glow} color="#fff1d6" blending={THREE.AdditiveBlending} depthWrite={false} transparent opacity={0.55} fog={false} /></sprite>
+          <sprite position={[0, 0, 0.05]} scale={[0.9, 0.9, 1]}><spriteMaterial map={parts.glow} color="#fff1d6" blending={THREE.AdditiveBlending} depthWrite={false} transparent opacity={0.38} fog={false} /></sprite>
         </group>
       ))}
       <primitive object={parts.target} />
-      <spotLight position={[0, 0.8, 2.2]} target={parts.target} color="#fff0d2" intensity={on ? 260 : 0} angle={0.42} penumbra={0.5} decay={2}
+      <spotLight position={[0, 0.8, 2.2]} target={parts.target} color="#fff0d2" intensity={on ? 155 : 0} angle={0.42} penumbra={0.5} decay={2}
         castShadow shadow-mapSize={lowShadows ? [512, 512] : [1024, 1024]} shadow-bias={-0.0005} />
       {[-0.62, 0.62].map((x) => (
         <mesh key={x} position={[x, 0.74, -2.16]}><boxGeometry args={[0.18, 0.1, 0.02]} /><meshBasicMaterial color={[1.6, 0.08, 0.05]} toneMapped={false} /></mesh>

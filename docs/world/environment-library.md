@@ -25,6 +25,13 @@ A 320 m ground plane displaced by fbm, flattened near the road, plus a `terrain(
 ## Road — `components/VillageRoad.tsx` ✅
 A crowned, broken-edged asphalt strip with puddle-aware colour and roughness maps, leaf litter, and an optional `terrain` ramp. Also `Milestone` (an orange cap means a village road).
 
+## Opt-in reference forest — `scenes/reference-forest/` ✅
+`reference_forest` is an independent Studio scene for real-asset cinematic evaluation, not an Ink story change. Open `/?studio&scene=reference_forest` or use the scene dropdown. It uses the ordinary Stage/PostFX pipeline, seeded placements, analytic terrain height, shared fog/mist and the `ModelInstances` GLB loader. Close trees, real ferns, rocks, stumps, fallen wood and a brass diya are instanced from registered CC0 assets. Distant trees may use the source-derived alpha billboard.
+
+Scene JSON `props.forest` controls seed, density, PBR texture scale/normal strength, physical terrain relief, wetness, wind, mist and puddles. The Rendering panel exposes those controls and independent HDRI illumination versus visible-sky choices. **Terrain relief (m)** adds small-scale physical bumps to the existing broad terrain, separate from normal-map grain. Zero restores the earlier flatter shape; the field is optional in older saved settings. Every placement and the mist shares the same height function, and puddles remain level. The compact **Cinematic look guide** in the Rendering panel records the transferable visual lessons from this approved reference. Quality profiles change density and resources, not texture resolution. Close props use actual shadow maps; distant trees and ferns avoid extra shadow work. The paper-like procedural bush experiment was rejected, and the third shot is placed in a clear camera corridor.
+
+Original source links, authors, LOD triangle counts, bytes and SHA-256 hashes live in `public/models/forest/provenance.json`, `public/textures/forest_ground_04/provenance.json` and `public/CREDITS.md`. Rendered screenshots and luma checks supplement—not replace—art-direction approval. The forest's visual direction was approved before the terrain-relief refinement; the isolated template does not constitute blanket art or real-device FPS approval.
+
 ## Vegetation — `components/vegetation.ts` + `ForestEnvironment.tsx` ✅
 - `salTree(seed)`: trunk and branches (bark) plus leaf cards. Six archetypes per forest; instance rotation, scale and tint vary them.
 - `bush(seed)`, `grassClump()`: undergrowth.

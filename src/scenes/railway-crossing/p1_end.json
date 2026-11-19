@@ -6,7 +6,7 @@
     {
       "id": "crane_up",
       "type": "slow_push",
-      "duration": 12,
+      "duration": 4,
       "from": [
         0.3,
         1.6,
@@ -20,24 +20,81 @@
       "fov": 36,
       "fovPortrait": 54,
       "to": [
-        1.5,
+        0.7,
+        3.9,
+        24.667
+      ],
+      "lookAtTo": [
+        0,
+        0.7,
+        -1.333
+      ],
+      "exposure": 1.3
+    },
+    {
+      "id": "crane_up-detail",
+      "type": "focus",
+      "duration": 4,
+      "from": [
+        0.708,
+        3.946,
+        24.72
+      ],
+      "lookAt": [
+        0,
+        0.65,
+        -2
+      ],
+      "fov": 29,
+      "fovPortrait": 45,
+      "to": [
+        1.104,
+        6.223,
+        27.36
+      ],
+      "lookAtTo": [
+        0,
+        0.584,
+        -2.88
+      ],
+      "exposure": 1.3
+    },
+    {
+      "id": "crane_up-side",
+      "type": "slow_push",
+      "duration": 4,
+      "from": [
+        0.8,
+        6.43,
+        27.615
+      ],
+      "lookAt": [
+        0,
+        0.5,
+        -4
+      ],
+      "fov": 36,
+      "fovPortrait": 54,
+      "to": [
+        1.16,
         8.5,
-        30
+        30.015
       ],
       "lookAtTo": [
         0,
         0.5,
         -4
       ],
-      "exposure": 1.3
+      "exposure": 1.3,
+      "roll": 0.03
     }
   ],
   "lighting": {
     "ambientIntensity": 0.7,
     "fogDensity": 0.028,
-    "exposure": 1.0,
+    "exposure": 1,
     "moon": 0.6,
-    "gi": 1.0
+    "gi": 1
   },
   "audio": {
     "ambience": [
@@ -117,5 +174,37 @@
       "to": 0.55,
       "duration": 4
     }
-  ]
+  ],
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1.5,
+    "antialias": "smaa",
+    "shadowType": "pcf-soft",
+    "shadowMapSize": 1024,
+    "textureAnisotropy": 4,
+    "ao": {
+      "enabled": true,
+      "radius": 1.1,
+      "intensity": 2.2,
+      "quality": "medium",
+      "halfRes": true
+    },
+    "bloom": {
+      "enabled": true,
+      "intensity": 0.34,
+      "threshold": 0.97
+    },
+    "vignette": {
+      "enabled": true,
+      "darkness": 0.78
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.17
+    },
+    "grade": {
+      "saturation": -0.22,
+      "contrast": 0.08
+    }
+  }
 }

@@ -3,6 +3,9 @@ import { PRESETS } from './presets.ts'
 import type { SceneConfig } from './types.ts'
 import { validateWorld } from '../world/types.ts'
 import { validateRenderSettings } from './rendering.ts'
+import { validateReferenceStudy } from '../reference/compose.ts'
+import { validateChoreography } from './choreography.ts'
+import { compileCues, validateCceTrack } from '../cce/engine.ts'
 
 const record = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v)
 const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
@@ -67,6 +70,18 @@ export function validateScene(value: unknown): string[] {
   if (burn !== undefined && (!record(burn) || !finite(burn.at) || burn.at < 0 || !finite(burn.duration) || burn.duration <= 0 || (finite(value.duration) && finite(burn.at) && burn.at > value.duration))) err('paperBurn needs a non-negative at within the scene and a positive duration.')
   const rain = record(value.props) ? value.props.rain : undefined
   if (rain !== undefined && (!record(rain) || (rain.enabled !== undefined && typeof rain.enabled !== 'boolean') || (rain.count !== undefined && (!finite(rain.count) || rain.count < 0 || rain.count > 20000)) || (rain.wind !== undefined && (!Array.isArray(rain.wind) || rain.wind.length !== 2 || rain.wind.some((v: unknown) => !finite(v) || Math.abs(v as number) > 6))))) err('rain needs enabled?: boolean, count 0–20000 and wind [x, z] within ±6.')
+  const forest = record(value.props) ? value.props.forest : undefined
+  if (forest !== undefined) {
+    if (!record(forest)) err('forest settings must be an object.')
+    else {
+      const limits: Record<string, [number, number]> = { density: [0, 1], textureScale: [4, 60], normalStrength: [0, 2], relief: [0, .6], wetness: [0, 1], wind: [0, 2], mist: [0, .12] }
+      for (const [key, [lo, hi]] of Object.entries(limits)) if (key !== 'relief' || forest[key] !== undefined) {
+      if (!finite(forest[key]) || (forest[key] as number) < lo || (forest[key] as number) > hi) err(`forest.${key} must be within ${lo}–${hi}.`)
+    }
+      if (!Number.isInteger(forest.seed) || (forest.seed as number) < 0) err('forest.seed must be a non-negative integer.')
+      if (typeof forest.puddles !== 'boolean') err('forest.puddles must be boolean.')
+    }
+  }
   const mist = record(value.props) ? value.props.groundMist : undefined
   if (mist !== undefined && (!record(mist) || !vector(mist.center) || !finite(mist.width) || mist.width <= 0 || mist.width > 24 || !finite(mist.length) || mist.length <= 0 || mist.length > 48 || (mist.height !== undefined && (!finite(mist.height) || mist.height < 0.1 || mist.height > 0.4)) || (mist.opacity !== undefined && (!finite(mist.opacity) || mist.opacity < 0 || mist.opacity > 0.12)))) err('groundMist needs a center, bounded positive width/length, a low height and restrained opacity.')
 
@@ -97,6 +112,9 @@ export function validateScene(value: unknown): string[] {
   }
 
   const shots = Array.isArray(value.shots) ? value.shots : []
+  errors.push(...validateReferenceStudy(props?.referenceStudy, shots as SceneConfig['shots']))
+  errors.push(...validateChoreography(props?.choreography))
+  errors.push(...validateCceTrack(props?.cce, finite(value.duration) ? value.duration : undefined))
   if (!shots.length) err('at least one shot is required.')
   let total = 0
   shots.forEach((shot, i) => {
@@ -120,7 +138,7 @@ export function validateScene(value: unknown): string[] {
   let cues: unknown[] = Array.isArray(value.cues) ? value.cues : []
   if (!Array.isArray(value.cues)) err('cues must be an array.')
   try {
-    cues = [...cues, ...expandTechniques(value.techniques as SceneConfig['techniques'])]
+    cues = [...cues, ...expandTechniques(value.techniques as SceneConfig['techniques']), ...compileCues(value as unknown as SceneConfig, props?.cce as import('../cce/types').CceTrack | undefined)]
   } catch (e) {
     err(e instanceof Error ? e.message : String(e))
   }

@@ -9,7 +9,7 @@ export function ScreenOverlay({ label, className, title, onClick, button, passTh
   const element = useMemo(() => {
     const container = document.createElement('div')
     Object.assign(container.style, {
-      position: 'absolute', zIndex: '2', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      position: 'fixed', left: '0', top: '0', zIndex: '3', display: 'flex', alignItems: 'center', justifyContent: 'center',
       width: '0', height: '0', pointerEvents: passThrough ? 'none' : 'auto',
     })
     const child = document.createElement(button ? 'button' : 'span')
@@ -19,7 +19,7 @@ export function ScreenOverlay({ label, className, title, onClick, button, passTh
   }, [button, passThrough])
   useEffect(() => {
     const { container, child } = element
-    gl.domElement.parentElement?.appendChild(container)
+    document.body.appendChild(container)
     if (!onClick) return () => void container.remove()
     const down = (event: Event) => event.stopPropagation()
     const click = (event: Event) => { event.stopPropagation(); onClick() }
@@ -36,7 +36,7 @@ export function ScreenOverlay({ label, className, title, onClick, button, passTh
   useFrame(() => {
     const point = anchor.current?.getWorldPosition(position).project(camera)
     if (!point) return
-    element.container.style.transform = `translate(-50%,-50%) translate(${(point.x * 0.5 + 0.5) * size.width}px,${(-point.y * 0.5 + 0.5) * size.height}px)`
+    element.container.style.transform = `translate(-50%,-50%) translate(${size.left + (point.x * 0.5 + 0.5) * size.width}px,${size.top + (-point.y * 0.5 + 0.5) * size.height}px)`
     element.container.style.visibility = point.z > 1 || point.z < -1 || Math.abs(point.x) > 1 || Math.abs(point.y) > 1 ? 'hidden' : ''
   })
   return <group ref={anchor} />

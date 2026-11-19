@@ -5,7 +5,8 @@ import { Grounded } from '../../components/Placement'
 import { FogSystem } from '../../components/FogSystem'
 import { RainSystem } from '../../components/RainSystem'
 import { FlickeringLight } from '../../components/FlickeringLight'
-import { ForestEnvironment } from '../../components/ForestEnvironment'
+import { ForestEnvironment, forestFloor } from '../../components/ForestEnvironment'
+import { RoadsideNature } from '../../components/RoadsideNature'
 import { Entity } from '../../components/Entity'
 import { Actor } from '../../components/Actor'
 import { useStore } from '../../state/store'
@@ -44,7 +45,8 @@ export function TeaStallEnv({ lighting, scene }: { lighting: SceneConfig['lighti
     <mesh rotation-x={-Math.PI / 2} receiveShadow>
       <planeGeometry args={[70, 70]} /><meshStandardMaterial map={ground(11)} roughness={0.76} />
     </mesh>
-    <ForestEnvironment clear={clear} trees={28} bushes={45} grass={180} />
+    <ForestEnvironment clear={clear} trees={low ? 18 : 26} bushes={low ? 30 : 42} grass={low ? 130 : 170} />
+    <RoadsideNature clear={clear} heightAt={(x, z) => forestFloor(() => 0, x, z)} seed={61} density={.6} zMin={-18} zMax={18} />
     <ShelterRain low={low} scene={scene} />
     <WoodBox position={[0, 2.55, 0]} size={[4.8, 0.08, 4.7]} material={tin} />
     <Slats transforms={roof} material={tin} />

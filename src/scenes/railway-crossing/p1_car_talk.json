@@ -1,12 +1,12 @@
 {
   "sceneId": "p1_car_talk",
   "environment": "railway-crossing",
-  "duration": 14,
+  "duration": 14.01,
   "shots": [
     {
       "id": "behind_taxi",
       "type": "slow_push",
-      "duration": 14,
+      "duration": 4.67,
       "from": [
         -0.4,
         1.7,
@@ -20,19 +20,81 @@
       "fov": 30,
       "fovPortrait": 46,
       "to": [
-        -0.7,
-        1.62,
-        28.6
+        -0.5,
+        1.673,
+        30.533
       ],
-      "exposure": 1.3
+      "exposure": 1.3,
+      "lookAtTo": [
+        -0.9,
+        1.1,
+        12
+      ]
+    },
+    {
+      "id": "behind_taxi-detail",
+      "type": "focus",
+      "duration": 4.67,
+      "from": [
+        -0.502,
+        1.673,
+        30.514
+      ],
+      "lookAt": [
+        -0.9,
+        1.1,
+        12
+      ],
+      "fov": 23,
+      "fovPortrait": 37,
+      "to": [
+        -0.601,
+        1.646,
+        29.557
+      ],
+      "exposure": 1.3,
+      "lookAtTo": [
+        -0.9,
+        1.1,
+        12
+      ]
+    },
+    {
+      "id": "behind_taxi-side",
+      "type": "slow_push",
+      "duration": 4.67,
+      "from": [
+        -0.95,
+        1.644,
+        29.474
+      ],
+      "lookAt": [
+        -0.9,
+        1.1,
+        12
+      ],
+      "fov": 30,
+      "fovPortrait": 46,
+      "to": [
+        -1.04,
+        1.62,
+        28.604
+      ],
+      "exposure": 1.3,
+      "lookAtTo": [
+        -0.9,
+        1.1,
+        12
+      ],
+      "roll": 0.03
     }
   ],
   "lighting": {
     "ambientIntensity": 0.7,
     "fogDensity": 0.028,
-    "exposure": 1.0,
+    "exposure": 1,
     "moon": 0.6,
-    "gi": 1.0
+    "gi": 1
   },
   "audio": {
     "ambience": [
@@ -83,7 +145,7 @@
       "target": "taxi",
       "visible": true,
       "position": [
-        -1.0,
+        -1,
         0,
         24
       ],
@@ -116,5 +178,37 @@
       "anim": "sit",
       "headYaw": -0.25
     }
-  ]
+  ],
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1.5,
+    "antialias": "smaa",
+    "shadowType": "pcf-soft",
+    "shadowMapSize": 1024,
+    "textureAnisotropy": 4,
+    "ao": {
+      "enabled": true,
+      "radius": 1.1,
+      "intensity": 2.2,
+      "quality": "medium",
+      "halfRes": true
+    },
+    "bloom": {
+      "enabled": true,
+      "intensity": 0.34,
+      "threshold": 0.97
+    },
+    "vignette": {
+      "enabled": true,
+      "darkness": 0.78
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.17
+    },
+    "grade": {
+      "saturation": -0.22,
+      "contrast": 0.08
+    }
+  }
 }

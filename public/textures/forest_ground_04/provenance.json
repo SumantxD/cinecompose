@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "source": "https://polyhaven.com/a/forest_ground_04",
+  "authors": "Rob Tuytel (photography/processing), Rico Cilliers (minor adjustment)",
+  "license": "CC0 1.0",
+  "licenseText": "https://polyhaven.com/license",
+  "verifiedAt": "2026-11-18",
+  "conversion": "Original 1K JPEG to 1K WebP; normal, roughness and AO remain linear",
+  "maps": [
+    {
+      "file": "textures/forest_ground_04/color.webp",
+      "sourceDownload": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/forest_ground_04/forest_ground_04_diff_1k.jpg",
+      "sourceMd5": "6ad9df4d731a238299806f739a26af83",
+      "bytes": 377424,
+      "sha256": "56d0013604117def28675f98a676375d5c5828eeb4da19207f9d0cba9bf4f345"
+    },
+    {
+      "file": "textures/forest_ground_04/normal.webp",
+      "sourceDownload": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/forest_ground_04/forest_ground_04_nor_gl_1k.jpg",
+      "sourceMd5": "a010a0802c2d9a930c6f00d3b1f196d2",
+      "bytes": 663320,
+      "sha256": "31e80c179c41cb837eef3444dcb811171515ab252ebefdc9c9da252fb6f19880"
+    },
+    {
+      "file": "textures/forest_ground_04/roughness.webp",
+      "sourceDownload": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/forest_ground_04/forest_ground_04_rough_1k.jpg",
+      "sourceMd5": "b5c7ba5c16f00261e9a765d52cf7e0ac",
+      "bytes": 349742,
+      "sha256": "78925d1c57974b26ff66c6bbc931e5bb2e4edb884963bd6c2a48170d1166d6da"
+    },
+    {
+      "file": "textures/forest_ground_04/ao.webp",
+      "sourceDownload": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/forest_ground_04/forest_ground_04_ao_1k.jpg",
+      "sourceMd5": "289bfcedb4676de2632c678a35eeea63",
+      "bytes": 480878,
+      "sha256": "d9096b030fbeb6536231e9c0ffdb74956010772a3ccf211ba69dd52385ac3d14"
+    }
+  ]
+}

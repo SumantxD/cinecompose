@@ -16,5 +16,10 @@ export { createCharacterRig } from './rig.ts'
 export type { CharacterRig, CharacterLook, RigFace } from './rig.ts'
 export { DEFAULT_MOTION, putPositionKey, putRotationKey, validClip, validMotion } from './types.ts'
 export type { AnimationContext, BoneTrack, CharacterClip, CharacterMotion, IKTarget, PositionKey, QuaternionValue, RotationKey, Vec3 } from './types.ts'
+export { EXPRESSION_PRESETS, FACE_RANGES, NEUTRAL_FACE, PRESET_GROUPS, sampleSequence, validFaceSettings } from './facial.ts'
+export type { ExpressionEvent, FaceAdapter, FacePose, FaceSettings, FaceSpeech, PresetName } from './facial.ts'
+export { createVRMAdapter, createMorphAdapter, createFaceAdapter } from './adapters.ts'
+export { VISEME_SHAPES, fromRhubarbJSON, fromLighterKeyframes, sampleTimeline, validTimeline } from './lipsync.ts'
+export type { LipSyncTimeline, SavedSpeech, TalkingMode, VisemeCue, VisemeShape } from './lipsync.ts'
 
 

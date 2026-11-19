@@ -6,6 +6,8 @@ import { RailwayCrossingEnv } from './railway-crossing/RailwayCrossingEnv'
 import { TeaStallEnv } from './tea-stall/TeaStallEnv'
 import { ChildhoodHouseEnv } from './childhood-house/ChildhoodHouseEnv'
 import { ReturnRoadEnv } from './return-road/ReturnRoadEnv'
+import { ReferenceForestEnv } from './reference-forest/ReferenceForestEnv'
+import { ReferenceStudyEnv } from './reference-study/ReferenceStudyEnv'
 
 export interface EnvironmentProps { lighting: SceneConfig['lighting']; scene: SceneConfig }
 
@@ -15,6 +17,9 @@ export const ENVIRONMENTS: Record<string, ComponentType<EnvironmentProps>> = {
   'tea-stall': TeaStallEnv,
   'childhood-house': ChildhoodHouseEnv,
   'return-road': ReturnRoadEnv,
+  'reference-forest': ReferenceForestEnv,
+  'reference-study': ReferenceStudyEnv,
+  'control-room': ReferenceStudyEnv,
   'procedural-world': ({ scene }) => scene.props?.world ? <WorldEnvironment spec={scene.props.world} shots={scene.shots} lighting={scene.lighting} rain={scene.props.rain} /> : null,
   void: () => null,
 }

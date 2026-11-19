@@ -33,10 +33,10 @@ export function jointMap(source: THREE.Object3D): Map<string, THREE.Object3D> {
 
 const CHAIN: [string, string, string][] = [
   ['spine', 'chest', 'spine'], ['chest', 'neck', 'chest'], ['neck', 'head', 'neck'],
-  ['leftShoulder', 'leftElbow', 'leftElbow'], ['leftElbow', 'leftWrist', 'leftWrist'],
-  ['rightShoulder', 'rightElbow', 'rightElbow'], ['rightElbow', 'rightWrist', 'rightWrist'],
-  ['leftHip', 'leftKnee', 'leftKnee'], ['leftKnee', 'leftAnkle', 'leftAnkle'],
-  ['rightHip', 'rightKnee', 'rightKnee'], ['rightKnee', 'rightAnkle', 'rightAnkle'],
+  ['leftShoulder', 'leftElbow', 'leftShoulder'], ['leftElbow', 'leftWrist', 'leftElbow'],
+  ['rightShoulder', 'rightElbow', 'rightShoulder'], ['rightElbow', 'rightWrist', 'rightElbow'],
+  ['leftHip', 'leftKnee', 'leftHip'], ['leftKnee', 'leftAnkle', 'leftKnee'],
+  ['rightHip', 'rightKnee', 'rightHip'], ['rightKnee', 'rightAnkle', 'rightKnee'],
   ['leftAnkle', 'leftToe', 'leftAnkle'], ['rightAnkle', 'rightToe', 'rightAnkle'],
   ['leftWrist', 'leftFinger', 'leftWrist'], ['rightWrist', 'rightFinger', 'rightWrist'],
 ]
@@ -58,15 +58,17 @@ export function retargetCharacterClip(source: THREE.Object3D, input: THREE.Anima
   source.updateMatrixWorld(true)
   const restHipHeight = joints.get('hips')!.getWorldPosition(new THREE.Vector3()).y
   const mixer = new THREE.AnimationMixer(source), action = mixer.clipAction(input)
-  if (options.loop === false) { action.setLoop(THREE.LoopOnce, 0); action.clampWhenFinished = true }
   action.play()
   const frames = Math.max(2, Math.ceil(input.duration * 30) + 1), inPlace = options.inPlace ?? true
   const world = new Map<string, THREE.Vector3>(), tracks: CharacterClip['tracks'] = {}
   const sourceHips: THREE.Vector3[] = [], floorSamples: number[] = []
   const p = (part: string) => world.get(part)!
+  const at = (time: number) => {
+    action.reset().play(); action.time = options.loop !== false && time >= input.duration ? 0 : time
+    mixer.update(0); source.updateMatrixWorld(true)
+  }
   const snapshot = (time: number) => {
-    mixer.setTime(time)
-    source.updateMatrixWorld(true)
+    at(time)
     for (const name of ['hips', 'leftAnkle', 'rightAnkle']) {
       const position = joints.get(name)!.getWorldPosition(new THREE.Vector3())
       if (!Number.isFinite(position.x + position.y + position.z)) throw new Error('Animation contains invalid joint positions')
@@ -106,7 +108,7 @@ export function retargetCharacterClip(source: THREE.Object3D, input: THREE.Anima
   }
   for (let frame = 0; frame < frames; frame++) {
     const time = input.duration * frame / (frames - 1), phase = frame / (frames - 1)
-    mixer.setTime(time)
+    at(time)
     source.updateMatrixWorld(true)
     for (const [name, joint] of joints) world.set(name, joint.getWorldPosition(new THREE.Vector3()))
     up.copy(p('spine')).sub(p('hips')).normalize()

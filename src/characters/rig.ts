@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import type { Vec3 } from './types.ts'
+import type { FaceDetails } from './face.ts'
 import { createFacialFeatures } from './face.ts'
 
 const JOINTS: [string, string | null, Vec3][] = [
@@ -25,6 +26,8 @@ const JOINTS: [string, string | null, Vec3][] = [
 ]
 
 export interface RigFace {
+  group: THREE.Group
+  details?: FaceDetails
   mouth: THREE.Mesh
   eyes: [THREE.Mesh, THREE.Mesh]
   brows: [THREE.Mesh, THREE.Mesh]
@@ -120,7 +123,7 @@ export function createCharacterRig(look: CharacterLook = {}): CharacterRig {
   const head = new THREE.SphereGeometry(0.1, 16, 12)
   head.scale(0.86, 1.08, 1); head.translate(...p('head').add(new THREE.Vector3(0, 0.06, 0)).toArray())
   add(head, 'head', 2)
-  const hair = new THREE.SphereGeometry(0.104, 16, 10, 0, Math.PI * 2, 0, 1.75)
+  const hair = new THREE.SphereGeometry(0.104, 16, 10, 0, Math.PI * 2, 0, 1.4)
   hair.scale(0.92, 0.95, 1.05); hair.translate(...p('head').add(new THREE.Vector3(0, 0.1, -0.012)).toArray())
   add(hair, 'head', 3)
   const bag = new THREE.BoxGeometry(0.065, 0.29, 0.22)
@@ -153,13 +156,17 @@ export function createCharacterRig(look: CharacterLook = {}): CharacterRig {
 
   return {
     group, bones, skeleton, skinned, rest,
-    face: { mouth, eyes, brows, eyeRest, browRest },
-    animationNodes: [mouth, ...eyes, ...brows],
+    face: { group: facial.group, details: facial.details, mouth, eyes, brows, eyeRest, browRest },
+    animationNodes: [mouth, ...eyes, ...brows, ...facial.details.pupils],
     dispose: () => {
-      const geometries = new Set<THREE.BufferGeometry>()
-      group.traverse((node) => { if ('geometry' in node) geometries.add((node as THREE.Mesh).geometry) })
+      const geometries = new Set<THREE.BufferGeometry>(), materialSet = new Set(materials)
+      group.traverse((node) => {
+        if ('geometry' in node) geometries.add((node as THREE.Mesh).geometry)
+        const material = (node as THREE.Mesh).material
+        if (material) for (const value of Array.isArray(material) ? material : [material]) materialSet.add(value)
+      })
       geometries.forEach((g) => g.dispose())
-      materials.forEach((m) => m.dispose())
+      materialSet.forEach((m) => m.dispose())
     },
   }
 }

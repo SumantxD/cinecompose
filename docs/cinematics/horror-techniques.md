@@ -12,6 +12,23 @@ Cost (per frame, mobile): **free** = cues/camera only · **low** = <1 ms, no ext
 - Don't repeat a technique within the same episode unless the repetition is the point (see SND-01).
 - Horror budget for each episode: **at most one** loud moment. The rest is dread.
 
+## Technique Studio composition presets
+
+In addition to the hand-authored techniques below, the main Studio exposes **44 CCE composition presets**. They are editable additive layers over an existing film shot, not replacements for Ink or canonical coverage. Presets use versioned `props.cce` tracks, normalized actions, explicit intensity/seed/duration, current-shot camera bases, state-restoring cues and validated JSON import/export. See `docs/pipeline.md` for the authoring workflow and current engine limits.
+
+| Category | Preset ids in `src/cce/templates.ts` |
+|---|---|
+| Camera | `patient-push`, `crash-zoom`, `whip-pan`, `dutch-realisation`, `dolly-punch`, `snap-wide`, `orbit-reveal`, `pov-head-snap`, `micro-jitter`, `tracking-sprint` |
+| Editing | `jump-ahead`, `smash-reverse`, `flash-cut`, `whip-cut`, `repeat-angle`, `blackout-reveal`, `micro-montage`, `held-breath` |
+| Reactions | `fear-retreat`, `shock-zoom`, `confusion`, `panic`, `realisation-close`, `watched-stop` |
+| Horror | `subliminal-figure`, `darkness-displacement`, `false-reveal`, `delayed-apparition`, `shadow-first`, `frame-displacement`, `impact-close` |
+| Audio | `cut-to-silence`, `distant-motif`, `three-knocks`, `late-footstep`, `sound-behind` |
+| Environment | `tube-stutter`, `power-dip`, `light-dies`, `camera-tremor` |
+| Editorial | `impact-word`, `quiet-word` (author-supplied non-dialogue text only) |
+| Curated combinations | `discovery-sequence`, `chase-pressure` |
+
+These presets do not approve indiscriminate shake/glitch, an attack by the Woman, or a chase. High-intensity layers remain opt-in and bounded. Shots, target ids and every resulting composed frame still need visual review.
+
 ## Technique macros (composable)
 
 A scene JSON can list techniques instead of hand-writing their cues:

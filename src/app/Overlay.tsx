@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useStore } from '../state/store'
 import { AudioManager } from '../audio/AudioManager'
 import * as player from './player'
+import { ChoreographyOverlay } from '../components/ChoreographyOverlay'
 
 const params = new URLSearchParams(location.search)
 /** Optional knot to start from (?start=prototype). Default: the top of the story. */
@@ -97,6 +98,7 @@ export function Overlay() {
   return (
     <div className="overlay">
       <div className="blackout" style={{ opacity: blackout }} />
+      <ChoreographyOverlay />
       <div className={`title ${showTitle ? 'on' : ''}`} aria-hidden={!showTitle}>
         <h1>KAALI RAAT</h1>
         <p>The Road That Remembers</p>

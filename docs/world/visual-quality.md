@@ -19,6 +19,7 @@
 ## Checklist
 
 **Scale and grounding**
+- [ ] Terrain has intentional, bounded physical relief, not just a normal map. The path need not be perfectly flat; props root slightly into the same height function used by the ground and mist (`reference-forest/layout.ts` is the reference).
 - [ ] Doors about 2 m, people 1.6–1.8 m (she is 1.84 m), road 5–6 m wide, rails 1.676 m apart.
 - [ ] Nothing floats: posts, trunks and props sink slightly into the ground (root flares, buried bases).
 - [ ] No z-fighting or flicker where surfaces meet (road/panel, decals).

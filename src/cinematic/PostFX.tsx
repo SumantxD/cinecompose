@@ -5,7 +5,8 @@ import {
   ToneMapping, N8AO, SMAA, DepthOfField, ChromaticAberration, GodRays,
 } from '@react-three/postprocessing'
 import { BlendFunction, Effect, SMAAPreset, ToneMappingMode } from 'postprocessing'
-import { Uniform, Mesh, SphereGeometry, MeshBasicMaterial, Color } from 'three'
+import { Uniform, Mesh, SphereGeometry, MeshBasicMaterial, Color, Vector2 } from 'three'
+import { cceFrame } from '../cce/runtime'
 import { useStore } from '../state/store'
 import * as player from '../app/player'
 import { cam } from './timeline'
@@ -50,7 +51,12 @@ export function PostFX() {
     mesh.name = 'rendering-godray-source'
     return mesh
   }, [])
-  useFrame(() => (exposure.uniforms.get('exposure')!.value = BASE_EXPOSURE * (player.lighting.exposure ?? 1) * cam.exposure))
+  const chromaticOffset = useMemo(() => new Vector2(), [])
+  useFrame(() => {
+    exposure.uniforms.get('exposure')!.value = BASE_EXPOSURE * (player.lighting.exposure ?? 1) * cam.exposure
+    const base = settings.chromatic.enabled ? settings.chromatic.offset : 0
+    chromaticOffset.set(base + cceFrame.chromatic, base + cceFrame.chromatic)
+  })
   const bloom = settings.bloom.enabled && (!low || !!player.scene.rendering)
   const tone = settings.toneMapping === 'none' ? null : settings.toneMapping === 'neutral' ? ToneMappingMode.NEUTRAL : ToneMappingMode.ACES_FILMIC
   return <>
@@ -62,7 +68,7 @@ export function PostFX() {
       {settings.ao.enabled && <N8AO quality={settings.ao.quality} aoRadius={settings.ao.radius} intensity={settings.ao.intensity} halfRes={settings.ao.halfRes} />}
       {bloom && <Bloom mipmapBlur luminanceThreshold={settings.bloom.threshold} luminanceSmoothing={0.2} intensity={settings.bloom.intensity} />}
       {settings.dof.enabled && <DepthOfField focusDistance={settings.dof.focusDistance} focalLength={settings.dof.focalLength} bokehScale={settings.dof.bokeh * (2.8 / settings.dof.fStop)} />}
-      {settings.chromatic.enabled && <ChromaticAberration offset={[settings.chromatic.offset, settings.chromatic.offset]} />}
+      {(settings.chromatic.enabled || !!player.scene.props?.cce?.clips.length) && <ChromaticAberration offset={chromaticOffset} />}
       {settings.godRays.enabled && <GodRays sun={sun} density={settings.godRays.density} decay={settings.godRays.decay} opacity={settings.godRays.intensity} clampMax={1.2} samples={32} />}
       <HueSaturation saturation={settings.grade.saturation} />
       <BrightnessContrast contrast={settings.grade.contrast} />

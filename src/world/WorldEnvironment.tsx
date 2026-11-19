@@ -1,4 +1,5 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import type { ImageObservation } from './types.ts'
 import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { clock as sceneClock } from '../cinematic/clock'
@@ -50,6 +51,34 @@ function Instances({ parts, placements, time }: { parts: GeometryPart[]; placeme
   </>
 }
 
+function ProjectedDepthMesh({ mesh }: { mesh: NonNullable<ImageObservation['projection']> }) {
+  const geometry = useMemo(() => {
+    const result = new THREE.BufferGeometry()
+    result.setAttribute('position', new THREE.Float32BufferAttribute(mesh.positions, 3))
+    result.setAttribute('uv', new THREE.Float32BufferAttribute(mesh.uvs, 2))
+    result.setIndex(mesh.indices)
+    result.computeVertexNormals()
+    result.computeBoundingSphere()
+    return result
+  }, [mesh])
+  const [photo, setPhoto] = useState<THREE.Texture | null>(null)
+  useEffect(() => () => geometry.dispose(), [geometry])
+  useEffect(() => {
+    if (!mesh.photoUrl) return
+    let alive = true
+    const texture = new THREE.TextureLoader().load(mesh.photoUrl, (loaded) => {
+      loaded.colorSpace = THREE.SRGBColorSpace
+      if (alive) setPhoto(loaded)
+      else loaded.dispose()
+    })
+    return () => { alive = false; texture.dispose(); setPhoto(null) }
+  }, [mesh.photoUrl])
+  // Source lighting is already baked into this image; relighting it would expose it twice.
+  return <mesh geometry={geometry} name="photo-depth-projection" renderOrder={-100}>
+    <meshBasicMaterial map={photo ?? undefined} color={photo ? '#ffffff' : '#59636b'} transparent depthWrite={false} depthTest={false} toneMapped={false} side={THREE.DoubleSide} fog={false} />
+  </mesh>
+}
+
 function Observation({ spec }: { spec: SceneSpecification }) {
   const geometry = useMemo(() => {
     const observation = spec.image?.observation
@@ -59,11 +88,13 @@ function Observation({ spec }: { spec: SceneSpecification }) {
     geometry.setAttribute('color', new THREE.Float32BufferAttribute(observation.points.flatMap((p) => new THREE.Color(p.color).toArray()), 3))
     return geometry
   }, [spec])
+  if (spec.image?.observation?.projection) return <ProjectedDepthMesh mesh={spec.image.observation.projection} />
   if (!geometry) return null
   return <points geometry={geometry} name="observed-depth-samples"><pointsMaterial vertexColors size={0.18} sizeAttenuation transparent opacity={0.65} depthWrite={false} /></points>
 }
 
 export function WorldEnvironment({ spec, shots, lighting, rain }: { spec: SceneSpecification; shots: SceneConfig['shots']; lighting: SceneConfig['lighting']; rain?: RainConfig }) {
+  const projected = !!spec.image?.observation?.projection?.photoUrl
   const terrain = useMemo(() => createTerrain(spec), [spec])
   const texture = useMemo(() => ground(spec.seed % 128), [spec.seed])
   const time = useMemo(() => ({ value: 0 }), [])
@@ -94,9 +125,20 @@ export function WorldEnvironment({ spec, shots, lighting, rain }: { spec: SceneS
   })), [spec.routes, terrain])
   useEffect(() => () => paths.forEach((p) => p.geometry.dispose()), [paths])
 
+  const landmarkGroups = useMemo(() => {
+    const groups = new Map<string, Placement[]>()
+    for (const landmark of landmarks) {
+      const group = groups.get(landmark.assembly) ?? []
+      group.push({ x: landmark.position[0], y: terrain.heightAt(landmark.position[0], landmark.position[1]), z: landmark.position[1], rotation: landmark.rotation ?? 0, scale: landmark.scale ?? 1 })
+      groups.set(landmark.assembly, group)
+    }
+    return [...groups]
+  }, [landmarks, terrain])
+
   return <group name="procedural-world">
     <NightSky intensity={lighting.gi ?? 0.65} color={spec.terrain.skyColor} />
     <FogSystem color={lighting.fogColor ?? spec.terrain.fogColor} density={lighting.fogDensity} />
+    <group visible={!projected}>
     <mesh geometry={terrain.geometry} receiveShadow>
       <meshStandardMaterial map={texture} vertexColors roughness={0.98} />
     </mesh>
@@ -104,18 +146,11 @@ export function WorldEnvironment({ spec, shots, lighting, rain }: { spec: SceneS
       <meshStandardMaterial color={route.material ?? (route.surface === 'water' ? '#324e52' : '#514a3c')} roughness={route.surface === 'water' ? 0.17 : 1} metalness={route.surface === 'water' ? 0.16 : 0} transparent={route.surface === 'water'} opacity={route.surface === 'water' ? 0.86 : 1} side={THREE.DoubleSide} />
     </mesh>)}
     <Instances parts={useMemo(() => assembly(spec.terrain.vegetation.asset).build(spec.seed), [spec])} placements={trees} time={time} />
-    {useMemo(() => {
-      const groups = new Map<string, Placement[]>()
-      for (const landmark of landmarks) {
-        const group = groups.get(landmark.assembly) ?? []
-        group.push({ x: landmark.position[0], y: terrain.heightAt(landmark.position[0], landmark.position[1]), z: landmark.position[1], rotation: landmark.rotation ?? 0, scale: landmark.scale ?? 1 })
-        groups.set(landmark.assembly, group)
-      }
-      return [...groups]
-    }, [landmarks, terrain]).map(([id, placements]) => <Instances key={id} parts={assembly(id).build(spec.seed + 47, spec.landmarks.find((l) => l.assembly === id)?.parameters)} placements={placements} time={time} />)}
+    {landmarkGroups.map(([id, placements]) => <Instances key={id} parts={assembly(id).build(spec.seed + 47, spec.landmarks.find((l) => l.assembly === id)?.parameters)} placements={placements} time={time} />)}
+    </group>
     <Observation spec={spec} />
     <hemisphereLight args={[spec.terrain.skyColor, spec.terrain.groundColor, lighting.ambientIntensity * 1.7]} />
     <directionalLight color="#bfced0" intensity={(lighting.moon ?? spec.lighting.moon) * 2.4} position={[Math.cos(spec.lighting.azimuth) * 30, 45, Math.sin(spec.lighting.azimuth) * 30]} />
-    <RainSystem count={rain?.enabled === false ? 0 : Math.min(rain?.count || 7500, 9000)} box={[spec.terrain.size * 0.55, 26, spec.terrain.size * 0.55]} wind={rain?.wind ?? [0.6, 0.2]} ground="0.0" />
+    <RainSystem count={projected || rain?.enabled === false ? 0 : Math.min(rain?.count || 7500, 9000)} box={[spec.terrain.size * 0.55, 26, spec.terrain.size * 0.55]} wind={rain?.wind ?? [0.6, 0.2]} ground="0.0" />
   </group>
 }

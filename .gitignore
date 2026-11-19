@@ -3,3 +3,5 @@ dist
 .DS_Store
 exports/
 captures/
+reference-imports/
+depth-imports/

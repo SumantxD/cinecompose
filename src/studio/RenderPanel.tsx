@@ -1,7 +1,8 @@
 import { useRef, type ChangeEvent } from 'react'
 import { useStudio } from './studioStore'
-import { RENDER_PROFILES, validateRenderSettings } from '../cinematic/rendering'
-import type { HdriId, QualityProfile, RenderSettingsPatch } from '../cinematic/types'
+import { RENDER_PROFILES, validateRenderSettings, HDRI_LIBRARY } from '../cinematic/rendering'
+import { DEFAULT_RELIEF } from '../scenes/reference-forest/layout'
+import type { HdriId, QualityProfile, RenderSettingsPatch, ForestSettings } from '../cinematic/types'
 
 function Range({ label, value, min, max, step = 0.01, onChange }: { label: string; value: number; min: number; max: number; step?: number; onChange: (v: number) => void }) {
   return (
@@ -21,6 +22,7 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
 export function RenderPanel() {
   const st = useStudio()
   const cfg = st.cfg
+  const forest = (next: Partial<ForestSettings>) => st.edit((c) => { c.props = { ...c.props, forest: { ...c.props!.forest!, ...next } } })
   const patch = cfg.rendering
   const fileInput = useRef<HTMLInputElement>(null)
   const set = (next: RenderSettingsPatch) => st.edit((c) => { c.rendering = { ...c.rendering, ...next } })
@@ -69,6 +71,18 @@ export function RenderPanel() {
         ))}
         {!patch && <button onClick={() => set({ profile: 'high' })} title="Edit individual settings without changing the legacy image">Customize</button>}
       </div>
+
+      <details className="st-look-guide">
+        <summary>Cinematic look guide</summary>
+        <ol className="st-help">
+          <li>Use detailed, real foreground assets. Keep simplified meshes and impostors in the distance, not as a disguise for weak close-up work.</li>
+          <li>Use albedo, normal, roughness and AO together. Normal maps add surface grain, not physical ground height.</li>
+          <li>Share one terrain-height function across geometry, prop roots and mist. Small physical bumps and slightly buried roots make contact believable.</li>
+          <li>Let a warm practical light anchor the path. Keep the cool fill restrained and separate HDRI illumination from the visible sky.</li>
+          <li>Spend geometry and shadow budget on hero objects. Judge portrait and landscape frames, not feature counts.</li>
+        </ol>
+        <p className="st-help">Lessons from the reference forest. Use <code>?studio&amp;scene=reference_forest</code> to inspect the example.</p>
+      </details>
 
       {patch && <>
         <h4>Output and sampling</h4>
@@ -149,12 +163,27 @@ export function RenderPanel() {
         <label className="st-slider"><span>Environment light</span>
           <select aria-label="Environment lighting" value={patch.environment?.hdri ?? ''} onChange={(e) => setEnvironment(e.target.value)}>
             <option value="">Procedural night fill</option>
-            <option value="moonless_golf">Moonless Golf HDRI (CC0)</option>
+            {Object.entries(HDRI_LIBRARY).map(([id, asset]) => <option key={id} value={id}>{asset.label}</option>)}
           </select>
         </label>
         {patch.environment && <>
           <Range label="HDRI intensity" value={patch.environment.intensity} min={0} max={4} onChange={(v) => set({ environment: { ...patch.environment!, intensity: v } })} />
           <Range label="HDRI rotation" value={patch.environment.rotation} min={-360} max={360} step={1} onChange={(v) => set({ environment: { ...patch.environment!, rotation: v } })} />
+          <Toggle label="Visible sky" value={patch.environment.background === true} onChange={(v) => set({ environment: { ...patch.environment!, background: v } })} />
+          <Range label="Sky brightness" value={patch.environment.backgroundIntensity ?? .45} min={0} max={4} onChange={(v) => set({ environment: { ...patch.environment!, backgroundIntensity: v } })} />
+          <Range label="Sky softness" value={patch.environment.backgroundBlurriness ?? .03} min={0} max={1} onChange={(v) => set({ environment: { ...patch.environment!, backgroundBlurriness: v } })} />
+          <Range label="Sky rotation" value={patch.environment.backgroundRotation ?? patch.environment.rotation} min={-360} max={360} step={1} onChange={(v) => set({ environment: { ...patch.environment!, backgroundRotation: v } })} />
+        </>}
+        {cfg.environment === 'reference-forest' && cfg.props?.forest && <>
+          <h4>Reference environment</h4>
+          <Range label="Tree density" value={cfg.props.forest.density} min={0} max={1} onChange={(v) => forest({ density: v })} />
+          <Range label="Ground texture scale" value={cfg.props.forest.textureScale} min={4} max={60} step={1} onChange={(v) => forest({ textureScale: v })} />
+          <Range label="Ground normal strength" value={cfg.props.forest.normalStrength} min={0} max={2} onChange={(v) => forest({ normalStrength: v })} />
+          <Range label="Terrain relief (m)" value={cfg.props.forest.relief ?? DEFAULT_RELIEF} min={0} max={.6} onChange={(v) => forest({ relief: v })} />
+          <Range label="Ground wetness" value={cfg.props.forest.wetness} min={0} max={1} onChange={(v) => forest({ wetness: v })} />
+          <Range label="Forest wind" value={cfg.props.forest.wind} min={0} max={2} onChange={(v) => forest({ wind: v })} />
+          <Range label="Forest mist" value={cfg.props.forest.mist} min={0} max={.12} step={.005} onChange={(v) => forest({ mist: v })} />
+          <Toggle label="Ground puddles" value={cfg.props.forest.puddles} onChange={(v) => forest({ puddles: v })} />
         </>}
 
         <h4>Budget and presets</h4>

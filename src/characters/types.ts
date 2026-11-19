@@ -1,3 +1,6 @@
+import { validFaceSettings } from './facial.ts'
+import type { FaceSettings } from './facial.ts'
+
 export type Vec3 = [number, number, number]
 export type QuaternionValue = [number, number, number, number]
 export type IKTarget = 'leftHand' | 'rightHand'
@@ -39,6 +42,7 @@ export interface CharacterClip {
   targets: Partial<Record<IKTarget, PositionKey[]>>
   face?: Partial<Record<FacialChannel, ScalarKey[]>>
   faceHead?: Vec3
+  faceAnimation?: FaceSettings
   loop?: boolean
   source?: AnimationSource
   libraryId?: string
@@ -49,6 +53,7 @@ export interface AnimationContext {
   groundY?: number
   clip?: CharacterClip
   clipTime?: number
+  paused?: boolean
   transitionSeconds?: number
 }
 
@@ -96,6 +101,7 @@ export function validClip(clip: unknown): boolean {
   }
   if (!Object.entries(clip.targets).every(([target, keys]) => ['leftHand', 'rightHand'].includes(target) && positions(keys, duration))) return false
   if (clip.faceHead !== undefined && (!Array.isArray(clip.faceHead) || !vector(clip.faceHead, 3) || clip.faceHead.some((value: number) => Math.abs(value) > Math.PI))) return false
+  if (clip.faceAnimation !== undefined && !validFaceSettings(clip.faceAnimation, duration)) return false
   if (clip.loop !== undefined && typeof clip.loop !== 'boolean') return false
   if (clip.libraryId !== undefined && (typeof clip.libraryId !== 'string' || !clip.libraryId.trim() || clip.libraryId.length > 120)) return false
   if (clip.source !== undefined && (!object(clip.source) || typeof clip.source.id !== 'string' || !clip.source.id.trim() || clip.source.id.length > 120
@@ -127,10 +133,14 @@ export function retimeFaceKeys(face: CharacterClip['face'], ratio: number): void
 
 export function retimeClip(clip: CharacterClip, duration: number): void {
   if (!finite(duration) || duration < 0.1 || duration > 120) throw new RangeError('Clip length must be 0.1–120 seconds')
+  if (clip.faceAnimation?.speech?.timeline) throw new RangeError('Remove the dialogue timeline before changing the clip duration')
   const ratio = duration / clip.duration
   for (const track of Object.values(clip.tracks)) { scaleKeyTimes(track.rotation, ratio); scaleKeyTimes(track.position, ratio) }
   for (const keys of Object.values(clip.targets)) scaleKeyTimes(keys, ratio)
   retimeFaceKeys(clip.face, ratio)
+  for (const event of clip.faceAnimation?.events ?? []) {
+    event.start *= ratio; event.duration *= ratio; event.transition *= ratio; event.exit *= ratio
+  }
   clip.duration = duration
 }
 

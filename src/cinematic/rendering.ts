@@ -13,6 +13,11 @@ export const HDRI_LIBRARY: Record<HdriId, { label: string; file: string; source:
     file: '/environments/moonless_golf_1k.hdr',
     source: 'https://polyhaven.com/a/moonless_golf',
   },
+  kloppenheim_02_puresky: {
+    label: 'Kloppenheim dusk sky (Poly Haven, CC0)',
+    file: '/environments/kloppenheim_02_puresky_1k.hdr',
+    source: 'https://polyhaven.com/a/kloppenheim_02_puresky',
+  },
 }
 
 /** Legacy image. This is the exact prior PostFX/Stage setup and must stay stable for existing scenes. */
@@ -121,6 +126,9 @@ export function validateRenderSettings(value: unknown): string[] {
       if (!(String(env.hdri) in HDRI_LIBRARY)) err('environment.hdri must name a registered local HDRI asset.')
       if (!bounded(env.intensity, 0, 4)) err('environment.intensity must be within 0–4.')
       if (!bounded(env.rotation, -360, 360)) err('environment.rotation must be within -360–360 degrees.')
+      if (env.background !== undefined && typeof env.background !== 'boolean') err('environment.background must be boolean.')
+      for (const key of ['backgroundIntensity', 'backgroundBlurriness']) if (env[key] !== undefined && !bounded(env[key], 0, 4)) err(`environment.${key} must be within 0–4.`)
+      if (env.backgroundRotation !== undefined && !bounded(env.backgroundRotation, -360, 360)) err('environment.backgroundRotation must be within -360–360 degrees.')
     }
   }
   return errors

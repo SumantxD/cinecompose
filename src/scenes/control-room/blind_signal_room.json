@@ -1,0 +1,212 @@
+{
+  "sceneId": "blind_signal_room",
+  "environment": "control-room",
+  "duration": 7,
+  "shots": [
+    {
+      "type": "slow_push",
+      "from": [
+        2.8,
+        2,
+        5.6
+      ],
+      "to": [
+        2.2,
+        1.8,
+        4.8
+      ],
+      "lookAt": [
+        -1.8,
+        1.9,
+        -2.75
+      ],
+      "lookAtTo": [
+        -1.8,
+        1.9,
+        -2.75
+      ],
+      "fov": 40,
+      "fovPortrait": 58,
+      "exposure": 0.96,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "id": "01_hook",
+      "duration": 1.8
+    },
+    {
+      "type": "static",
+      "from": [
+        -2.55,
+        2.45,
+        -0.7
+      ],
+      "lookAt": [
+        -2.65,
+        2.45,
+        -2.55
+      ],
+      "fov": 32,
+      "fovPortrait": 38,
+      "exposure": 0.96,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "id": "02_detail",
+      "duration": 1.1
+    },
+    {
+      "type": "slow_push",
+      "from": [
+        0.2,
+        1.55,
+        1.9
+      ],
+      "to": [
+        0.6,
+        1.7,
+        1.2
+      ],
+      "lookAt": [
+        -1.8,
+        1.9,
+        -2.79
+      ],
+      "lookAtTo": [
+        -2.3,
+        1.9,
+        -2.79
+      ],
+      "fov": 38,
+      "fovPortrait": 50,
+      "exposure": 0.96,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "id": "03_reveal",
+      "duration": 1.7
+    },
+    {
+      "type": "pan",
+      "from": [
+        3,
+        1.55,
+        3
+      ],
+      "to": [
+        3,
+        1.55,
+        3
+      ],
+      "lookAt": [
+        1.3,
+        0.77,
+        0.65
+      ],
+      "lookAtTo": [
+        -0.4,
+        1.9,
+        -2.8
+      ],
+      "fov": 42,
+      "fovPortrait": 58,
+      "exposure": 0.96,
+      "eyeLight": 0,
+      "roll": 0,
+      "ease": "none",
+      "id": "04_decision",
+      "duration": 2.4
+    }
+  ],
+  "lighting": {
+    "ambientIntensity": 0.52,
+    "exposure": 0.94,
+    "fogDensity": 0.008,
+    "fogColor": "#202b2b",
+    "moon": 0.5
+  },
+  "rendering": {
+    "profile": "high",
+    "renderScale": 1,
+    "antialias": "smaa",
+    "shadowMapSize": 512,
+    "textureAnisotropy": 4,
+    "grade": {
+      "saturation": -0.07,
+      "contrast": 0.04
+    },
+    "bloom": {
+      "enabled": false
+    },
+    "grain": {
+      "enabled": true,
+      "opacity": 0.12
+    },
+    "ao": {
+      "enabled": true,
+      "radius": 0.6,
+      "intensity": 1.6,
+      "quality": "performance",
+      "halfRes": true
+    },
+    "dof": {
+      "enabled": false
+    }
+  },
+  "audio": {
+    "ambience": [
+      {
+        "sound": "night_drone",
+        "volume": 0.08
+      }
+    ],
+    "music": null
+  },
+  "cues": [],
+  "props": {
+    "choreography": {
+      "version": 1,
+      "preset": "control-room-pressure",
+      "outline": "Quiet generator room.\nThe clock freezes.\nA figure appears on the left monitor.\nStop the tape.",
+      "pace": "pressure",
+      "cut": "hard",
+      "mirror": false,
+      "lens": 0,
+      "endCard": true,
+      "beats": [
+        {
+          "id": "01_hook",
+          "role": "hook",
+          "note": "Quiet generator room",
+          "at": 0,
+          "duration": 1.8,
+          "visual": "normal"
+        },
+        {
+          "id": "02_detail",
+          "role": "detail",
+          "note": "The clock freezes",
+          "at": 1.8,
+          "duration": 1.1,
+          "visual": "clock-stop"
+        },
+        {
+          "id": "03_reveal",
+          "role": "reveal",
+          "note": "A figure appears on the left monitor",
+          "at": 2.9000000000000004,
+          "duration": 1.7,
+          "visual": "monitor-figure"
+        },
+        {
+          "id": "04_decision",
+          "role": "decision",
+          "note": "Stop the tape",
+          "at": 4.6000000000000005,
+          "duration": 2.4,
+          "visual": "normal"
+        }
+      ]
+    }
+  }
+}

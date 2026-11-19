@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { AbandonedRailwayCrossing, groundLevel, railwaySurfaceHeight, roadRamp } from '../../components/AbandonedRailwayCrossing'
 import { VillageRoad, Milestone } from '../../components/VillageRoad'
-import { ForestEnvironment } from '../../components/ForestEnvironment'
+import { ForestEnvironment, forestFloor } from '../../components/ForestEnvironment'
+import { RoadsideNature } from '../../components/RoadsideNature'
 import { FlickeringLight } from '../../components/FlickeringLight'
 import { RainSystem } from '../../components/RainSystem'
 import { FogSystem } from '../../components/FogSystem'
@@ -54,7 +55,7 @@ export function RailwayCrossingEnv({ lighting, scene, children, groundedActors =
   const low = useStore((s) => s.quality === 'low')
   return (
     <group>
-      <FogSystem color={lighting.fogColor ?? '#232d39'} density={lighting.fogDensity} sheets={SHEETS} glowPos={SODIUM} glowColor="#ff9a40" />
+      <FogSystem color={lighting.fogColor ?? '#232d39'} density={lighting.fogDensity} sheets={SHEETS} glowPos={SODIUM} glowColor="#c9803f" />
       {!scene?.rendering?.environment && <NightSky intensity={lighting.gi ?? 0.6} />}
       <hemisphereLight args={['#3a4a5e', '#0a0c0e', lighting.ambientIntensity]} />
       {softFill && <ambientLight color='#9eacb8' intensity={lighting.ambientIntensity * 2.2} />}
@@ -62,7 +63,8 @@ export function RailwayCrossingEnv({ lighting, scene, children, groundedActors =
       <directionalLight position={[-20, 30, -40]} intensity={lighting.moon ?? 0.5} color="#7f93b4" />
 
       {scene?.props?.groundMist && <GroundMist config={scene.props.groundMist} surfaceAt={railwaySurfaceHeight} lamps={MIST_LIGHTS} layers={low ? 2 : 3} />}
-      <ForestEnvironment clear={clear} terrain={groundLevel} trees={low ? 260 : 420} bushes={low ? 260 : 500} grass={low ? 1200 : 2600} />
+      <ForestEnvironment clear={clear} terrain={groundLevel} trees={low ? 210 : 330} bushes={low ? 220 : 400} grass={low ? 1100 : 2400} />
+      <RoadsideNature clear={clear} heightAt={(x, z) => forestFloor(groundLevel, x, z)} seed={47} density={1} zMin={-42} zMax={30} />
       <VillageRoad terrain={roadRamp} />
       <AbandonedRailwayCrossing />
       <Milestone position={[-3.0, groundLevel(-3.0, 21), 21]} rotationY={0.35} place="सोनपहाड़ी" km="3" />
@@ -70,10 +72,10 @@ export function RailwayCrossingEnv({ lighting, scene, children, groundedActors =
       <LampPost base={[3.7, 0, -12]} head={SODIUM} />
       <LampPost base={[-3.7, 0, -48]} head={DEEP} />
       <LampPost base={[-3.7, 0, 9]} head={NEAR} />
-      <FlickeringLight id="sodium_far" kind="spot" color="#ff9a40" intensity={280} position={SODIUM} target={SODIUM_TARGET}
-        angle={0.75} castShadow shadowSize={low ? 512 : 1024} bulb="sodium" glow={1.3} beam seed={3} />
-      <FlickeringLight id="sodium_near" kind="spot" color="#ff9a40" intensity={nearIntensity} position={NEAR} target={NEAR_TARGET}
-        angle={0.8} castShadow shadowSize={low ? 512 : 1024} bulb="sodium" glow={1.2} seed={7} />
+      <FlickeringLight id="sodium_far" kind="spot" color="#ff9a40" intensity={115} position={SODIUM} target={SODIUM_TARGET}
+        angle={0.52} castShadow shadowSize={low ? 512 : 1024} bulb="sodium" glow={1.1} beam seed={3} />
+      <FlickeringLight id="sodium_near" kind="spot" color="#ff9a40" intensity={nearIntensity * .45} position={NEAR} target={NEAR_TARGET}
+        angle={0.58} castShadow shadowSize={low ? 512 : 1024} bulb="sodium" glow={1} seed={7} />
       <FlickeringLight id="sodium_deep" kind="spot" color="#ff9440" intensity={90} position={DEEP} target={DEEP_TARGET}
         angle={0.7} bulb="sodium" glow={1.1} beam seed={9} />
       <FlickeringLight id="gate_tube" kind="point" color="#d6f2e4" intensity={30} position={TUBE} distance={18}

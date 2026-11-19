@@ -13,15 +13,15 @@ import { EnvironmentEffects } from '../environment/EnvironmentEffects'
 import { EnvironmentLighting } from '../components/EnvironmentLighting'
 import { resolveRenderSettings, RenderSettingsContext } from '../cinematic/rendering'
 
-function Clock({ drive }: { drive: boolean }) {
+function Clock({ drive, film = false }: { drive: boolean; film?: boolean }) {
   const state = useThree()
   useEffect(() => {
-    if (import.meta.env.DEV) Object.assign(window, { r3f: state })
+    if (import.meta.env.DEV) Object.assign(window, { r3f: state, ...(film ? { filmR3f: state } : {}) })
   }, [state])
   useFrame((frameState, dt) => {
     if (!drive) return
     player.tick(dt)
-    if (import.meta.env.DEV) Object.assign(window, { r3f: frameState })
+      if (import.meta.env.DEV) Object.assign(window, { ...(film ? { filmR3f: frameState } : { r3f: frameState }) })
   })
   return null
 }
@@ -54,7 +54,7 @@ export function Stage({ mode = 'game' }: { mode?: 'game' | 'preview' | 'director
       camera={{ fov: director ? 50 : 40, near: 0.05, far: 600, position: director ? [13, 8, 19] : [0, 1.6, 5] }}
     >
       {!director && <PerformanceMonitor onDecline={() => useStore.getState().set({ quality: 'low' })} />}
-      <Clock drive={!director} />
+      <Clock drive={!director} film={mode === 'preview'} />
       {!director && <CameraController />}
       <StageModeContext.Provider value={{ director }}>
         <RenderSettingsContext.Provider value={configured ? render : undefined}>
